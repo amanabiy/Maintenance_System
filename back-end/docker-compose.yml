@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0.36
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+    environment:
+      # MYSQL
+      MYSQL_HOST: mysql
+      MYSQL_PORT: ${MYSQL_PORT}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+
+      # JWT
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+    volumes:
+      - ./src:/usr/src/app/src
+      - ./test:/usr/src/app/test
+      - ./public:/usr/src/app/public
+      - .env:/usr/src/app/.env
+      - ./tsconfig.json:/usr/src/app/tsconfig.json
+      - ./package.json:/usr/src/app/package.json
