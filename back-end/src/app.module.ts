@@ -8,6 +8,7 @@ import { RoleModule } from './modules/role/role.module';
 import { DepartmentModule } from './modules/department/department.module';
 import { LocationModule } from './modules/location/location.module';
 import { MaintenanceRequestTypeModule } from './modules/maintenance_request_type/maintenance_request_type.module';
+import { MaintenanceRequestModule } from './modules/maintenance_request/maintenance_request.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { MaintenanceRequestTypeModule } from './modules/maintenance_request_type
     DepartmentModule,
     LocationModule,
     MaintenanceRequestTypeModule,
+    MaintenanceRequestModule,
   ],
   controllers: [],
   providers: [

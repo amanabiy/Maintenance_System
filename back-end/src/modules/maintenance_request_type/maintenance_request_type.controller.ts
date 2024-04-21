@@ -8,7 +8,7 @@ import { FindAllResponseMaintenanceRequestTypeDto } from './dto/find-all-respons
 import { UpdateMaintenanceRequestTypeDto } from './dto/update-maintenance_request_type.dto';
 import { DeleteResponseDto } from 'src/dto/delete-response.dto';
 
-@ApiTags('maintenance-request-types')
+@ApiTags('Maintenance Request Types')
 @Controller('maintenance-request-types')
 export class MaintenanceRequestTypeController {
   constructor(private readonly maintenanceRequestTypeService: MaintenanceRequestTypeService) {}

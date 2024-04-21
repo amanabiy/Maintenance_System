@@ -61,7 +61,7 @@ export class UserController {
   })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
-  @Roles(UserRoleEnum.USER) // Role decorator
+  // @Roles(UserRoleEnum.USER) // Role decorator
   findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,

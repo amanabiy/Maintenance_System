@@ -5,6 +5,7 @@ import {
   DeepPartial,
   FindManyOptions,
   FindOneOptions,
+  In,
 } from 'typeorm';
 
 export class GenericDAL<Entity, DTO, UpdateDTO> {
@@ -39,6 +40,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
   async create(dto: DeepPartial<Entity>): Promise<Entity> {
     try {
       const entity = this.repository.create(dto as DeepPartial<Entity>);
+      console.log(entity)
       return await this.repository.save(entity);
     } catch (error) {
       throw new HttpException(
@@ -85,6 +87,28 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     } catch (error) {
       throw new HttpException(
         `Error fetching ${this.entityName} with id ${id}: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async findByIds(ids: number[]): Promise<Entity[]> {
+    try {
+      if (!ids || ids.length === 0) {
+        return [];
+      }
+  
+      const entities = await this.repository.find({ where: { id: In(ids) } } as any);
+      if (entities.length !== ids.length) {
+        const missingIds = ids.filter(id => !entities.some(entity => entity['id'] === id));
+        throw new NotFoundException(
+          `Some ${this.entityName} were not found: ${missingIds.join(', ')}`
+        );
+      }
+      return entities;
+    } catch (error) {
+      throw new HttpException(
+        `Error fetching ${this.entityName} with ids ${ids.join(', ')}: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }

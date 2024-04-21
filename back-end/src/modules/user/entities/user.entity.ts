@@ -1,9 +1,10 @@
-import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { BaseModelEntity } from '../../BaseEntity/base-model.entity';
 import { Department } from 'src/modules/department/entities/department.entity';
 import { Role } from 'src/modules/role/entities/role.entity';
+import { MaintenanceRequest } from 'src/modules/maintenance_request/entities/maintenance_request.entity';
 
 @Entity('users')
 export class User extends BaseModelEntity {
@@ -56,4 +57,9 @@ export class User extends BaseModelEntity {
     default: () => 'CURRENT_TIMESTAMP',
   })
   lastPasswordUpdatedAt: Date;
+
+  @ApiProperty({ description: 'Maintenance requests assigned to the user' })
+  @ManyToMany(() => MaintenanceRequest)
+  @JoinTable()
+  assignedMaintenanceRequests: MaintenanceRequest[];
 }
