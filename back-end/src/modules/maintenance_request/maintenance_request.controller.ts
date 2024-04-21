@@ -36,7 +36,9 @@ export class MaintenanceRequestController {
   @ApiQuery({ name: 'limit', required: false, type: Number, description: 'Number of items per page', example: 10 })
   @ApiResponse({ status: HttpStatus.OK, description: 'Retrieved all maintenance requests successfully', type: [MaintenanceRequest] })
   async findAll(@Query('page') page = 1, @Query('limit') limit = 50): Promise<FindAllResponseMaintenanceRequestDto> {
-    return await this.maintenanceRequestService.findAll(page, limit);
+    const result = await this.maintenanceRequestService.findAll(page, limit);
+    result.items.map(item => plainToInstance(MaintenanceRequest, item))
+    return result
   }
 
   @Get(':id')
@@ -44,7 +46,7 @@ export class MaintenanceRequestController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Retrieved maintenance request successfully', type: MaintenanceRequest })
   @ApiNotFoundResponse({ description: 'Maintenance request with the specified ID not found' })
   async findOne(@Param('id') id: string): Promise<MaintenanceRequest> {
-    return await this.maintenanceRequestService.findOne(+id);
+    return plainToInstance(MaintenanceRequest, await this.maintenanceRequestService.findOne(+id));
   }
 
   @Patch(':id')
@@ -54,7 +56,7 @@ export class MaintenanceRequestController {
   async update(@Param('id') id: string,
     @Body() updateMaintenanceRequestDto: UpdateMaintenanceRequestDto,
     @CurrentUser() currentUser: User): Promise<MaintenanceRequest> {
-    return await this.maintenanceRequestService.updateRequest(+id, updateMaintenanceRequestDto, currentUser);
+    return plainToInstance(MaintenanceRequest, await this.maintenanceRequestService.updateRequest(+id, updateMaintenanceRequestDto, currentUser));
   }
 
   @Delete(':id')

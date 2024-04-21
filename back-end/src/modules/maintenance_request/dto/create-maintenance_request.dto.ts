@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsEnum, IsOptional, IsNumber, Min, Max, IsString, IsDate, IsArray } from 'class-validator';
+import { IsNotEmpty, IsEnum, IsOptional, IsNumber, Min, Max, IsString, IsDate, IsArray, IsInt } from 'class-validator';
 import { MaintenanceVerificationStatusEnum, MaintenanceConfirmationStatusEnum } from '../entities/maintenance_request.enum';
 
 export class CreateMaintenanceRequestDto {
@@ -42,17 +42,17 @@ export class CreateMaintenanceRequestDto {
   @ApiProperty({ description: 'The IDs of users assigned to handle the maintenance request' })
   @IsOptional()
   @IsArray()
-  @IsNumber({}, { each: true })
+  @IsInt({ each: true })
   assignedPersonIds: number[];
 
   @ApiProperty({ description: 'The IDs of maintenance request types associated with this request' })
   @IsOptional()
   @IsArray()
-  @IsNumber({}, { each: true })
+  @IsInt({ each: true })
   maintenanceRequestTypeIds: number[];
 
   @ApiProperty({ description: 'The ID of the department assigned to handle the maintenance request' })
   @IsOptional()
-  @IsNumber()
+  @IsInt()
   handlingDepartmentId: number;
 }
