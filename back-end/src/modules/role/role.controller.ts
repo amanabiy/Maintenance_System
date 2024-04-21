@@ -8,7 +8,7 @@ import { DeleteResponseDto } from 'src/dto/delete-response.dto';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
 import { FindAllResponseRoleDto } from './dto/find-all-response-role.dto';
 
-@ApiTags('role')
+@ApiTags('Role')
 @Controller('role')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}

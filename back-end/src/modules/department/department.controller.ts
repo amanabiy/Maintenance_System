@@ -7,7 +7,7 @@ import { ApiTags, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiOp
 import { DeleteResponseDto } from 'src/dto/delete-response.dto';
 import { FindAllResponseDepartmentDto } from './dto/find-all-response-department.dto';
 
-@ApiTags('department')
+@ApiTags('Department')
 @Controller('department')
 export class DepartmentController {
   constructor(private readonly departmentService: DepartmentService) {}
