@@ -6,6 +6,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { RolesGuard } from './modules/auth/guards/roles-guard';
 import { RoleModule } from './modules/role/role.module';
 import { DepartmentModule } from './modules/department/department.module';
+import { LocationModule } from './modules/location/location.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { DepartmentModule } from './modules/department/department.module';
     AuthModule,
     RoleModule,
     DepartmentModule,
+    LocationModule,
   ],
   controllers: [],
   providers: [
