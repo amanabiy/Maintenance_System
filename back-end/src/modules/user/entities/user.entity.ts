@@ -1,27 +1,24 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { UserRole } from './user-role.enum';
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
+import { BaseModelEntity } from '../../BaseEntity/base-model.entity';
+import { Department } from 'src/modules/department/entities/department.entity';
+import { Role } from 'src/modules/role/entities/role.entity';
 
 @Entity('users')
-export class User {
-  @PrimaryGeneratedColumn()
-  @ApiProperty({ description: 'Unique identifier of the user' })
-  id: number;
+export class User extends BaseModelEntity {
+  // @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  // @ApiProperty({
+  //   description: 'Role of the user',
+  //   enum: UserRole,
+  //   default: UserRole.USER,
+  // })
+  // role: UserRole;
 
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
-  @ApiProperty({
-    description: 'Role of the user',
-    enum: UserRole,
-    default: UserRole.USER,
-  })
-  role: UserRole;
+  @ManyToOne(() => Role, { eager: true })
+  @JoinColumn({ name: 'role_id' })
+  @ApiProperty({ description: 'Role ID of the user' })
+  role: Role;
 
   @Column({ unique: true })
   @ApiProperty({
@@ -33,23 +30,33 @@ export class User {
 
   @Column()
   @Exclude()
+  @ApiProperty({
+    description: 'Hashed Password of the user',
+    writeOnly: true,
+  })
   password: string;
 
-  @CreateDateColumn({ name: 'created_at' })
-  @ApiProperty({
-    description: 'Date and time when the user account was created',
-  })
-  createdAt: Date;
+  @ManyToOne(() => Department, { eager: true }) 
+  @JoinColumn({ name: 'department_id' })
+  @ApiProperty({ description: 'Department ID of the user' })
+  department: Department;
 
-  @UpdateDateColumn({ name: 'updated_at' })
-  @ApiProperty({
-    description: 'Date and time when the user account was last updated',
-  })
-  updatedAt: Date;
+  @Column({ nullable: true, default: '' })
+  @Exclude()
+  OTP: string;
+
+  @Column({ nullable: true, default: () => 'CURRENT_TIMESTAMP' })
+  @Exclude()
+  OTPExpiry: Date;
 
   @Column({
     name: 'last_password_updated_at',
     nullable: true,
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  @ApiProperty({
+    description: 'Timestamp when the password was last updated',
+    type: Date,
     default: () => 'CURRENT_TIMESTAMP',
   })
   lastPasswordUpdatedAt: Date;

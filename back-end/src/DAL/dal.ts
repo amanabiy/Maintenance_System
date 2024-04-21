@@ -36,9 +36,10 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     }
   }
 
-  async create(dto: DTO): Promise<Entity> {
+  async create(dto: DeepPartial<Entity>): Promise<Entity> {
     try {
       const entity = this.repository.create(dto as DeepPartial<Entity>);
+      console.log(entity)
       return await this.repository.save(entity);
     } catch (error) {
       throw new HttpException(
@@ -57,6 +58,8 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       this.applyPagination(options, page, pageSize);
 
       const [items, total] = await this.repository.findAndCount(options);
+      console.log(items)
+
       return new FindAllResponseDto<Entity>(page, pageSize, total, items);
     } catch (error) {
       throw new HttpException(
@@ -82,6 +85,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
           HttpStatus.NOT_FOUND,
         );
       }
+      console.log(result)
       return result;
     } catch (error) {
       throw new HttpException(
@@ -91,7 +95,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     }
   }
 
-  async update(id: number, dto: UpdateDTO): Promise<Entity | undefined> {
+  async update(id: number, dto: DeepPartial<Entity>): Promise<Entity | undefined> {
     try {
       const entityToUpdate = await this.findOne(id);
       if (!entityToUpdate) {
@@ -130,7 +134,9 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
 
   async find(conditions: FindManyOptions<Entity>): Promise<Entity[]> {
     try {
-      return await this.repository.find(conditions);
+      const result = await this.repository.find(conditions);
+      console.log(result)
+      return result
     } catch (error) {
       throw new HttpException(
         `Error fetching ${this.entityName}: ${error.message}`,
@@ -149,6 +155,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       this.applyPagination(options, page, pageSize);
 
       const [items, total] = await this.repository.findAndCount(options);
+      console.log(items, total)
       return new FindAllResponseDto<Entity>(page, pageSize, total, items);
     } catch (error) {
       throw new HttpException(

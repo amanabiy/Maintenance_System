@@ -21,11 +21,12 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any): Promise<User> {
     try {
       const user = await this.userService.findOne(payload['userId']);
-      if (payload.lastPasswordUpdatedAt !== user.lastPasswordUpdatedAt) {
+      if (payload.lastPasswordUpdatedAt !== user.lastPasswordUpdatedAt.toISOString()) {
         throw new UnauthorizedException('Password have changed'); // this is not shown for the user (only Invalid credentials is)
       }
       return user;
-    } catch {
+    } catch (error) {
+      console.log(error)
       throw new UnauthorizedException('Invalid credentials');
     }
   }
