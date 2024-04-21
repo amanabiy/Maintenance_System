@@ -7,6 +7,7 @@ import { RolesGuard } from './modules/auth/guards/roles-guard';
 import { RoleModule } from './modules/role/role.module';
 import { DepartmentModule } from './modules/department/department.module';
 import { LocationModule } from './modules/location/location.module';
+import { MaintenanceRequestTypeModule } from './modules/maintenance_request_type/maintenance_request_type.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { LocationModule } from './modules/location/location.module';
     RoleModule,
     DepartmentModule,
     LocationModule,
+    MaintenanceRequestTypeModule,
   ],
   controllers: [],
   providers: [
