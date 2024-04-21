@@ -30,10 +30,6 @@ export class User extends BaseModelEntity {
 
   @Column()
   @Exclude()
-  @ApiProperty({
-    description: 'Hashed Password of the user',
-    writeOnly: true,
-  })
   password: string;
 
   @ManyToOne(() => Department, { eager: true }) 
