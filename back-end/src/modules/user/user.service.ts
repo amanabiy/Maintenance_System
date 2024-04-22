@@ -13,6 +13,8 @@ import * as bcrypt from 'bcrypt';
 import { LoginUserDto } from '../auth/dto/login.user.dto';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
+import { DepartmentService } from '../department/department.service';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class UserService extends GenericDAL<
@@ -23,6 +25,9 @@ export class UserService extends GenericDAL<
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly departmentService: DepartmentService,
+    private readonly roleService: RoleService,
+
   ) {
     super(userRepository);
   }
@@ -34,25 +39,43 @@ export class UserService extends GenericDAL<
     if (existingUser) {
       throw new ConflictException('User with this email already exists');
     }
-    const hashedPassword = await this.hashPassword(dto.password);
-    dto.password = hashedPassword;
 
-    const createdUser = super.create(dto);
+    const { email, departmentId, roleId } = dto;
+    const password = await this.hashPassword(dto.password);
+
+    // find department and role
+    const department = await this.departmentService.findOne(departmentId)
+    const role = await this.roleService.findOne(roleId)
+
+    const createdUser = super.create({
+      email,
+      password,
+      department,
+      role,
+    });
     return plainToInstance(User, createdUser);
   }
 
   async update(id: number, dto: UpdateUserDto): Promise<User> {
+    const { email, departmentId, roleId } = dto;
+    const department = await this.departmentService.findOne(departmentId)
+    const role = await this.roleService.findOne(roleId)
+    const userToUpdate = {
+      email, department, role
+    }
+
     // Hash the password before updating the user
     if (dto.password) {
       const hashedPassword = await this.hashPassword(dto.password);
-      dto.password = hashedPassword;
-      dto.lastPasswordUpdatedAt = new Date();
+      userToUpdate['password'] = hashedPassword;
+      userToUpdate['lastPasswordUpdatedAt'] = new Date();
     }
-    const result = super.update(id, dto);
+
+    const result = super.update(id, userToUpdate);
     return plainToInstance(User, result);
   }
 
-  async findAll(
+  async findAllCensored(
     page: number,
     pageSize: number,
   ): Promise<FindAllResponseDto<User>> {
@@ -61,7 +84,7 @@ export class UserService extends GenericDAL<
     return result;
   }
 
-  async findOne(
+  async findOneCensored(
     id: number,
     options: FindOneOptions = { where: {} },
   ): Promise<User | undefined> {
@@ -84,7 +107,7 @@ export class UserService extends GenericDAL<
   async authenticateUser(loginUserDto: LoginUserDto): Promise<User> {
     const { email, password } = loginUserDto;
     try {
-      const user: User = await super.findOne(-1, { where: { email } });
+      const user: User = await this.findOne(-1, { where: { email } });
       const isValidPassword = await this.validatePassword(
         password,
         user.password,

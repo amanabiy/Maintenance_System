@@ -8,6 +8,10 @@ import { AuthController } from './auth.controller';
 import { UserService } from '../user/user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../user/entities/user.entity';
+import { DepartmentService } from '../department/department.service';
+import { RoleService } from '../role/role.service';
+import { Role } from '../role/entities/role.entity';
+import { Department } from '../department/entities/department.entity';
 
 @Module({
   imports: [
@@ -17,9 +21,9 @@ import { User } from '../user/entities/user.entity';
       secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '48h' },
     }),
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Department, Role]),
   ],
-  providers: [AuthService, UserService, JwtStrategy],
+  providers: [AuthService, UserService, JwtStrategy, DepartmentService, RoleService],
   controllers: [AuthController],
   exports: [JwtModule, AuthModule],
 })

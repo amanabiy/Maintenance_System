@@ -1,6 +1,6 @@
-import { IsEmail, IsEnum, IsNotEmpty, MinLength } from 'class-validator';
-import { UserRole } from '../entities/user-role.enum';
+import { IsEmail, IsEnum, IsInt, IsNotEmpty, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { UserRoleEnum } from '../entities/user-role.enum';
 
 export class CreateUserDto {
   @IsEmail()
@@ -20,16 +20,26 @@ export class CreateUserDto {
   })
   password: string;
 
-  @IsEnum(UserRole)
-  @ApiProperty({
-    description: 'Role of the user',
-    required: false,
-    enum: UserRole,
-    default: UserRole.USER,
-    enumName: 'UserRoleEnum',
-  })
-  role: UserRole;
+  // @IsEnum(UserRoleEnum)
+  // @ApiProperty({
+  //   description: 'Role of the user',
+  //   required: false,
+  //   enum: UserRoleEnum,
+  //   default: UserRoleEnum.USER,
+  //   enumName: 'UserRoleEnum',
+  // })
+  // role: UserRoleEnum;
 
+
+  @ApiProperty({ description: 'ID of the department' })
+  @IsInt()
+  @IsNotEmpty()
+  departmentId: number;
+
+  @ApiProperty({ description: 'ID of the role' })
+  @IsInt()
+  @IsNotEmpty()
+  roleId: number;
   /**
    * Date when the user's password was last updated.
    * This field is optional and may not be included in the request.
