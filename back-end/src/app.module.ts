@@ -4,6 +4,11 @@ import { UserModule } from './modules/user/user.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthModule } from './modules/auth/auth.module';
 import { RolesGuard } from './modules/auth/guards/roles-guard';
+import { RoleModule } from './modules/role/role.module';
+import { DepartmentModule } from './modules/department/department.module';
+import { LocationModule } from './modules/location/location.module';
+import { MaintenanceRequestTypeModule } from './modules/maintenance_request_type/maintenance_request_type.module';
+import { MaintenanceRequestModule } from './modules/maintenance_request/maintenance_request.module';
 
 @Module({
   imports: [
@@ -19,6 +24,11 @@ import { RolesGuard } from './modules/auth/guards/roles-guard';
     }),
     UserModule,
     AuthModule,
+    RoleModule,
+    DepartmentModule,
+    LocationModule,
+    MaintenanceRequestTypeModule,
+    MaintenanceRequestModule,
   ],
   controllers: [],
   providers: [

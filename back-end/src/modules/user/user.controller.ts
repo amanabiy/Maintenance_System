@@ -25,10 +25,12 @@ import {
 import { User } from './entities/user.entity';
 import { DeleteResponseDto } from 'src/dto/delete-response.dto';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
-import { FindAllResponseUserDto } from './dto/find-all-response-user.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RolesGuard } from '../auth/guards/roles-guard';
+import { FindAllResponseUserDto } from './dto/find-all-response-user.dto';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRoleEnum } from './entities/user-role.enum';
 
 @Controller('users')
 @ApiTags('User')
@@ -59,11 +61,12 @@ export class UserController {
   })
   @ApiQuery({ name: 'page', required: false })
   @ApiQuery({ name: 'limit', required: false })
+  // @Roles(UserRoleEnum.USER) // Role decorator
   findAll(
     @Query('page') page?: number,
     @Query('limit') limit?: number,
   ): Promise<FindAllResponseDto<User>> {
-    return this.userService.findAll(page, limit);
+    return this.userService.findAllCensored(page, limit);
   }
 
   @Get(':id')
@@ -75,7 +78,7 @@ export class UserController {
     type: User,
   })
   findOne(@Param('id') id: string): Promise<User> {
-    return this.userService.findOne(+id);
+    return this.userService.findOneCensored(+id);
   }
 
   // @Post('search')

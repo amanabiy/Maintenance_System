@@ -1,10 +1,11 @@
-import { BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
+import { BadRequestException, HttpException, HttpStatus, NotFoundException } from '@nestjs/common';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
 import {
   Repository,
   DeepPartial,
   FindManyOptions,
   FindOneOptions,
+  In,
 } from 'typeorm';
 
 export class GenericDAL<Entity, DTO, UpdateDTO> {
@@ -36,9 +37,10 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     }
   }
 
-  async create(dto: DTO): Promise<Entity> {
+  async create(dto: DeepPartial<Entity>): Promise<Entity> {
     try {
       const entity = this.repository.create(dto as DeepPartial<Entity>);
+      console.log(entity)
       return await this.repository.save(entity);
     } catch (error) {
       throw new HttpException(
@@ -77,9 +79,8 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       }
       const result = await this.repository.findOne(options);
       if (!result) {
-        throw new HttpException(
-          `No ${this.entityName} found with id ${id}`,
-          HttpStatus.NOT_FOUND,
+        throw new NotFoundException(
+          `No ${this.entityName} found with id ${id}`
         );
       }
       return result;
@@ -91,15 +92,31 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     }
   }
 
-  async update(id: number, dto: UpdateDTO): Promise<Entity | undefined> {
+  async findByIds(ids: number[]): Promise<Entity[]> {
     try {
-      const entityToUpdate = await this.findOne(id);
-      if (!entityToUpdate) {
-        throw new HttpException(
-          `Entity with id ${id} not found`,
-          HttpStatus.NOT_FOUND,
+      if (!ids || ids.length === 0) {
+        return [];
+      }
+  
+      const entities = await this.repository.find({ where: { id: In(ids) } } as any);
+      if (entities.length !== ids.length) {
+        const missingIds = ids.filter(id => !entities.some(entity => entity['id'] === id));
+        throw new NotFoundException(
+          `Some ${this.entityName} were not found: ${missingIds.join(', ')}`
         );
       }
+      return entities;
+    } catch (error) {
+      throw new HttpException(
+        `Error fetching ${this.entityName} with ids ${ids.join(', ')}: ${error.message}`,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  async update(id: number, dto: DeepPartial<Entity>): Promise<Entity | undefined> {
+    try {
+      const entityToUpdate = await this.findOne(id);
       const updatedEntity = { ...entityToUpdate, ...dto } as Entity;
       await this.repository.save(updatedEntity);
       return this.findOne(id);
@@ -130,7 +147,8 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
 
   async find(conditions: FindManyOptions<Entity>): Promise<Entity[]> {
     try {
-      return await this.repository.find(conditions);
+      const result = await this.repository.find(conditions);
+      return result
     } catch (error) {
       throw new HttpException(
         `Error fetching ${this.entityName}: ${error.message}`,
