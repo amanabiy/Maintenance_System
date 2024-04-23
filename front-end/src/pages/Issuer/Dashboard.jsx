@@ -7,7 +7,7 @@ import MyRequests from "./MyRequests";
 const Dashboard = () => {
   return (
     <GridParent>
-      <DashboardContainer content={<MyRequests />} />
+      <DashboardContainer content={<RequestPage />} />
     </GridParent>
   );
 };

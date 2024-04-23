@@ -4,7 +4,6 @@ import GridItem from "../layout/GridItem";
 import HeaderContainer from "./HeaderContainer";
 import SidebarContainer from "./SidebarContainer";
 import HexagonIcon from "@mui/icons-material/Hexagon";
-import zIndex from "@mui/material/styles/zIndex";
 
 const DashboardContainer = ({ content }) => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
