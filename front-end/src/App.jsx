@@ -1,13 +1,9 @@
 import { useState } from "react";
-import DashboardContainer from "./components/dashboard/DashboardContainer";
-import Dashboard from "./pages/Issuer/Dashboard";
+import { RouterProvider } from "react-router-dom";
+import router from "./routing/router";
 
 function App() {
-  return (
-    <>
-      <Dashboard />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

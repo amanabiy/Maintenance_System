@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; //temporary modification comment out later
 import { MdOutlineEmail } from "react-icons/md";
 import { MdOutlinePassword } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
@@ -26,8 +27,11 @@ const SignupForm = () => {
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const navigate = useNavigate(); //temporary modification comment out later
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    navigate("/dashboard"); //temporary modification comment out later
   };
 
   const handleEmailChange = (e) => {
