@@ -10,6 +10,7 @@ import { LocationModule } from './modules/location/location.module';
 import { MaintenanceRequestTypeModule } from './modules/maintenance_request_type/maintenance_request_type.module';
 import { MaintenanceRequestModule } from './modules/maintenance_request/maintenance_request.module';
 import { MailModule } from './modules/mail/mail.module';
+import { MediaModule } from './modules/media/media.module';
 
 @Module({
   imports: [
@@ -30,7 +31,8 @@ import { MailModule } from './modules/mail/mail.module';
     LocationModule,
     MaintenanceRequestTypeModule,
     MaintenanceRequestModule,
-    MailModule
+    MailModule,
+    MediaModule
   ],
   controllers: [],
   providers: [

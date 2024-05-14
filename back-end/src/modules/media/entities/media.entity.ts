@@ -1,0 +1,26 @@
+import { Entity, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { ApiProperty } from '@nestjs/swagger';
+import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
+import { User } from 'src/modules/user/entities/user.entity';
+import { Exclude } from 'class-transformer';
+
+@Entity('media')
+export class Media extends BaseModelEntity {
+  @Column()
+  @ApiProperty({ description: 'The filename of the media' })
+  filename: string;
+
+  @Column()
+  @ApiProperty({ description: 'The MIME type of the media' })
+  mimetype: string;
+
+  @Column()
+  @ApiProperty({ description: 'The path where the media is stored' })
+  path: string;
+
+  @ManyToOne(() => User, { eager: true, nullable: true })
+  @JoinColumn({ name: 'uploaded_by' })
+  @ApiProperty({ description: 'The user who uploaded the media', nullable: true })
+  @Exclude()
+  uploadedBy: User;
+}
