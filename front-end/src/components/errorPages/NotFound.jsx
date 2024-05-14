@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Typography, Container } from "@mui/material";
 import GridParent from "../layout/GridParent";
 import NotFoundImage from "../../assets/images/404Error.svg";
-import "./index.scss";
+import "./style.scss";
 
 const NotFound = () => (
   <GridParent className="not-authorized-container">

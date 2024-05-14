@@ -1,10 +1,14 @@
 import React, { useState } from "react";
 import { Outlet } from "react-router-dom";
+// custom components
 import GridParent from "../../components/layout/GridParent";
 import GridItem from "../../components/layout/GridItem";
-import HeaderContainer from "../../components/dashboard/HeaderContainer";
 import SidebarContainer from "../../components/dashboard/SidebarContainer";
+import Navbar from "../../components/dashboard/Navbar";
+// data
 import SidebarData from "../../components/dashboard/SidebarData";
+// styles
+import "./style.scss";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -14,53 +18,13 @@ const DashboardLayout = () => {
   // Adjust sidebarButtons state if needed when user role changes
 
   return (
-    <GridParent style={{ height: "100%", width: "100%" }}>
-      {sidebarOpen && (
-        <GridItem xs={2} style={{ overflow: "hidden" }}>
-          <GridParent style={{ width: "100%" }}>
-            <GridItem
-              xs={12}
-              style={{
-                height: "100vh",
-                borderRight: "solid grey 1px",
-                backgroundColor: "#F9fbfd",
-                position: "fixed",
-              }}
-            >
-              <SidebarContainer buttons={sidebarButtons} />
-            </GridItem>
-          </GridParent>
-        </GridItem>
-      )}
-      <GridItem
-        xs={12}
-        md={sidebarOpen ? 10 : 12}
-        lg={10}
-        style={{ height: "100%" }}
-      >
-        <GridParent style={{ height: "100%" }}>
-          <GridItem xs={12} style={{ position: "sticky", top: 0, zIndex: "2" }}>
-            <GridItem
-              style={{
-                backgroundColor: "#F9fbfd",
-                borderBottom: "solid grey 1px",
-                marginBottom: "10px",
-              }}
-            >
-              <HeaderContainer />
-            </GridItem>
-          </GridItem>
-          <GridItem
-            xs={12}
-            style={{
-              height: "100%",
-              padding: "30px",
-            }}
-          >
-            <Outlet /> {/* Nested routes will be rendered here */}
-          </GridItem>
-        </GridParent>
-      </GridItem>
+    <GridParent className={"main-dashboard-container"}>
+      <SidebarContainer buttons={sidebarButtons} sidebarOpen={sidebarOpen} />
+
+      <div className="main">
+        <Navbar />
+        <Outlet /> {/* Nested routes will be rendered here */}
+      </div>
     </GridParent>
   );
 };
