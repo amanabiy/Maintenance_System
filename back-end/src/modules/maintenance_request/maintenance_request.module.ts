@@ -17,6 +17,7 @@ import { Location } from '../location/entities/location.entity';
 import { RoleService } from '../role/role.service';
 import { Department } from '../department/entities/department.entity';
 import { Role } from '../role/entities/role.entity';
+import { MailService } from '../mail/mailer.service';
 
 @Module({
   imports: [
@@ -29,6 +30,6 @@ import { Role } from '../role/entities/role.entity';
   ],
   controllers: [MaintenanceRequestController],
   providers: [MaintenanceRequestService, LocationService, UserService, DepartmentService,
-    MaintenanceRequestTypeService, RoleService],
+    MaintenanceRequestTypeService, RoleService, MailService],
 })
 export class MaintenanceRequestModule {}

@@ -16,6 +16,8 @@ import FindAllResponseDto from 'src/dto/find-all-response.dto';
 import { DepartmentService } from '../department/department.service';
 import { RoleService } from '../role/role.service';
 import { Role } from '../role/entities/role.entity';
+import { JwtService } from '@nestjs/jwt';
+import { MailService } from '../mail/mailer.service';
 
 @Injectable()
 export class UserService extends GenericDAL<
@@ -28,6 +30,8 @@ export class UserService extends GenericDAL<
     private readonly userRepository: Repository<User>,
     private readonly departmentService: DepartmentService,
     private readonly roleService: RoleService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
 
   ) {
     super(userRepository);
@@ -38,6 +42,10 @@ export class UserService extends GenericDAL<
     const userRole = email.endsWith(staffDomain) ? 'STAFF' : 'STUDENT';
     const role = await this.roleService.findByName(userRole);
     return role;
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.findOne(-1, { where: { email } });
   }
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -59,17 +67,20 @@ export class UserService extends GenericDAL<
         department = await this.departmentService.findOne(departmentId);
     }
 
-    const createdUser = super.create({
+    const createdUser = await super.create({
       email,
       password,
       department,
       role,
       fullName,
     });
+    const token = this.jwtService.sign({ sub: createdUser.id, email: createdUser.email });
+    await this.mailService.sendUserConfirmation(createdUser.email, token);
+
     return plainToInstance(User, createdUser);
   }
 
-  async update(id: number, dto: UpdateUserDto, currentUser=null): Promise<User> {
+  async updateUser(id: number, dto: UpdateUserDto, currentUser=null): Promise<User> {
     const { email, departmentId, roleId, fullName } = dto;
     const toUpdateUser = await this.findOne(id);
     let { role, department } = toUpdateUser;
@@ -117,7 +128,7 @@ export class UserService extends GenericDAL<
     return plainToClass(User, result);
   }
 
-  private hashPassword(password: string): Promise<string> {
+  hashPassword(password: string): Promise<string> {
     const saltOrRounds = 12;
     return bcrypt.hash(password, saltOrRounds);
   }

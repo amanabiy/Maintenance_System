@@ -9,6 +9,7 @@ import { DepartmentModule } from './modules/department/department.module';
 import { LocationModule } from './modules/location/location.module';
 import { MaintenanceRequestTypeModule } from './modules/maintenance_request_type/maintenance_request_type.module';
 import { MaintenanceRequestModule } from './modules/maintenance_request/maintenance_request.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { MaintenanceRequestModule } from './modules/maintenance_request/maintena
     LocationModule,
     MaintenanceRequestTypeModule,
     MaintenanceRequestModule,
+    MailModule
   ],
   controllers: [],
   providers: [

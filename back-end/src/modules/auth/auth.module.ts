@@ -12,6 +12,7 @@ import { DepartmentService } from '../department/department.service';
 import { RoleService } from '../role/role.service';
 import { Role } from '../role/entities/role.entity';
 import { Department } from '../department/entities/department.entity';
+import { MailService } from '../mail/mailer.service';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { Department } from '../department/entities/department.entity';
     }),
     TypeOrmModule.forFeature([User, Department, Role]),
   ],
-  providers: [AuthService, UserService, JwtStrategy, DepartmentService, RoleService],
+  providers: [AuthService, UserService, JwtStrategy, DepartmentService, RoleService, MailService],
   controllers: [AuthController],
   exports: [JwtModule, AuthModule],
 })
