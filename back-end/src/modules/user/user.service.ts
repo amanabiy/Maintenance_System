@@ -15,6 +15,7 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
 import { DepartmentService } from '../department/department.service';
 import { RoleService } from '../role/role.service';
+import { Role } from '../role/entities/role.entity';
 
 @Injectable()
 export class UserService extends GenericDAL<
@@ -32,6 +33,13 @@ export class UserService extends GenericDAL<
     super(userRepository);
   }
 
+  async determineRoleByEmail(email: string): Promise<Role> {
+    const staffDomain = 'aastu.edu.et';
+    const userRole = email.endsWith(staffDomain) ? 'STAFF' : 'STUDENT';
+    const role = await this.roleService.findByName(userRole);
+    return role;
+  }
+
   async create(dto: CreateUserDto): Promise<User> {
     const existingUser = await this.userRepository.findOne({
       where: { email: dto.email },
@@ -45,7 +53,7 @@ export class UserService extends GenericDAL<
 
     // find department and role
     const department = await this.departmentService.findOne(departmentId)
-    const role = await this.roleService.findOne(roleId)
+    const role = await this.determineRoleByEmail(email);
 
     const createdUser = super.create({
       email,
@@ -57,13 +65,25 @@ export class UserService extends GenericDAL<
     return plainToInstance(User, createdUser);
   }
 
-  async update(id: number, dto: UpdateUserDto): Promise<User> {
+  async update(id: number, dto: UpdateUserDto, currentUser=null): Promise<User> {
     const { email, departmentId, roleId, fullName } = dto;
-    const department = await this.departmentService.findOne(departmentId)
-    const role = await this.roleService.findOne(roleId)
-    const userToUpdate = {
-      email, department, role, fullName
+    const toUpdateUser = await this.findOne(id);
+    let { role, department } = toUpdateUser;
+    const adminRoleId = this.roleService.findByName('ADMIN');
+    if (currentUser && currentUser.role.id === adminRoleId) {
+      if (departmentId) {
+        department = await this.departmentService.findOne(departmentId);
+      }
+      if (roleId) {
+        role = await this.roleService.findOne(roleId);
+      }
     }
+
+    const userToUpdate: Partial<User> = {};
+    if (email) userToUpdate.email = email;
+    if (fullName) userToUpdate.fullName = fullName;
+    if (department) userToUpdate.department = department;
+    if (role) userToUpdate.role = role;
 
     // Hash the password before updating the user
     if (dto.password) {

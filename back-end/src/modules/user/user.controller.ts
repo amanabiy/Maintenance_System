@@ -115,7 +115,7 @@ export class UserController {
       'Logging the current user to avoid linting problem',
       currentUser,
     );
-    return this.userService.update(+id, updateUserDto);
+    return this.userService.update(+id, updateUserDto, currentUser);
   }
 
   @Delete(':id')

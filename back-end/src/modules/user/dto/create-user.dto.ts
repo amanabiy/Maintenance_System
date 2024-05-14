@@ -54,6 +54,6 @@ export class CreateUserDto {
    * This field is optional and may not be included in the request.
    * Example: "2024-04-15T08:00:00.000Z"
    */
-  @IsOptional()
-  lastPasswordUpdatedAt?: Date;
+  // @IsOptional()
+  // lastPasswordUpdatedAt?: Date;
 }
