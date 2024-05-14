@@ -67,7 +67,7 @@ export class AuthController {
     return { message: 'OTP sent successfully' };
   }
 
-  @Post('verify-otp')
+  @Post('reset-password')
   @ApiOperation({ summary: 'Verify OTP and reset password' })
   @ApiBody({ type: VerifyOtpDto })
   @ApiResponse({
