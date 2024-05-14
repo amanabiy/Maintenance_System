@@ -45,6 +45,13 @@ export class User extends BaseModelEntity {
   @ApiProperty({ description: 'Department ID of the user' })
   department: Department;
 
+  @Column({ default: false })
+  @ApiProperty({
+    description: 'Indicates if the user has verified their email',
+    default: false,
+  })
+  isVerified: boolean;
+
   @Column({ nullable: true, default: '' })
   @Exclude()
   OTP: string;

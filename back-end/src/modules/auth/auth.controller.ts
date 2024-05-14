@@ -5,6 +5,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
 import { User } from '../user/entities/user.entity';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginUserDto } from './dto/login.user.dto';
+import { AuthRegisterDto } from './dto/auth-register.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -13,7 +14,7 @@ export class AuthController {
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })
-  @ApiBody({ type: CreateUserDto })
+  @ApiBody({ type: AuthRegisterDto })
   @ApiResponse({
     status: HttpStatus.CREATED,
     description: 'User registered successfully',
