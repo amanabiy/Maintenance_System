@@ -27,12 +27,10 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
   }
 
   async createRequest(dto: CreateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceRequest> {
-    const { locationId, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
+    const { locationId, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
 
     const location = locationId ? await this.locationService.findOne(locationId) : null;
     const requester = currentUser;
-    const handlingDepartment = handlingDepartmentId ? await this.departmentService.findOne(handlingDepartmentId) : null;
-    const assignedPersons = assignedPersonIds ? await this.userService.findByIds(assignedPersonIds) : [];
     const maintenanceRequestTypes = maintenanceRequestTypeIds ? await this.maintenanceRequestTypeService.findByIds(maintenanceRequestTypeIds) : [];
     const mediaFiles = mediaIds ? await this.mediaService.findByIds(mediaIds) : [];
 
@@ -40,8 +38,6 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
       ...rest,
       location,
       requester,
-      handlingDepartment,
-      assignedPersons,
       maintenanceRequestTypes,
       mediaFiles,
     }
