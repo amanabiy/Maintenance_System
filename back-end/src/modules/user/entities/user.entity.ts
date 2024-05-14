@@ -30,6 +30,13 @@ export class User extends BaseModelEntity {
   email: string;
 
   @Column()
+  @ApiProperty({
+    description: 'Full name of the user',
+    required: true,
+  })
+  fullName: string;
+
+  @Column()
   @Exclude()
   password: string;
 

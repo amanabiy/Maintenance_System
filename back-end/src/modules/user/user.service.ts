@@ -40,7 +40,7 @@ export class UserService extends GenericDAL<
       throw new ConflictException('User with this email already exists');
     }
 
-    const { email, departmentId, roleId } = dto;
+    const { email, departmentId, roleId, fullName } = dto;
     const password = await this.hashPassword(dto.password);
 
     // find department and role
@@ -52,16 +52,17 @@ export class UserService extends GenericDAL<
       password,
       department,
       role,
+      fullName,
     });
     return plainToInstance(User, createdUser);
   }
 
   async update(id: number, dto: UpdateUserDto): Promise<User> {
-    const { email, departmentId, roleId } = dto;
+    const { email, departmentId, roleId, fullName } = dto;
     const department = await this.departmentService.findOne(departmentId)
     const role = await this.roleService.findOne(roleId)
     const userToUpdate = {
-      email, department, role
+      email, department, role, fullName
     }
 
     // Hash the password before updating the user
