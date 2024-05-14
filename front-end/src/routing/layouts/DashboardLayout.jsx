@@ -1,24 +1,20 @@
-import { useState } from "react";
-import GridParent from "../layout/GridParent";
-import GridItem from "../layout/GridItem";
-import HeaderContainer from "./HeaderContainer";
-import SidebarContainer from "./SidebarContainer";
-import SidebarData from "./SidebarData";
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
+import GridParent from "../../components/layout/GridParent";
+import GridItem from "../../components/layout/GridItem";
+import HeaderContainer from "../../components/dashboard/HeaderContainer";
+import SidebarContainer from "../../components/dashboard/SidebarContainer";
+import SidebarData from "../../components/dashboard/SidebarData";
 
-const DashboardContainer = ({ content }) => {
+const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const user = { user: { name: "User", role: "user" } }; //useSelector((state) => state.auth.user) for later
   const [sidebarButtons, setSidebarButtons] = useState(SidebarData.user);
 
-  // UseEffect to determine which buttons to display in the sidebar based on user role*
+  // Adjust sidebarButtons state if needed when user role changes
 
   return (
-    <GridParent
-      style={{
-        height: "100%",
-        width: "100%",
-        // border: "solid red 2px"
-      }}
-    >
+    <GridParent style={{ height: "100%", width: "100%" }}>
       {sidebarOpen && (
         <GridItem xs={2} style={{ overflow: "hidden" }}>
           <GridParent style={{ width: "100%" }}>
@@ -40,10 +36,7 @@ const DashboardContainer = ({ content }) => {
         xs={12}
         md={sidebarOpen ? 10 : 12}
         lg={10}
-        style={{
-          height: "100%",
-          // border: "solid red 2px"
-        }}
+        style={{ height: "100%" }}
       >
         <GridParent style={{ height: "100%" }}>
           <GridItem xs={12} style={{ position: "sticky", top: 0, zIndex: "2" }}>
@@ -64,7 +57,7 @@ const DashboardContainer = ({ content }) => {
               padding: "30px",
             }}
           >
-            {content}
+            <Outlet /> {/* Nested routes will be rendered here */}
           </GridItem>
         </GridParent>
       </GridItem>
@@ -72,4 +65,4 @@ const DashboardContainer = ({ content }) => {
   );
 };
 
-export default DashboardContainer;
+export default DashboardLayout;

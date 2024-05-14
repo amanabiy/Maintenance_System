@@ -12,13 +12,18 @@ const SidebarContainer = ({ buttons }) => {
         alignItems: "center",
       }}
     >
-      <GridItem xs={12} style={{ height: "100px" }}></GridItem>
+      <GridItem
+        xs={12}
+        style={{ height: "100px" }}
+        key="sidebar-placeholder"
+      ></GridItem>
       {buttons &&
-        buttons.map((button) => {
+        buttons.map((button, index) => {
           return (
             <SidebarButton
+              key={index}
               text={button.text}
-              icon={button.icon}
+              icon={<button.icon />}
               onClick={button.onClick}
             />
           );
