@@ -56,6 +56,17 @@
           color: #888;
           margin-left: 5px;
         }
+        .nav-link {
+          text-decoration: none;
+          color: inherit;
+          display: flex;
+          align-items: center;
+
+          &.active {
+            font-weight: bold;
+            color: #007bff; // Customize as needed
+          }
+        }
       }
     }
   }
@@ -69,8 +80,8 @@
     .colorOption {
       width: 20px;
       height: 20px;
-      border-radius: 5px;
-      border: 1px solid #7451f8;
+      border-radius: 3px;
+      border: 1px solid #b9b7b7;
       margin: 5px;
       cursor: pointer;
 
@@ -189,11 +200,11 @@
 
 @keyframes background-transition {
   0% {
-    width: 0;
+    // width: 0;
     background-color: transparent;
   }
   100% {
-    width: 90%;
+    // width: 90%;
     background-color: #ece8ff; /* Hover background color */
   }
 }

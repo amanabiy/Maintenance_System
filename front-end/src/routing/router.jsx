@@ -1,34 +1,95 @@
+import React, { Suspense, lazy } from "react";
 import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
 } from "react-router-dom";
 
-// pages
-import SignUp from "../(auth)/SignUp";
-import Login from "../(auth)/Login";
-import NotAuthorized from "../components/errorPages/NotAuthorized";
-import NotFound from "../components/errorPages/NotFound";
+// Lazy loading components
+const SignUp = lazy(() => import("../(auth)/SignUp"));
+const Login = lazy(() => import("../(auth)/Login"));
+const NotAuthorized = lazy(() =>
+  import("../components/errorPages/NotAuthorized")
+);
+const NotFound = lazy(() => import("../components/errorPages/NotFound"));
+const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
+const ReportIssue = lazy(() => import("../pages/Issuer/ReportIssue"));
+const ProtectedRoute = lazy(() => import("./ProtectedRoute"));
 
-//layouts
-import ProtectedRoute from "./ProtectedRoute";
-import DashboardLayout from "./layouts/DashboardLayout";
+// paths
+import { generalPaths, issuerPaths } from "./paths";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route>
-      <Route index element={<SignUp />} />
-      <Route path="login" element={<Login />} />
-      <Route path="dashboard" element={<DashboardLayout />}>
+      <Route
+        index
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <SignUp />
+          </Suspense>
+        }
+      />
+      <Route
+        path="login"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <Login />
+          </Suspense>
+        }
+      />
+      <Route
+        path="active"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <DashboardLayout />
+          </Suspense>
+        }
+      >
         <Route
-          path="test"
-          element={<ProtectedRoute requiredRoles={["admin"]} />}
+          path="user-dashboard"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <ProtectedRoute requiredRoles={["user"]} />
+            </Suspense>
+          }
         >
-          <Route index element={<div>Test</div>} />
+          <Route index element={<div>Dashboard Content</div>} />
+        </Route>
+        <Route
+          path="report-issue"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <ProtectedRoute requiredRoles={["user"]} />
+            </Suspense>
+          }
+        >
+          <Route
+            index
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                <ReportIssue />
+              </Suspense>
+            }
+          />
         </Route>
       </Route>
-      <Route path="not-authorized" element={<NotAuthorized />} />
-      <Route path="*" element={<NotFound />} />
+      <Route
+        path="not-authorized"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <NotAuthorized />
+          </Suspense>
+        }
+      />
+      <Route
+        path="*"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <NotFound />
+          </Suspense>
+        }
+      />
     </Route>
   )
 );

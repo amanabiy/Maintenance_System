@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink, Navigate } from "react-router-dom";
 import GridParent from "../layout/GridParent";
 import SidebarButton from "./SidebarButton";
 import GridItem from "../layout/GridItem";
@@ -10,40 +11,61 @@ import "./styles.scss";
 const SidebarContainer = ({ buttons, sidebarOpen }) => {
   return (
     <div className={"sidebar"}>
-      <div xs={12} className="top">
-        <span className="logo">Maintainance System</span>
+      <div className="top">
+        <span className="logo">Maintenance System</span>
       </div>
-      <div xs={12}>
+      <div>
         <hr />
       </div>
-      <div xs={12} className="center">
+      <div className="center">
         <ul>
-          <p className="title">MAIN</p>
-          <li>
-            <DashboardIcon className="icon" />
-            <span>Dashboard</span>
-          </li>
-          <p className="title">LIST</p>
-          <li>
-            <DashboardIcon className="icon" />
-            <span>Dashboard</span>
-          </li>
-          <li>
-            <DashboardIcon className="icon" />
-            <span>Dashboard</span>
-          </li>
-          <p className="title">USER</p>
-          <li>
-            <DashboardIcon className="icon" />
-            <span>Dashboard</span>
-          </li>
-          <li>
-            <DashboardIcon className="icon" />
-            <span>Dashboard</span>
-          </li>
+          {buttons && buttons.main && <p className="title">MAIN</p>}
+          {buttons &&
+            buttons.main &&
+            buttons.main.map((button, index) => (
+              <li key={index}>
+                <NavLink to={`/active${button.path}`} className="nav-link">
+                  <button.icon className="icon" />
+                  <span>{button.text}</span>
+                </NavLink>
+              </li>
+            ))}
+          {buttons && buttons.list && <p className="title">LIST</p>}
+          {buttons &&
+            buttons.list &&
+            buttons.list.map((button, index) => (
+              <li key={index}>
+                <NavLink to={`/active${button.path}`} className="nav-link">
+                  <button.icon className="icon" />
+                  <span>{button.text}</span>
+                </NavLink>
+              </li>
+            ))}
+          {buttons && buttons.usefull && <p className="title">USEFULL</p>}
+          {buttons &&
+            buttons.usefull &&
+            buttons.usefull.map((button, index) => (
+              <li key={index}>
+                <NavLink to={`/active${button.path}`} className="nav-link">
+                  <button.icon className="icon" />
+                  <span>{button.text}</span>
+                </NavLink>
+              </li>
+            ))}
+          {buttons && buttons.user && <p className="title">USER</p>}
+          {buttons &&
+            buttons.user &&
+            buttons.user.map((button, index) => (
+              <li key={index}>
+                <NavLink to={`/active${button.path}`} className="nav-link">
+                  <button.icon className="icon" />
+                  <span>{button.text}</span>
+                </NavLink>
+              </li>
+            ))}
         </ul>
       </div>
-      <div xs={12} className="bottom">
+      <div className="bottom">
         <div className="colorOption"></div>
         <div className="colorOption"></div>
       </div>

@@ -1,6 +1,5 @@
 import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
-import NotAuthorized from "../components/errorPages/NotAuthorized";
 
 // Mock function to get current user's role
 const getCurrentUserRole = () => {
