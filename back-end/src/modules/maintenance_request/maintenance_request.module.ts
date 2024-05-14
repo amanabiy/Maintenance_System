@@ -18,11 +18,13 @@ import { RoleService } from '../role/role.service';
 import { Department } from '../department/entities/department.entity';
 import { Role } from '../role/entities/role.entity';
 import { MailService } from '../mail/mailer.service';
+import { MediaService } from '../media/media.service';
+import { Media } from '../media/entities/media.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MaintenanceRequest, Location, User, MaintenanceRequestType,
-      Department, Role]),
+      Department, Role, Media]),
     LocationModule,
     UserModule,
     DepartmentModule,
@@ -30,6 +32,7 @@ import { MailService } from '../mail/mailer.service';
   ],
   controllers: [MaintenanceRequestController],
   providers: [MaintenanceRequestService, LocationService, UserService, DepartmentService,
-    MaintenanceRequestTypeService, RoleService, MailService],
+    MaintenanceRequestTypeService, RoleService, MailService,
+    MediaService],
 })
 export class MaintenanceRequestModule {}

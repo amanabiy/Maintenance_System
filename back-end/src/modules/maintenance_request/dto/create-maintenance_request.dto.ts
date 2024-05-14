@@ -55,4 +55,10 @@ export class CreateMaintenanceRequestDto {
   @IsOptional()
   @IsInt()
   handlingDepartmentId: number;
+
+  @ApiProperty({ description: 'The IDs of media files associated with this maintenance request' })
+  @IsOptional()
+  @IsArray()
+  @IsInt({ each: true })
+  mediaIds: number[];
 }
