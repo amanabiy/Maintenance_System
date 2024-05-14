@@ -9,6 +9,7 @@ import { LocationService } from '../location/location.service';
 import { UserService } from '../user/user.service';
 import { DepartmentService } from '../department/department.service';
 import { MaintenanceRequestTypeService } from '../maintenance_request_type/maintenance_request_type.service';
+import { MediaService } from '../media/media.service';
 import { User } from '../user/entities/user.entity';
 
 @Injectable()
@@ -20,26 +21,25 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     private readonly userService: UserService,
     private readonly departmentService: DepartmentService,
     private readonly maintenanceRequestTypeService: MaintenanceRequestTypeService,
+    private readonly mediaService: MediaService,
   ) {
     super(maintenanceRequestRepository);
   }
 
   async createRequest(dto: CreateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceRequest> {
-    const { locationId, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, ...rest } = dto;
+    const { locationId, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
 
     const location = locationId ? await this.locationService.findOne(locationId) : null;
     const requester = currentUser;
-    const handlingDepartment = handlingDepartmentId ? await this.departmentService.findOne(handlingDepartmentId) : null;
-    const assignedPersons = assignedPersonIds ? await this.userService.findByIds(assignedPersonIds) : [];
     const maintenanceRequestTypes = maintenanceRequestTypeIds ? await this.maintenanceRequestTypeService.findByIds(maintenanceRequestTypeIds) : [];
+    const mediaFiles = mediaIds ? await this.mediaService.findByIds(mediaIds) : [];
 
     const toCreate = {
       ...rest,
       location,
       requester,
-      handlingDepartment,
-      assignedPersons,
       maintenanceRequestTypes,
+      mediaFiles,
     }
 
     return super.create(toCreate);
@@ -52,7 +52,7 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
       throw new Error('Maintenance request not found');
     }
 
-    const { locationId, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, ...rest } = dto;
+    const { locationId, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
 
     if (locationId) {
       maintenanceRequest.location = await this.locationService.findOne(locationId);
@@ -66,11 +66,12 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     if (maintenanceRequestTypeIds) {
       maintenanceRequest.maintenanceRequestTypes = await this.maintenanceRequestTypeService.findByIds(maintenanceRequestTypeIds);
     }
+    if (mediaIds) {
+      maintenanceRequest.mediaFiles = await this.mediaService.findByIds(mediaIds);
+    }
 
     Object.assign(maintenanceRequest, rest);
     console.log(maintenanceRequest)
     return this.maintenanceRequestRepository.save(maintenanceRequest);
   }
-  
-  
 }

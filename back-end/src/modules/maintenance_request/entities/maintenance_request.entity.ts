@@ -1,12 +1,33 @@
-import { Entity, Column, ManyToOne, ManyToMany, JoinTable, RelationId, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  ManyToMany,
+  JoinTable,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsEnum, IsOptional, IsNumber, Min, Max, IsString, IsDate, ValidateNested, IsArray } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsEnum,
+  IsOptional,
+  IsNumber,
+  Min,
+  Max,
+  IsString,
+  IsDate,
+} from 'class-validator';
 import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
 import { User } from 'src/modules/user/entities/user.entity';
 import { Department } from 'src/modules/department/entities/department.entity';
 import { Location } from 'src/modules/location/entities/location.entity';
 import { MaintenanceRequestType } from 'src/modules/maintenance_request_type/entities/maintenance_request_type.entity';
-import { MaintenanceConfirmationStatusEnum, MaintenanceVerificationStatusEnum } from './maintenance_request.enum';
+import {
+  MaintenanceConfirmationStatusEnum,
+  MaintenanceVerificationStatusEnum,
+} from './maintenance_request.enum';
+import { Media } from 'src/modules/media/entities/media.entity';
 
 @Entity('maintenance_requests')
 export class MaintenanceRequest extends BaseModelEntity {
@@ -75,4 +96,9 @@ export class MaintenanceRequest extends BaseModelEntity {
   @ApiProperty({ description: 'The department assigned to handle the maintenance request' })
   @ManyToOne(() => Department, { eager: true, nullable: true })
   handlingDepartment: Department;
+
+  @ApiProperty({ description: 'The media files associated with this maintenance request' })
+  @OneToMany(() => Media, media => media.maintenanceRequests, { eager: true })
+  @JoinColumn({ name: 'media_id'})
+  mediaFiles: Media[];
 }

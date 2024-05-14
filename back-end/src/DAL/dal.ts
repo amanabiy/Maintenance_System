@@ -73,10 +73,14 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     options: FindOneOptions = { where: {} },
   ): Promise<Entity | undefined> {
     try {
-      options['where']['id'] = id;
-      if (id == -1) {
-        delete options['where']['id'];
+      if (!options.where) {
+        options.where = {};
       }
+      options.where['id'] = id;
+      if (id === -1) {
+        delete options.where['id'];
+      }
+      // console.log(options)
       const result = await this.repository.findOne(options);
       if (!result) {
         throw new NotFoundException(
@@ -85,6 +89,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       }
       return result;
     } catch (error) {
+      console.log("Error fetching ${this.entityName} with id ${id}: ${error.message}:", error)
       throw new HttpException(
         `Error fetching ${this.entityName} with id ${id}: ${error.message}`,
         HttpStatus.INTERNAL_SERVER_ERROR,

@@ -18,4 +18,8 @@ export class RoleService extends GenericDAL<
   ) {
     super(roleRepository);
   }
+  
+  async findByName(roleName: string): Promise<Role> {
+    return this.findOne(-1, { where: { roleName } });
+  }
 }

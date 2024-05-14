@@ -21,6 +21,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   async validate(payload: any): Promise<User> {
     try {
       const user = await this.userService.findOne(payload['userId']);
+      if (user.isVerified === false) {
+        throw new UnauthorizedException('Please verify your email address');
+      }
       if (payload.lastPasswordUpdatedAt !== user.lastPasswordUpdatedAt.toISOString()) {
         throw new UnauthorizedException('Password have changed'); // this is not shown for the user (only Invalid credentials is)
       }

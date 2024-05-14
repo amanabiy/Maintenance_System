@@ -30,6 +30,13 @@ export class User extends BaseModelEntity {
   email: string;
 
   @Column()
+  @ApiProperty({
+    description: 'Full name of the user',
+    required: true,
+  })
+  fullName: string;
+
+  @Column()
   @Exclude()
   password: string;
 
@@ -37,6 +44,13 @@ export class User extends BaseModelEntity {
   @JoinColumn({ name: 'department_id' })
   @ApiProperty({ description: 'Department ID of the user' })
   department: Department;
+
+  @Column({ default: false })
+  @ApiProperty({
+    description: 'Indicates if the user has verified their email',
+    default: false,
+  })
+  isVerified: boolean;
 
   @Column({ nullable: true, default: '' })
   @Exclude()
