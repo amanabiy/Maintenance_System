@@ -13,7 +13,7 @@ import FormGroup from "@mui/material/FormGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Divider from "@mui/material/Divider";
 
-const RequestPage = () => {
+const ReportIssue = () => {
   return (
     <GridParent
       style={{
@@ -132,4 +132,4 @@ const RequestPage = () => {
   );
 };
 
-export default RequestPage;
+export default ReportIssue;
