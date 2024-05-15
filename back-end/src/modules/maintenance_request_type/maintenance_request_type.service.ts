@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GenericDAL } from 'src/DAL/dal';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { MaintenanceRequestType } from './entities/maintenance_request_type.entity';
 import { CreateMaintenanceRequestTypeDto } from './dto/create-maintenance_request_type.dto';
 import { UpdateMaintenanceRequestTypeDto } from './dto/update-maintenance_request_type.dto';
@@ -17,5 +17,14 @@ export class MaintenanceRequestTypeService extends GenericDAL<
     private readonly maintenanceRequestTypeRepository: Repository<MaintenanceRequestType>,
   ) {
     super(maintenanceRequestTypeRepository);
+  }
+
+  async fuzzySearch(term: string): Promise<MaintenanceRequestType[]> {
+    return await this.find({
+      where: [
+        { name: Like(`%${term}%`) },
+        { description: Like(`%${term}%`) },
+      ],
+    });
   }
 }
