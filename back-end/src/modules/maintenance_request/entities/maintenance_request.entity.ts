@@ -102,3 +102,4 @@ export class MaintenanceRequest extends BaseModelEntity {
   @JoinColumn({ name: 'media_id'})
   mediaFiles: Media[];
 }
+

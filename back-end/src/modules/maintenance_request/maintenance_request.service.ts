@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MaintenanceRequest } from './entities/maintenance_request.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { GenericDAL } from 'src/DAL/dal';
 import { CreateMaintenanceRequestDto } from './dto/create-maintenance_request.dto';
 import { UpdateMaintenanceRequestDto } from './dto/update-maintenance_request.dto';
@@ -11,6 +11,8 @@ import { DepartmentService } from '../department/department.service';
 import { MaintenanceRequestTypeService } from '../maintenance_request_type/maintenance_request_type.service';
 import { MediaService } from '../media/media.service';
 import { User } from '../user/entities/user.entity';
+import { SearchMaintenanceRequestDto } from './dto/filter-maintenance_request.dto';
+import findAllResponseDto from 'src/dto/find-all-response.dto';
 
 @Injectable()
 export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, CreateMaintenanceRequestDto, UpdateMaintenanceRequestDto> {
@@ -73,5 +75,50 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     Object.assign(maintenanceRequest, rest);
     console.log(maintenanceRequest)
     return this.maintenanceRequestRepository.save(maintenanceRequest);
+  }
+
+
+  async searchRequests(criteria: SearchMaintenanceRequestDto): Promise<findAllResponseDto<MaintenanceRequest>> {
+    const where: any = {};
+    console.log("sdfsd")
+    if (criteria.assignedPersonIds && criteria.assignedPersonIds.length > 0) {
+      where.assignedPersons = { id: In(criteria.assignedPersonIds) };
+    }
+
+    if (criteria.maintenanceRequestTypeIds && criteria.maintenanceRequestTypeIds.length > 0) {
+      where.maintenanceRequestTypes = { id: In(criteria.maintenanceRequestTypeIds) };
+    }
+
+    if (criteria.handlingDepartmentId) {
+      where.handlingDepartment = { id: criteria.handlingDepartmentId };
+    }
+
+    if (criteria.requesterId) {
+      where.requester = { id: criteria.requesterId };
+    }
+
+    if (criteria.confirmationStatus) {
+      where.confirmationStatus = criteria.confirmationStatus;
+    }
+
+    if (criteria.verificationStatus) {
+      where.verificationStatus = criteria.verificationStatus;
+    }
+
+    if (criteria.verifiedById) {
+      where.verifiedBy = { id: criteria.verifiedById }; // Assuming 'verifiedBy' is a relation with 'User'
+    }
+    console.log("here")
+    console.log("where", where)
+    return await this.findWithPagination({
+      where,
+      relations: [
+        'assignedPersons',
+        'maintenanceRequestTypes',
+        'handlingDepartment',
+        'requester',
+        // 'verifiedBy', // Add this if 'verifiedBy' is a relation
+      ],
+    });
   }
 }
