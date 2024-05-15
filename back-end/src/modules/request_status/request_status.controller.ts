@@ -2,8 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { RequestStatusService } from './request_status.service';
 import { CreateRequestStatusDto } from './dto/create-request_status.dto';
 import { UpdateRequestStatusDto } from './dto/update-request_status.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('request-status')
+@ApiTags('Media')
 export class RequestStatusController {
   constructor(private readonly requestStatusService: RequestStatusService) {}
 
