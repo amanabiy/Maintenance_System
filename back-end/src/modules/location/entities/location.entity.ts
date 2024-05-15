@@ -28,7 +28,7 @@ export class Location extends BaseModelEntity {
   })
   roomNumbers: string;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   @ApiProperty({
     description: 'Toilets per floor',
     example: true,
