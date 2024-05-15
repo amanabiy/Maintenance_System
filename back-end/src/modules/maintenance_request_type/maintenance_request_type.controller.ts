@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MaintenanceRequestTypeService } from './maintenance_request_type.service';
-import { ApiTags, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { CreateMaintenanceRequestTypeDto } from './dto/create-maintenance_request_type.dto';
 import { MaintenanceRequestType } from './entities/maintenance_request_type.entity';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
@@ -51,5 +51,18 @@ export class MaintenanceRequestTypeController {
   async remove(@Param('id') id: string): Promise<DeleteResponseDto> {
     await this.maintenanceRequestTypeService.delete(+id);
     return new DeleteResponseDto();
+  }
+
+
+  @Get('fuzzy-search/:term')
+  @ApiOperation({ summary: 'Fuzzy search maintenance request types by name or description' })
+  @ApiParam({ name: 'term', description: 'The term to search for' })
+  @ApiResponse({
+    status: 200,
+    description: 'Array of maintenance request types that match the search criteria',
+    type: [MaintenanceRequestType],
+  })
+  async fuzzySearch(@Param('term') term: string): Promise<MaintenanceRequestType[]> {
+    return await this.maintenanceRequestTypeService.fuzzySearch(term);
   }
 }

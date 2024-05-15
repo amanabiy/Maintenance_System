@@ -4,11 +4,11 @@ import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
 
 @Entity('locations')
 export class Location extends BaseModelEntity {
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @ApiProperty({ description: 'Block number of the location', example: 'B57' })
   blockNumber: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable : true })
   @ApiProperty({ description: 'Number of floors in the location', example: 5 })
   numberOfFloors: number;
 
@@ -19,4 +19,20 @@ export class Location extends BaseModelEntity {
   @Column({ type: 'float', nullable: true })
   @ApiProperty({ description: 'Longitude of the location', required: false })
   longitude: number | null;
+
+  @Column({ type: 'varchar', nullable: true })
+  @ApiProperty({
+    description: 'Room number',
+    example: '204',
+    required: false,
+  })
+  roomNumbers: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  @ApiProperty({
+    description: 'Toilets per floor',
+    example: true,
+    required: false,
+  })
+  toiletsPerFloor: boolean;
 }
