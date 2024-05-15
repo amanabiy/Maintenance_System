@@ -35,6 +35,7 @@ import { RequestStatusModule } from './modules/request_status/request_status.mod
     MailModule,
     MediaModule,
     RequestStatusModule
+
   ],
   controllers: [],
   providers: [
