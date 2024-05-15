@@ -11,6 +11,7 @@ const Login = lazy(() => import("../(auth)/Login"));
 const NotAuthorized = lazy(() =>
   import("../components/errorPages/NotAuthorized")
 );
+const MyRequests = lazy(() => import("../pages/Issuer/MyRequests"));
 const NotFound = lazy(() => import("../components/errorPages/NotFound"));
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
 const ReportIssue = lazy(() => import("../pages/Issuer/ReportIssue"));
@@ -50,7 +51,7 @@ const router = createBrowserRouter(
           path="user-dashboard"
           element={
             <Suspense fallback={<div>Loading...</div>}>
-              <ProtectedRoute requiredRoles={["user"]} />
+              <ProtectedRoute requiredRoles={["admin"]} />
             </Suspense>
           }
         >
@@ -69,6 +70,23 @@ const router = createBrowserRouter(
             element={
               <Suspense fallback={<div>Loading...</div>}>
                 <ReportIssue />
+              </Suspense>
+            }
+          />
+        </Route>
+        <Route
+          path="my-reports"
+          element={
+            <Suspense fallback={<div>Loading...</div>}>
+              <ProtectedRoute requiredRoles={["user"]} />
+            </Suspense>
+          }
+        >
+          <Route
+            index
+            element={
+              <Suspense fallback={<div>Loading...</div>}>
+                <MyRequests />
               </Suspense>
             }
           />

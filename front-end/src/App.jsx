@@ -1,12 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import { RouterProvider } from "react-router-dom";
+import { ColorModeContext, useMode } from "./theme";
+import { CssBaseline, ThemeProvider } from "@mui/material";
+
 import router from "./routing/router";
 
 function App() {
+  const [theme, colorMode] = useMode();
+  console.log(theme);
   return (
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <React.StrictMode>
+          <RouterProvider router={router} />
+        </React.StrictMode>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   );
 }
 
