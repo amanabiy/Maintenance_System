@@ -5,7 +5,7 @@ import { UpdateRequestStatusDto } from './dto/update-request_status.dto';
 import { ApiTags } from '@nestjs/swagger';
 
 @Controller('request-status')
-@ApiTags('Media')
+@ApiTags('Status')
 export class RequestStatusController {
   constructor(private readonly requestStatusService: RequestStatusService) {}
 
