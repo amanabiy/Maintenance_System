@@ -28,4 +28,13 @@ export class CreateMaintenanceRequestDto {
   @IsArray()
   @IsInt({ each: true })
   mediaIds: number[];
+
+  @ApiProperty({
+    description: 'The priority of the request, by default it is -1',
+    example: -1,
+    default: -1,
+  })
+  @IsInt()
+  @IsOptional()
+  priority: number;
 }

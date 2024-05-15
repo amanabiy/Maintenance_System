@@ -13,6 +13,8 @@ import { MediaService } from '../media/media.service';
 import { User } from '../user/entities/user.entity';
 import { SearchMaintenanceRequestDto } from './dto/filter-maintenance_request.dto';
 import findAllResponseDto from 'src/dto/find-all-response.dto';
+import { MaintenanceVerificationStatusEnum } from './entities/maintenance_request.enum';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, CreateMaintenanceRequestDto, UpdateMaintenanceRequestDto> {
@@ -24,8 +26,18 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     private readonly departmentService: DepartmentService,
     private readonly maintenanceRequestTypeService: MaintenanceRequestTypeService,
     private readonly mediaService: MediaService,
+    private readonly roleService: RoleService,
   ) {
     super(maintenanceRequestRepository);
+  }
+
+  async setVerificationStatus(dto: CreateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceVerificationStatusEnum> {
+    const studentRole = await this.roleService.findByName("STUDENT")
+    console.log(studentRole, currentUser)
+    if (currentUser.role.id === studentRole.id) {
+      return MaintenanceVerificationStatusEnum.PENDING;
+    }
+    return MaintenanceVerificationStatusEnum.NOT_REQUIRED;
   }
 
   async createRequest(dto: CreateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceRequest> {
@@ -35,11 +47,13 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     const requester = currentUser;
     const maintenanceRequestTypes = maintenanceRequestTypeIds ? await this.maintenanceRequestTypeService.findByIds(maintenanceRequestTypeIds) : [];
     const mediaFiles = mediaIds ? await this.mediaService.findByIds(mediaIds) : [];
+    const verificationStatus = await this.setVerificationStatus(dto, currentUser);
 
     const toCreate = {
       ...rest,
       location,
       requester,
+      verificationStatus,
       maintenanceRequestTypes,
       mediaFiles,
     }

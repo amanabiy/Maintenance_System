@@ -41,4 +41,12 @@ export class SearchMaintenanceRequestDto {
   @IsOptional()
   @IsNumber()
   verifiedById?: number;
+
+  @ApiProperty({
+    description: 'The priority of the request',
+    example: -1,
+    default: -1,
+  })
+  @IsInt()
+  priority: number;
 }

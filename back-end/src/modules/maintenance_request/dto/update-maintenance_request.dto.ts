@@ -62,4 +62,12 @@ export class UpdateMaintenanceRequestDto extends PartialType(CreateMaintenanceRe
   @IsArray()
   @IsInt({ each: true })
   mediaIds: number[];
+
+  @ApiProperty({
+    description: 'The priority of the request',
+    example: -1,
+    default: -1,
+  })
+  @IsInt()
+  priority: number;
 }

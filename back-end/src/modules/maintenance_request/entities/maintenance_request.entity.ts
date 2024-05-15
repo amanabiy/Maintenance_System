@@ -72,6 +72,14 @@ export class MaintenanceRequest extends BaseModelEntity {
   @Column({ nullable: true })
   rating: number;
 
+  @ApiProperty({
+    description: 'The priority of the request, by default it is -1',
+    example: -1,
+    default: -1,
+  })
+  @Column({ default: -1 })
+  priority: number;
+
   @ApiProperty({ description: 'The feedback for the maintenance request' })
   @IsOptional()
   @IsString()
