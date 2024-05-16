@@ -15,6 +15,9 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
 import { DepartmentService } from '../department/department.service';
 import { RoleService } from '../role/role.service';
+import { Role } from '../role/entities/role.entity';
+import { JwtService } from '@nestjs/jwt';
+import { MailService } from '../mail/mailer.service';
 
 @Injectable()
 export class UserService extends GenericDAL<
@@ -27,9 +30,22 @@ export class UserService extends GenericDAL<
     private readonly userRepository: Repository<User>,
     private readonly departmentService: DepartmentService,
     private readonly roleService: RoleService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
 
   ) {
     super(userRepository);
+  }
+
+  async determineRoleByEmail(email: string): Promise<Role> {
+    const staffDomain = 'aastu.edu.et';
+    const userRole = email.endsWith(staffDomain) ? 'STAFF' : 'STUDENT';
+    const role = await this.roleService.findByName(userRole);
+    return role;
+  }
+
+  async findByEmail(email: string): Promise<User> {
+    return await this.findOne(-1, { where: { email } });
   }
 
   async create(dto: CreateUserDto): Promise<User> {
@@ -40,29 +56,49 @@ export class UserService extends GenericDAL<
       throw new ConflictException('User with this email already exists');
     }
 
-    const { email, departmentId, roleId } = dto;
+    const { email, departmentId, roleId, fullName } = dto;
     const password = await this.hashPassword(dto.password);
 
     // find department and role
-    const department = await this.departmentService.findOne(departmentId)
-    const role = await this.roleService.findOne(roleId)
+    const role = await this.determineRoleByEmail(email);
+    let department = null;
+    const adminRole = await this.roleService.findByName('ADMIN')
+    if (role.id === adminRole.id && departmentId) {
+        department = await this.departmentService.findOne(departmentId);
+    }
 
-    const createdUser = super.create({
+    const createdUser = await super.create({
       email,
       password,
       department,
       role,
+      fullName,
     });
+    const token = this.jwtService.sign({ sub: createdUser.id, email: createdUser.email });
+    await this.mailService.sendUserConfirmation(createdUser.email, token);
+
     return plainToInstance(User, createdUser);
   }
 
-  async update(id: number, dto: UpdateUserDto): Promise<User> {
-    const { email, departmentId, roleId } = dto;
-    const department = await this.departmentService.findOne(departmentId)
-    const role = await this.roleService.findOne(roleId)
-    const userToUpdate = {
-      email, department, role
+  async updateUser(id: number, dto: UpdateUserDto, currentUser=null): Promise<User> {
+    const { email, departmentId, roleId, fullName } = dto;
+    const toUpdateUser = await this.findOne(id);
+    let { role, department } = toUpdateUser;
+    const adminRoleId = this.roleService.findByName('ADMIN');
+    if (currentUser && currentUser.role.id === adminRoleId) {
+      if (departmentId) {
+        department = await this.departmentService.findOne(departmentId);
+      }
+      if (roleId) {
+        role = await this.roleService.findOne(roleId);
+      }
     }
+
+    const userToUpdate: Partial<User> = {};
+    if (email) userToUpdate.email = email;
+    if (fullName) userToUpdate.fullName = fullName;
+    if (department) userToUpdate.department = department;
+    if (role) userToUpdate.role = role;
 
     // Hash the password before updating the user
     if (dto.password) {
@@ -92,7 +128,7 @@ export class UserService extends GenericDAL<
     return plainToClass(User, result);
   }
 
-  private hashPassword(password: string): Promise<string> {
+  hashPassword(password: string): Promise<string> {
     const saltOrRounds = 12;
     return bcrypt.hash(password, saltOrRounds);
   }

@@ -1,7 +1,7 @@
 import { Button } from "@mui/material";
 import React from "react";
 import GridItem from "../layout/GridItem";
-import "./styles.css";
+import "./styles.scss";
 
 const SidebarButton = ({ onClick, icon, text }) => {
   return (

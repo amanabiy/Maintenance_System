@@ -9,6 +9,10 @@ import { Role } from '../role/entities/role.entity';
 import { DepartmentModule } from '../department/department.module';
 import { DepartmentService } from '../department/department.service';
 import { RoleService } from '../role/role.service';
+import { MailModule } from '../mail/mail.module';
+import { MailService } from '../mail/mailer.service';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { SharedModule } from '../shared/shared.module';
 
 @Module({
   imports: [
@@ -16,8 +20,11 @@ import { RoleService } from '../role/role.service';
     TypeOrmModule.forFeature([Role]),
     TypeOrmModule.forFeature([Department]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
+    MailModule,
+    SharedModule
   ],
   controllers: [UserController],
-  providers: [UserService, DepartmentService, RoleService],
+  providers: [UserService, DepartmentService, RoleService, MailService, JwtService],
+  exports: [UserService],
 })
 export class UserModule {}

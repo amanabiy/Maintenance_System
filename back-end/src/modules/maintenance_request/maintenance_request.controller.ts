@@ -11,6 +11,8 @@ import { User } from '../user/entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-guard';
 import { plainToInstance } from 'class-transformer';
+import { SearchMaintenanceRequestDto } from './dto/filter-maintenance_request.dto';
+import findAllResponseDto from 'src/dto/find-all-response.dto';
 
 @ApiTags('Maintenance Request')
 @Controller('maintenance-request')
@@ -67,5 +69,15 @@ export class MaintenanceRequestController {
   async remove(@Param('id') id: string): Promise<DeleteResponseDto> {
     await this.maintenanceRequestService.delete(+id);
     return new DeleteResponseDto();
+  }
+
+  @Post('search')
+  @ApiOperation({ summary: 'Search maintenance requests' })
+  @ApiResponse({ status: 200, description: 'Successful search', type: FindAllResponseMaintenanceRequestDto })
+  async searchRequests(
+    @Body() criteria: SearchMaintenanceRequestDto,
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    console.log(criteria);
+    return await this.maintenanceRequestService.searchRequests(criteria);
   }
 }

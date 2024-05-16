@@ -6,8 +6,16 @@ import * as dotenv from 'dotenv';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe());
   dotenv.config();
+
+  app.enableCors({
+    origin: '*', // Allow all origins
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow these methods
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  });
 
   setupSwagger(app);
   await app.listen(8081);
