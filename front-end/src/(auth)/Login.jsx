@@ -15,16 +15,42 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useLoginMutation } from "../redux/features/auth";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/slices/authSlice";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [login, { isLoading, error }] = useLoginMutation();
+  const dispatch = useDispatch();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission here
+  const handleSubmit = async () => {
+    if (!email || !password) {
+      setErrorMessage("All fields are required.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Invalid email address.");
+      return;
+    }
+
+    setErrorMessage("");
+    try {
+      // Using async-await to handle the promise returned by the mutation
+      const result = await login({ email, password }).unwrap();
+      console.log("Registration Successful", result);
+      dispatch(loginSuccess({ result }));
+      // You can handle further logic here, such as redirecting the user
+    } catch (err) {
+      console.error("Registration Failed", err);
+      // err will contain any error response from the server, handle accordingly
+      setErrorMessage(err.data ? err.data.message : "Failed to register");
+    }
   };
 
   const handleEmailChange = (e) => {
@@ -91,9 +117,6 @@ const LoginForm = () => {
           >
             LOGIN
           </Typography>
-          {errorMessage && (
-            <FormHelperText error>{errorMessage}</FormHelperText>
-          )}
           <Grid
             container
             spacing={1}
@@ -209,6 +232,9 @@ const LoginForm = () => {
                 </Button>
               </Typography>
             </Grid>
+            {errorMessage && (
+              <FormHelperText error>{errorMessage}</FormHelperText>
+            )}
             <Grid item xs={12}>
               <Button
                 type="submit"
