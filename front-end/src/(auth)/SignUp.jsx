@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; //temporary modification comment out later
+import { useNavigate } from "react-router-dom";
 import { MdOutlineEmail } from "react-icons/md";
 import { MdOutlinePassword } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
@@ -18,20 +18,61 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useRegisterMutation } from "../redux/features/auth";
+import { isAsyncThunkAction } from "@reduxjs/toolkit";
 
 const SignupForm = () => {
-  const [name, setName] = useState("");
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [register, { isLoading, error }] = useRegisterMutation();
 
-  const navigate = useNavigate(); //temporary modification comment out later
+  const handleSubmit = async () => {
+    if (!email || !fullName || !password) {
+      setErrorMessage("All fields are required.");
+      return;
+    }
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    navigate("/dashboard"); //temporary modification comment out later
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Invalid email address.");
+      return;
+    }
+
+    if (
+      !email.endsWith("@aastustudent.edu.et") &&
+      !email.endsWith("@aastu.edu.et")
+    ) {
+      setErrorMessage(
+        "Please use an institutional email address ending with @aastustudent.edu.et or @aastu.edu.et"
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage(
+        "Passwords do not match. Please enter matching passwords."
+      );
+      return;
+    }
+
+    setErrorMessage("");
+    try {
+      const result = await register({ email, fullName, password }).unwrap();
+      console.log("Registration Successful", result);
+    } catch (err) {
+      console.error("Registration Failed", err);
+      setErrorMessage(err.data ? err.data.message : "Failed to register");
+    }
   };
 
   const handleEmailChange = (e) => {
@@ -40,7 +81,7 @@ const SignupForm = () => {
   };
 
   const handleNameChange = (e) => {
-    setName(e.target.value);
+    setFullName(e.target.value);
     setErrorMessage("");
   };
 
@@ -56,6 +97,10 @@ const SignupForm = () => {
 
   const handleToggleVisibility = () => {
     setIsVisible(!isVisible);
+  };
+
+  const handleToggleConfirmVisibility = () => {
+    setIsConfirmVisible(!isConfirmVisible);
   };
 
   return (
@@ -108,9 +153,6 @@ const SignupForm = () => {
           >
             SIGN UP
           </Typography>
-          {errorMessage && (
-            <FormHelperText error>{errorMessage}</FormHelperText>
-          )}
           <Grid
             container
             spacing={1}
@@ -143,7 +185,7 @@ const SignupForm = () => {
                   id="name"
                   name="name"
                   type="text"
-                  value={name}
+                  value={fullName}
                   onChange={handleNameChange}
                   label="Full Name"
                   style={{
@@ -249,14 +291,14 @@ const SignupForm = () => {
                 <OutlinedInput
                   id="confirm_password"
                   name="confirm_password"
-                  type={isVisible ? "text" : "password"}
+                  type={isConfirmVisible ? "text" : "password"}
                   value={confirmPassword}
                   onChange={handleConfirmPasswordChange}
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle password visibility"
-                        onClick={handleToggleVisibility}
+                        onClick={handleToggleConfirmVisibility}
                         edge="end"
                         style={{
                           fontSize: "1rem",
@@ -264,7 +306,7 @@ const SignupForm = () => {
                           boxShadow: "none", // Remove any box shadow that might appear on focus
                         }}
                       >
-                        {isVisible ? (
+                        {isConfirmVisible ? (
                           <Visibility
                             style={{ fontSize: "1rem", outline: "none" }}
                           />
@@ -284,6 +326,9 @@ const SignupForm = () => {
                   }}
                 />
               </FormControl>
+              {errorMessage && (
+                <FormHelperText error>{errorMessage}</FormHelperText>
+              )}
             </Grid>
             <Grid item xs={12}>
               <Button

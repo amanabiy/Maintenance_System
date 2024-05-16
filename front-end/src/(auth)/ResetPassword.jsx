@@ -15,16 +15,45 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import { useSelector } from "react-redux";
+import { useResetPasswordMutation } from "../redux/features/auth";
 
 const ResetPasswordForm = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const otp = sessionStorage.getItem("otp");
+  const email = useSelector((state) => state.auth.email);
+  const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
+  console.log("the email", email, otp);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Handle form submission here
+  const handleSubmit = async () => {
+    if (!password || !confirmPassword) {
+      setErrorMessage("All fields are required");
+      return;
+    }
+
+    if (password.length < 8) {
+      setErrorMessage("Password must be at least 8 characters long.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage(
+        "Passwords do not match. Please enter matching passwords."
+      );
+      return;
+    }
+    setErrorMessage("");
+    try {
+      const result = await resetPassword({ email, otp, newPassword: password });
+      console.log("the result", result);
+    } catch (err) {
+      console.log("the err", err);
+      setErrorMessage(err.data ? err.data.message : "Failed to reset password");
+    }
   };
 
   const handlePasswordChange = (e) => {
@@ -39,6 +68,10 @@ const ResetPasswordForm = () => {
 
   const handleToggleVisibility = () => {
     setIsVisible(!isVisible);
+  };
+
+  const handleToggleConfirmVisibility = () => {
+    setIsConfirmVisible(!isConfirmVisible);
   };
 
   return (
@@ -168,14 +201,14 @@ const ResetPasswordForm = () => {
                 <OutlinedInput
                   id="confirm_password"
                   name="confirm_password"
-                  type={isVisible ? "text" : "password"}
+                  type={isConfirmVisible ? "text" : "password"}
                   value={confirmPassword}
                   onChange={handleConfirmPasswordChange}
                   endAdornment={
                     <InputAdornment position="end">
                       <IconButton
                         aria-label="toggle password visibility"
-                        onClick={handleToggleVisibility}
+                        onClick={handleToggleConfirmVisibility}
                         edge="end"
                         style={{
                           fontSize: "1rem",
@@ -183,7 +216,7 @@ const ResetPasswordForm = () => {
                           boxShadow: "none", // Remove any box shadow that might appear on focus
                         }}
                       >
-                        {isVisible ? (
+                        {isConfirmVisible ? (
                           <Visibility
                             style={{ fontSize: "1rem", outline: "none" }}
                           />

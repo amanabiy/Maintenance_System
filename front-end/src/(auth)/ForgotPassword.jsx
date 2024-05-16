@@ -13,13 +13,34 @@ import {
   OutlinedInput,
   Typography,
 } from "@mui/material";
+import { useForgotPasswordMutation } from "../redux/features/auth";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [forgotPassword, { isLoading, error }] = useForgotPasswordMutation();
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    if (!email) {
+      setErrorMessage("Email is required.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMessage("Invalid email address.");
+      return;
+    }
+
+    setErrorMessage("");
+    // Call the forgotPassword mutation here
+    try {
+      const result = await forgotPassword({ email }).unwrap();
+      console.log(result);
+    } catch (err) {
+      console.error("Forgot Password Failed", err);
+      setErrorMessage(err.data ? err.data.message : "Failed to request OTP");
+    }
   };
 
   const handleEmailChange = (e) => {
