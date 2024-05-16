@@ -71,7 +71,7 @@ export class AuthService {
     await this.mailService.sendOtp(user.email, otp);
   }
 
-  async verifyOtp(email: string, otp: string, newPassword: string): Promise<boolean> {
+  async verifyOtp(email: string, otp: string): Promise<boolean> {
     const user = await this.userService.findByEmail(email);
     if (!user || user.OTP !== otp || user.OTPExpiry < new Date()) {
       throw new BadRequestException('Invalid or expired OTP');
