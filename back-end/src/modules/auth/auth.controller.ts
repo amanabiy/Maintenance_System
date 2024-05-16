@@ -8,6 +8,7 @@ import { LoginUserDto } from './dto/login.user.dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { MessageResponseDto } from 'src/dto/message-response.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { ResetPasswordWithOtpDto } from './dto/reset-with-otp.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -69,14 +70,27 @@ export class AuthController {
 
   @Post('reset-password')
   @ApiOperation({ summary: 'Verify OTP and reset password' })
-  @ApiBody({ type: VerifyOtpDto })
+  @ApiBody({ type: ResetPasswordWithOtpDto })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Password reset successfully',
     type: MessageResponseDto,
   })
-  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto): Promise<MessageResponseDto> {
-    await this.authService.verifyOtp(verifyOtpDto.email, verifyOtpDto.otp, verifyOtpDto.newPassword);
+  async resetPasswordWithOtp(@Body() verifyOtpDto: ResetPasswordWithOtpDto): Promise<MessageResponseDto> {
+    await this.authService.ResetPasswordWithOtp(verifyOtpDto.email, verifyOtpDto.otp, verifyOtpDto.newPassword);
     return { message: 'Password reset successfully' };
+  }
+
+  @Post('verify-otp')
+  @ApiOperation({ summary: 'Verify OTP and reset password' })
+  @ApiBody({ type: VerifyOtpDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'OTP verified successfully',
+    type: MessageResponseDto,
+  })
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto): Promise<MessageResponseDto> {
+    await this.authService.verifyOtp(verifyOtpDto.email, verifyOtpDto.otp);
+    return { message: 'OTP verified successfully' };
   }
 }

@@ -76,6 +76,14 @@ export class AuthService {
     if (!user || user.OTP !== otp || user.OTPExpiry < new Date()) {
       throw new BadRequestException('Invalid or expired OTP');
     }
+    return true;
+  }
+
+  async ResetPasswordWithOtp(email: string, otp: string, newPassword: string): Promise<boolean> {
+    const user = await this.userService.findByEmail(email);
+    if (!user || user.OTP !== otp || user.OTPExpiry < new Date()) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
 
     user.password = await this.userService.hashPassword(newPassword);
     user['lastPasswordUpdatedAt'] = new Date();
