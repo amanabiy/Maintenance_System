@@ -11,7 +11,7 @@ import SidebarData from "../../components/dashboard/SidebarData";
 import "./style.scss";
 
 const DashboardLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const user = { user: { name: "User", role: "user" } }; //useSelector((state) => state.auth.user) for later
   const [sidebarButtons, setSidebarButtons] = useState(SidebarData.userButtons);
 
@@ -19,12 +19,14 @@ const DashboardLayout = () => {
   console.log(sidebarButtons);
   return (
     <GridParent className={"main-dashboard-container"}>
-      <SidebarContainer buttons={sidebarButtons} sidebarOpen={sidebarOpen} />
+      {sidebarOpen && (
+        <SidebarContainer buttons={sidebarButtons} sidebarOpen={sidebarOpen} />
+      )}
 
-      <div className="main">
+      <GridItem xs={12} className="main">
         <Navbar />
         <Outlet /> {/* Nested routes will be rendered here */}
-      </div>
+      </GridItem>
     </GridParent>
   );
 };

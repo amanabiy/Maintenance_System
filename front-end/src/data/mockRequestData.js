@@ -29,4 +29,22 @@ export const mockRequestData = [
     requestStatus: "Scheduled",
     locationId: "LOC004",
   },
+  {
+    id: 6,
+    requestTitle: "Paint room walls",
+    requestStatus: "Completed",
+    locationId: "LOC003",
+  },
+  {
+    id: 7,
+    requestTitle: "Replace light bulbs",
+    requestStatus: "Pending",
+    locationId: "LOC002",
+  },
+  {
+    id: 8,
+    requestTitle: "Install security cameras",
+    requestStatus: "Scheduled",
+    locationId: "LOC004",
+  },
 ];

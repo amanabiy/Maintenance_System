@@ -15,6 +15,7 @@ const MyRequests = lazy(() => import("../pages/Issuer/MyRequests"));
 const NotFound = lazy(() => import("../components/errorPages/NotFound"));
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
 const ReportIssue = lazy(() => import("../pages/Issuer/ReportIssue"));
+const DataTable = lazy(() => import("../components/tables/DataTable.jsx"));
 const ProtectedRoute = lazy(() => import("./ProtectedRoute"));
 
 // paths
@@ -86,7 +87,7 @@ const router = createBrowserRouter(
             index
             element={
               <Suspense fallback={<div>Loading...</div>}>
-                <MyRequests />
+                <DataTable />
               </Suspense>
             }
           />

@@ -2,7 +2,6 @@
   border-right: 0.5px solid #f0f0f0;
   // border-right: 0.5px solid #ece8ff;
   min-height: 100vh;
-  background-color: white;
   flex: 1;
   position: relative;
   .top {
@@ -14,7 +13,7 @@
       font-size: 15px;
       font-weight: bold;
       text-wrap: wrap;
-      color: #6439ff;
+      color: #4e24e1;
     }
   }
   hr {
@@ -48,7 +47,7 @@
         }
         .icon {
           font-size: 18px;
-          color: #7451f8;
+          color: #4e24e1;
         }
         span {
           font-size: 13px;
@@ -96,7 +95,7 @@
 }
 
 .navbar {
-  height: 50px;
+  height: 52px;
   border-bottom: 2px solid #f0f0f0;
   display: flex;
   align-items: center;
