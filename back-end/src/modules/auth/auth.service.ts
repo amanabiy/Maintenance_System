@@ -94,4 +94,10 @@ export class AuthService {
     await this.userService.update(user.id, user);
     return true;
   }
+
+  async RequestToken(email: string): Promise<boolean> {
+    const user = await this.userService.findByEmail(email);
+    await this.userService.sendVerifyEmailToken(user);
+    return true;
+  }
 }
