@@ -12,18 +12,30 @@ import {
   OutlinedInput,
   Typography,
 } from "@mui/material";
+import { useVerifyOtpMutation } from "../redux/features/auth";
+import { useSelector } from "react-redux";
 
 const VerifyOTP = () => {
   const [otp, setOTP] = useState("");
-  const [values, setValues] = useState(Array(4).fill(""));
-
+  const [error, setError] = useState("");
+  const [values, setValues] = useState(Array(6).fill(""));
+  const [verifyOtp, { isLoading, err }] = useVerifyOtpMutation();
+  const email = useSelector((state) => state.auth.email);
+  console.log("the email", email);
   const handleOTPChange = (event) => {
     setOTP(event.target.value);
   };
 
-  const handleVerifyOTP = () => {
-    // TODO: Implement OTP verification logic here
-    console.log("Verifying OTP:", otp);
+  const handleVerifyOTP = async () => {
+    console.log("Verifying OTP:", values.join(""));
+    sessionStorage.setItem("otp", values.join(""));
+    try {
+      const result = await verifyOtp({ email, otp: values.join("") }).unwrap();
+      console.log("OTP Verification Successful", result);
+    } catch (err) {
+      console.error("OTP Verification Failed", err);
+      setErrorMessage(err.data ? err.data.message : "Failed to send OTP");
+    }
   };
 
   const handlePaste = (index, event) => {
@@ -99,7 +111,7 @@ const VerifyOTP = () => {
       >
         <div
           style={{
-            width: "60%",
+            width: "80%",
             marginLeft: "150px",
             display: "flex",
             justifyContent: "center",
@@ -149,7 +161,7 @@ const VerifyOTP = () => {
                   border: "0.5px solid #ccc",
                   fontSize: "1.25rem", // equivalent to text-xl
                   textAlign: "center",
-                  width: "33.333%", // equivalent to w-1/3
+                  width: "50%", // equivalent to w-1/3
                   height: "2.5rem", // equivalent to h-10
                   outline: "none",
                   boxShadow: "none",

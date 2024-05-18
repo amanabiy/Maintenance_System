@@ -1,3 +1,4 @@
+
 import { Controller, Post, Body, HttpStatus, BadRequestException, Param, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
@@ -38,6 +39,7 @@ export class AuthController {
   async login(@Body() loginUserDto: LoginUserDto): Promise<AuthResponseDto> {
     return this.authService.login(loginUserDto);
   }
+
 
   @Get('request-new-token-to-verify-email/:email')
   @ApiOperation({ summary: 'Request a new token to verify email' })
