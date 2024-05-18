@@ -71,7 +71,15 @@ export class AuthService {
     await this.mailService.sendOtp(user.email, otp);
   }
 
-  async verifyOtp(email: string, otp: string, newPassword: string): Promise<boolean> {
+  async verifyOtp(email: string, otp: string): Promise<boolean> {
+    const user = await this.userService.findByEmail(email);
+    if (!user || user.OTP !== otp || user.OTPExpiry < new Date()) {
+      throw new BadRequestException('Invalid or expired OTP');
+    }
+    return true;
+  }
+
+  async ResetPasswordWithOtp(email: string, otp: string, newPassword: string): Promise<boolean> {
     const user = await this.userService.findByEmail(email);
     if (!user || user.OTP !== otp || user.OTPExpiry < new Date()) {
       throw new BadRequestException('Invalid or expired OTP');
@@ -84,6 +92,12 @@ export class AuthService {
     user.lastPasswordUpdatedAt = new Date();
 
     await this.userService.update(user.id, user);
+    return true;
+  }
+
+  async RequestToken(email: string): Promise<boolean> {
+    const user = await this.userService.findByEmail(email);
+    await this.userService.sendVerifyEmailToken(user);
     return true;
   }
 }
