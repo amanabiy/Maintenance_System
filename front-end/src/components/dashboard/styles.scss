@@ -3,7 +3,9 @@
   // border-right: 0.5px solid #ece8ff;
   min-height: 100vh;
   flex: 1;
-  position: relative;
+  // position: absolute;
+  background-color: white;
+  z-index: 2;
   .top {
     height: 50px;
     display: flex;
@@ -94,6 +96,19 @@
   }
 }
 
+.small-sidebar {
+  z-index: 2;
+  width: 100px;
+  position: fixed;
+  height: auto;
+}
+.animate-sidebar-open {
+  animation: sidebar-open 1s forwards;
+}
+.animate-sidebar-close {
+  animation: sidebar-close 1s forwards;
+}
+
 .navbar {
   height: 52px;
   border-bottom: 2px solid #f0f0f0;
@@ -102,11 +117,16 @@
   font-size: 14px;
   color: #555;
   padding-left: 10px;
+
   .wrapper {
     width: 100%;
     display: flex;
     align-self: center;
     justify-content: space-between;
+
+    .left {
+      flex: 1;
+    }
 
     .search {
       display: flex;
@@ -127,11 +147,12 @@
     .items {
       display: flex;
       align-items: center;
-
+      justify-content: flex-end;
+      gap: 10px;
+      flex: 3;
       .item {
         display: flex;
         align-items: center;
-        margin-right: 20px;
         position: relative;
 
         .icon {
@@ -205,5 +226,23 @@
   100% {
     // width: 90%;
     background-color: #ece8ff; /* Hover background color */
+  }
+}
+
+@keyframes sidebar-open {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 300px;
+  }
+}
+
+@keyframes sidebar-close {
+  0% {
+    width: 300px;
+  }
+  100% {
+    width: 0;
   }
 }

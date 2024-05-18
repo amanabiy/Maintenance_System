@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Outlet } from "react-router-dom";
 // custom components
 import GridParent from "../../components/layout/GridParent";
@@ -11,20 +11,67 @@ import SidebarData from "../../components/dashboard/SidebarData";
 import "./style.scss";
 
 const DashboardLayout = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarType, setSidebarType] = useState("large-sidebar");
   const user = { user: { name: "User", role: "user" } }; //useSelector((state) => state.auth.user) for later
   const [sidebarButtons, setSidebarButtons] = useState(SidebarData.userButtons);
 
-  // Adjust sidebarButtons state if needed when user role changes
-  console.log(sidebarButtons);
+  const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+        setSidebarType("small-sidebar");
+      } else {
+        setSidebarOpen(true);
+        setSidebarType("large-sidebar");
+      }
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [sidebarType]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setSidebarOpen(false);
+      }
+    };
+
+    if (sidebarOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [sidebarOpen]);
+
+  console.log(sidebarOpen);
+
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
+
   return (
     <GridParent className={"main-dashboard-container"}>
       {sidebarOpen && (
-        <SidebarContainer buttons={sidebarButtons} sidebarOpen={sidebarOpen} />
+        <SidebarContainer
+          ref={sidebarRef}
+          buttons={sidebarButtons}
+          sidebarOpen={sidebarOpen}
+          sidebarType={sidebarType}
+        />
       )}
 
       <GridItem xs={12} className="main">
-        <Navbar />
+        <Navbar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
         <Outlet /> {/* Nested routes will be rendered here */}
       </GridItem>
     </GridParent>
