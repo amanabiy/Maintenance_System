@@ -1,26 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRequestStatusDto } from './dto/create-request_status.dto';
-import { UpdateRequestStatusDto } from './dto/update-request_status.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { RequestStatus } from './entities/request_status.entity';
+import { GenericDAL } from 'src/DAL/dal';
+import { FindAllResponseRequestStatusDto } from './dto/find-all-response-maintenance_requestdto';
 
 @Injectable()
-export class RequestStatusService {
-  create(createRequestStatusDto: CreateRequestStatusDto) {
-    return 'This action adds a new requestStatus';
+export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
+  constructor(
+    @InjectRepository(RequestStatus)
+    private readonly requestStatusRepository: Repository<RequestStatus>,
+  ) {
+    super(requestStatusRepository, 0, 10, ['request', 'statusUpdatedBy', 'statusType']);
   }
 
-  findAll() {
-    return `This action returns all requestStatus`;
+  async findAllForRequest(requestId: number): Promise<FindAllResponseRequestStatusDto> {
+    return await this.findWithPagination({
+      where: { request: { id: requestId } },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} requestStatus`;
-  }
-
-  update(id: number, updateRequestStatusDto: UpdateRequestStatusDto) {
-    return `This action updates a #${id} requestStatus`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} requestStatus`;
+  async findOneForRequest(requestId: number, statusId: number): Promise<RequestStatus> {
+    return await this.findOne(statusId, {
+      where: { id: statusId, request: { id: requestId } },
+    });
   }
 }
