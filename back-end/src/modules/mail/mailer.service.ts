@@ -20,7 +20,7 @@ export class MailService {
         subject: 'Welcome to Maintenance System! Confirm your Email', // Subject line
         text: `${token}`, // plaintext body
         html: `<b>check the plain text for the token</b> <br> 
-        <a href="http://localhost:5173/verify-email?token=${token}">link</a>
+        <a href="http://localhost:5173/verify-email/${token}">link</a>
         `, // HTML body content
     
       });
