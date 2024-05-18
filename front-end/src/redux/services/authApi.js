@@ -36,7 +36,13 @@ const authApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body,
             })
-        })
+        }),
+        verifyEmail: builder.mutation({
+            query: (token) => ({
+                url: `auth/verify-email/${token}`,
+                method: 'POST',
+            })
+        }),
     }),
 });
 

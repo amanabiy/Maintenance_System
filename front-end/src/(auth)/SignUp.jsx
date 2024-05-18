@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { MdOutlineEmail } from "react-icons/md";
 import { MdOutlinePassword } from "react-icons/md";
 import { FaUser } from "react-icons/fa";
@@ -30,6 +30,7 @@ const SignupForm = () => {
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [register, { isLoading, error }] = useRegisterMutation();
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!email || !fullName || !password) {
@@ -69,6 +70,7 @@ const SignupForm = () => {
     try {
       const result = await register({ email, fullName, password }).unwrap();
       console.log("Registration Successful", result);
+      navigate("/check-your-email");
     } catch (err) {
       console.error("Registration Failed", err);
       setErrorMessage(err.data ? err.data.message : "Failed to register");
@@ -347,20 +349,28 @@ const SignupForm = () => {
               <Typography
                 variant="body2"
                 style={{
-                  fontSize: "8px",
+                  fontSize: "14px",
                   textAlign: "center",
-                  // marginTop: "1px",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
+                <Typography style={{ padding: "2px" }}>
+                  Already have an account?
+                </Typography>
                 <Button
                   style={{
                     color: "#24344B",
                     outline: "none",
                     boxShadow: "none",
                     textTransform: "none",
+                    fontSize: "14px",
                   }}
+                  onClick={() => navigate("/login")}
                 >
-                  Already have an account? Log in
+                  Log in
                 </Button>
               </Typography>
             </Grid>
