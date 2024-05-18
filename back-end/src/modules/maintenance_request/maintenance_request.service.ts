@@ -28,7 +28,17 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     private readonly mediaService: MediaService,
     private readonly roleService: RoleService,
   ) {
-    super(maintenanceRequestRepository);
+    super(maintenanceRequestRepository, 1, 10, 
+      [
+        'assignedPersons',
+        'maintenanceRequestTypes',
+        'handlingDepartment',
+        'requester',
+        'verifiedBy',
+        'mediaFiles',
+        'requestStatuses'
+      ]
+    );
   }
 
   async setVerificationStatus(dto: CreateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceVerificationStatusEnum> {
@@ -126,13 +136,6 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     console.log("where", where)
     return await this.findWithPagination({
       where,
-      relations: [
-        'assignedPersons',
-        'maintenanceRequestTypes',
-        'handlingDepartment',
-        'requester',
-        // 'verifiedBy', // Add this if 'verifiedBy' is a relation
-      ],
     });
   }
 }

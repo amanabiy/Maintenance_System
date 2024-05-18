@@ -1,10 +1,13 @@
-import { Controller, Get, Param, NotFoundException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, NotFoundException, UseGuards, Body, Patch } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiNotFoundResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { RequestStatusService } from './request_status.service';
 import { RequestStatus } from './entities/request_status.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles-guard';
 import { FindAllResponseRequestStatusDto } from './dto/find-all-response-maintenance_requestdto';
+import { UpdateMaintenanceRequestDto } from '../maintenance_request/dto/update-maintenance_request.dto';
+import { MaintenanceRequest } from '../maintenance_request/entities/maintenance_request.entity';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @ApiTags('Request Status')
 @Controller('maintenance-requests/:requestId/statuses')
@@ -12,6 +15,16 @@ import { FindAllResponseRequestStatusDto } from './dto/find-all-response-mainten
 @ApiBearerAuth('bearerAuth')
 export class RequestStatusController {
   constructor(private readonly requestStatusService: RequestStatusService) {}
+
+  @Patch(':maintenanceRequestId/status/:nextRequestTypeId')
+  async updateMaintenanceRequest(
+    @Param('maintenanceRequestId') maintenanceRequestId: number,
+    @Param('nextRequestTypeId') nextRequestTypeId: number,
+    @Body() updateDto: UpdateMaintenanceRequestDto,
+    @CurrentUser() currentUser: any,
+  ): Promise<MaintenanceRequest> {
+    return await this.requestStatusService.updateMaintenanceRequest(maintenanceRequestId, nextRequestTypeId, updateDto, currentUser);
+  }
 
   @Get()
   @ApiOperation({ summary: 'Get all statuses for a request' })

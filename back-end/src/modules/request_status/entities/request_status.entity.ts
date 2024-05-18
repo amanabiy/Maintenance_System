@@ -6,6 +6,7 @@ import { User } from 'src/modules/user/entities/user.entity';
 import { Media } from 'src/modules/media/entities/media.entity';
 import { RequestStatusEnum } from './request_status.enum';
 import { RequestStatusType } from 'src/modules/request_status_type/entities/request_status_type.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('request_status')
 export class RequestStatus extends BaseModelEntity {
@@ -39,6 +40,11 @@ export class RequestStatus extends BaseModelEntity {
   @ApiProperty({ description: 'Internal note' })
   @Column({ nullable: true })
   internalNote: string;
+
+  @ApiProperty({ description: 'Internal Version Changes on the maintenance request' })
+  @Column({ nullable: true })
+  // @Exclude()
+  internalVersionChanges: string;
 
   @ApiProperty({ description: 'External message' })
   @Column({ nullable: true })

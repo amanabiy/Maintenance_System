@@ -46,6 +46,10 @@ export class RequestStatusType extends BaseModelEntity {
   @Column({ default: false })
   allowChangeverificationStatus: boolean;
 
+  @ApiProperty({ description: 'Indicates if it allows changing the request types of the request' })
+  @Column({ default: false })
+  allowsChangeRequestTypes: boolean;
+
   @ApiProperty({ description: 'Indicates if it allows forwarding to a department' })
   @Column({ default: false })
   allowsForwardToDepartment: boolean;

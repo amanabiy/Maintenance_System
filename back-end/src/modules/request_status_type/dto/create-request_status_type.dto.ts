@@ -43,6 +43,11 @@ export class CreateRequestStatusTypeDto {
   @IsOptional()
   allowChangeverificationStatus: boolean;
 
+  @ApiProperty({ description: 'Indicates if it allows changing the request types of the request' })
+  @IsBoolean()
+  @IsOptional()
+  allowsChangeRequestTypes: boolean;
+
   @ApiProperty({ description: 'Indicates if it allows forwarding to a department' })
   @IsBoolean()
   @IsOptional()
