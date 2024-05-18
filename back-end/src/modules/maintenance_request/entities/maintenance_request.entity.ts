@@ -28,6 +28,7 @@ import {
   MaintenanceVerificationStatusEnum,
 } from './maintenance_request.enum';
 import { Media } from 'src/modules/media/entities/media.entity';
+import { RequestStatus } from 'src/modules/request_status/entities/request_status.entity';
 
 @Entity('maintenance_requests')
 export class MaintenanceRequest extends BaseModelEntity {
@@ -109,5 +110,9 @@ export class MaintenanceRequest extends BaseModelEntity {
   @OneToMany(() => Media, media => media.maintenanceRequests, { eager: true })
   @JoinColumn({ name: 'media_id'})
   mediaFiles: Media[];
+
+  @ApiProperty({ description: 'The statuses associated with this maintenance request' })
+  @OneToMany(() => RequestStatus, requestStatus => requestStatus.request, { eager: true })
+  requestStatuses: RequestStatus[];
 }
 

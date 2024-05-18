@@ -14,6 +14,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     private readonly repository: Repository<Entity>,
     private readonly defaultSkip: number = 0,
     private readonly defaultTake: number = 1,
+    private readonly defaultRelations: string[] = []
   ) {
     this.entityName = repository.metadata.name;
   }
@@ -37,6 +38,12 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     }
   }
 
+  private addDefaultRelations(options: any) {
+    if (!options.relations) {
+      options.relations = this.defaultRelations;
+    }
+  }
+
   async create(dto: DeepPartial<Entity>): Promise<Entity> {
     try {
       const entity = this.repository.create(dto as DeepPartial<Entity>);
@@ -57,6 +64,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     try {
       const options: any = {};
       this.applyPagination(options, page, pageSize);
+      this.addDefaultRelations(options);
 
       const [items, total] = await this.repository.findAndCount(options);
       return new FindAllResponseDto<Entity>(page, pageSize, total, items);
@@ -80,6 +88,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       if (id === -1) {
         delete options.where['id'];
       }
+      this.addDefaultRelations(options);
       // console.log(options)
       const result = await this.repository.findOne(options);
       if (!result) {
@@ -102,8 +111,11 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       if (!ids || ids.length === 0) {
         return [];
       }
+      const options: FindManyOptions<Entity> = { where: { id: In(ids) } } as any;
+      this.addDefaultRelations(options);
+      
+      const entities = await this.repository.find(options);
   
-      const entities = await this.repository.find({ where: { id: In(ids) } } as any);
       if (entities.length !== ids.length) {
         const missingIds = ids.filter(id => !entities.some(entity => entity['id'] === id));
         throw new NotFoundException(
@@ -152,6 +164,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
 
   async find(conditions: FindManyOptions<Entity>): Promise<Entity[]> {
     try {
+      this.addDefaultRelations(conditions);
       const result = await this.repository.find(conditions);
       return result
     } catch (error) {
@@ -170,6 +183,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
     try {
       const options: FindManyOptions = conditions || {};
       this.applyPagination(options, page, pageSize);
+      this.addDefaultRelations(options);
       const [items, total] = await this.repository.findAndCount(options);
       return new FindAllResponseDto<Entity>(page, pageSize, total, items);
     } catch (error) {
