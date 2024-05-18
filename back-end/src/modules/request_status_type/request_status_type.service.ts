@@ -13,12 +13,15 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
     @InjectRepository(RequestStatusType)
     private readonly requestStatusTypeRepository: Repository<RequestStatusType>,
   ) {
-    super(requestStatusTypeRepository);
+    super(requestStatusTypeRepository, 0, 10, ['allowedTransitions']);
   }
 
   async createRequestStatusType(createRequestStatusTypeDto: CreateRequestStatusTypeDto): Promise<RequestStatusType> {
-    const { name, hasSchedule, needsFile, needsSignatures, isInternal, requiresForwardToDepartment, requiresForwardToPerson, allowedTransitions } = createRequestStatusTypeDto;
-    
+    const { name, hasSchedule, needsFile, needsSignatures, 
+      isInternal, allowsForwardToDepartment, allowsForwardToPerson, 
+      allowChangePriority, allowChangeconfirmationStatus, 
+      allowChangeverificationStatus, allowedTransitions } = createRequestStatusTypeDto;
+
     // Find next options by IDs if provided
     let nextStatusOptions: RequestStatusType[] = [];
     if (allowedTransitions && allowedTransitions.length > 0) {
@@ -33,8 +36,11 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
       needsFile,
       needsSignatures,
       isInternal,
-      requiresForwardToDepartment,
-      requiresForwardToPerson,
+      allowChangePriority,
+      allowChangeconfirmationStatus,
+      allowChangeverificationStatus,
+      allowsForwardToDepartment,
+      allowsForwardToPerson,
       allowedTransitions: nextStatusOptions,
     });
 
@@ -54,14 +60,5 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
       .remove(requestStatusType.allowedTransitions);
 
     await super.delete(id);
-  }
-
-  async findAll(): Promise<FindAllResponseRequestStatustypeDto> {
-    return await super.findWithPagination({ relations: ['allowedTransitions'] });
-  }
-
-  async findOne(id: number): Promise<RequestStatusType> {
-    const requestStatusType = await super.findOne(id, { relations: ['allowedTransitions'] });
-    return requestStatusType;
   }
 }

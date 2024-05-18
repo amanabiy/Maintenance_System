@@ -53,6 +53,11 @@ export class MaintenanceRequest extends BaseModelEntity {
   @Column({ nullable: true })
   verificationStatus: MaintenanceVerificationStatusEnum;
 
+  @ApiProperty({ description: 'The user who requested the maintenance' })
+  @ManyToOne(() => User, { eager: true, nullable: true })
+  @JoinColumn({ name: 'requester_id' })
+  verifiedBy: Promise<User>;  
+
   @ApiProperty({ description: 'The date and time when the maintenance request was verified' })
   @IsOptional()
   @IsDate()

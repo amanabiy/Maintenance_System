@@ -34,13 +34,25 @@ export class RequestStatusType extends BaseModelEntity {
   })
   allowedTransitions: RequestStatusType[];
 
-  @ApiProperty({ description: 'Indicates if it requires forwarding to a department' })
+  @ApiProperty({ description: 'Indicates if it allows changing the priority of the request' })
   @Column({ default: false })
-  requiresForwardToDepartment: boolean;
+  allowChangePriority: boolean;
 
-  @ApiProperty({ description: 'Indicates if it requires forwarding to a person' })
+  @ApiProperty({ description: 'Indicates if it allows changing the confirmationStatus of the request (will also allow to update rating, and feedback)' })
   @Column({ default: false })
-  requiresForwardToPerson: boolean;
+  allowChangeconfirmationStatus: boolean;
+
+  @ApiProperty({ description: 'Indicates if it allows changing the verificationStatus of the request (will also automatically update verfiedBy, and verifiedAt)' })
+  @Column({ default: false })
+  allowChangeverificationStatus: boolean;
+
+  @ApiProperty({ description: 'Indicates if it allows forwarding to a department' })
+  @Column({ default: false })
+  allowsForwardToDepartment: boolean;
+
+  @ApiProperty({ description: 'Indicates if it allows forwarding to a person' })
+  @Column({ default: false })
+  allowsForwardToPerson: boolean;
 
   @OneToMany(() => RequestStatus, requestStatus => requestStatus.statusType)
   requestStatuses: RequestStatus[];
