@@ -19,8 +19,11 @@ export class MailService {
         to: email, // list of receivers
         subject: 'Welcome to Maintenance System! Confirm your Email', // Subject line
         text: `${token}`, // plaintext body
-        html: '<b>check the plain text for the token</b>', // HTML body content
-    });
+        html: `<b>check the plain text for the token</b> <br> 
+        <a href="http://localhost:5173/verify-email?token=${token}">link</a>
+        `, // HTML body content
+    
+      });
     console.log(`sent email to ${email} with token ${token}`)
     console.log()
   }
