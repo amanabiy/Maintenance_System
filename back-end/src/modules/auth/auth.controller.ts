@@ -1,4 +1,5 @@
-import { Controller, Post, Body, HttpStatus, BadRequestException, Param } from '@nestjs/common';
+
+import { Controller, Post, Body, HttpStatus, BadRequestException, Param, Get } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
@@ -8,6 +9,7 @@ import { LoginUserDto } from './dto/login.user.dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { MessageResponseDto } from 'src/dto/message-response.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
+import { ResetPasswordWithOtpDto } from './dto/reset-with-otp.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -36,6 +38,23 @@ export class AuthController {
   })
   async login(@Body() loginUserDto: LoginUserDto): Promise<AuthResponseDto> {
     return this.authService.login(loginUserDto);
+  }
+
+
+  @Get('request-new-token-to-verify-email/:email')
+  @ApiOperation({ summary: 'Request a new token to verify email' })
+  @ApiParam({ name: 'email', description: 'Email to verifiy the ' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Token sent to email successfully',
+    type: MessageResponseDto,
+  })
+  async requestToken(@Param('email') email: string): Promise<MessageResponseDto> {
+    const result = await this.authService.RequestToken(email);
+    if (!result) {
+      throw new BadRequestException('Could not send token to Email');
+    }
+    return { message: 'Token sent to Email Successfully' };
   }
 
   @Post('verify-email/:token')
@@ -69,14 +88,27 @@ export class AuthController {
 
   @Post('reset-password')
   @ApiOperation({ summary: 'Verify OTP and reset password' })
-  @ApiBody({ type: VerifyOtpDto })
+  @ApiBody({ type: ResetPasswordWithOtpDto })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Password reset successfully',
     type: MessageResponseDto,
   })
-  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto): Promise<MessageResponseDto> {
-    await this.authService.verifyOtp(verifyOtpDto.email, verifyOtpDto.otp, verifyOtpDto.newPassword);
+  async resetPasswordWithOtp(@Body() verifyOtpDto: ResetPasswordWithOtpDto): Promise<MessageResponseDto> {
+    await this.authService.ResetPasswordWithOtp(verifyOtpDto.email, verifyOtpDto.otp, verifyOtpDto.newPassword);
     return { message: 'Password reset successfully' };
+  }
+
+  @Post('verify-otp')
+  @ApiOperation({ summary: 'Verify OTP and reset password' })
+  @ApiBody({ type: VerifyOtpDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'OTP verified successfully',
+    type: MessageResponseDto,
+  })
+  async verifyOtp(@Body() verifyOtpDto: VerifyOtpDto): Promise<MessageResponseDto> {
+    await this.authService.verifyOtp(verifyOtpDto.email, verifyOtpDto.otp);
+    return { message: 'OTP verified successfully' };
   }
 }
