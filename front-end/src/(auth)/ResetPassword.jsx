@@ -25,7 +25,7 @@ const ResetPasswordForm = () => {
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const otp = sessionStorage.getItem("otp");
-  const email = useSelector((state) => state.auth.email);
+  const email = sessionStorage.getItem("email");
   const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
   console.log("the email", email, otp);
 
@@ -50,6 +50,12 @@ const ResetPasswordForm = () => {
     try {
       const result = await resetPassword({ email, otp, newPassword: password });
       console.log("the result", result);
+      if (result.data == "Password reset successfully") {
+        console.log("Password reset successfully");
+        sessionStorage.removeItem("otp");
+        sessionStorage.removeItem("email");
+        navigate("/login");
+      }
     } catch (err) {
       console.log("the err", err);
       setErrorMessage(err.data ? err.data.message : "Failed to reset password");

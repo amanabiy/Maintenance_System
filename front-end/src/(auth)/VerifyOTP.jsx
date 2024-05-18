@@ -14,24 +14,27 @@ import {
 } from "@mui/material";
 import { useVerifyOtpMutation } from "../redux/features/auth";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const VerifyOTP = () => {
   const [otp, setOTP] = useState("");
   const [error, setError] = useState("");
   const [values, setValues] = useState(Array(6).fill(""));
   const [verifyOtp, { isLoading, err }] = useVerifyOtpMutation();
-  const email = useSelector((state) => state.auth.email);
-  console.log("the email", email);
+  const email = sessionStorage.getItem("email");
+  const navigate = useNavigate();
   const handleOTPChange = (event) => {
     setOTP(event.target.value);
   };
 
   const handleVerifyOTP = async () => {
-    console.log("Verifying OTP:", values.join(""));
-    sessionStorage.setItem("otp", values.join(""));
     try {
       const result = await verifyOtp({ email, otp: values.join("") }).unwrap();
       console.log("OTP Verification Successful", result);
+      if (result.message === "OTP verified successfully") {
+        sessionStorage.setItem("otp", values.join(""));
+        navigate("/reset-password");
+      }
     } catch (err) {
       console.error("OTP Verification Failed", err);
       setErrorMessage(err.data ? err.data.message : "Failed to send OTP");

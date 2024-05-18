@@ -14,10 +14,12 @@ import {
   Typography,
 } from "@mui/material";
 import { useForgotPasswordMutation } from "../redux/features/auth";
+import { useNavigate } from "react-router-dom";
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
   const [forgotPassword, { isLoading, error }] = useForgotPasswordMutation();
 
   const handleSubmit = async () => {
@@ -36,7 +38,11 @@ const ForgotPasswordForm = () => {
     // Call the forgotPassword mutation here
     try {
       const result = await forgotPassword({ email }).unwrap();
-      console.log(result);
+      console.log("the result", result);
+      if (result.message === "OTP sent successfully") {
+        sessionStorage.setItem("email", email);
+        navigate("/verify-otp");
+      }
     } catch (err) {
       console.error("Forgot Password Failed", err);
       setErrorMessage(err.data ? err.data.message : "Failed to request OTP");

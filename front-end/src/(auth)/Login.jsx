@@ -18,6 +18,8 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useLoginMutation } from "../redux/features/auth";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slices/authSlice";
+// import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -26,6 +28,7 @@ const LoginForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [login, { isLoading, error }] = useLoginMutation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -41,14 +44,13 @@ const LoginForm = () => {
 
     setErrorMessage("");
     try {
-      // Using async-await to handle the promise returned by the mutation
       const result = await login({ email, password }).unwrap();
-      console.log("Registration Successful", result);
+      if (result.user.isVerified) {
+        navigate("/active");
+      }
       dispatch(loginSuccess({ result }));
-      // You can handle further logic here, such as redirecting the user
     } catch (err) {
       console.error("Registration Failed", err);
-      // err will contain any error response from the server, handle accordingly
       setErrorMessage(err.data ? err.data.message : "Failed to register");
     }
   };
@@ -227,6 +229,7 @@ const LoginForm = () => {
                     boxShadow: "none",
                     textTransform: "none",
                   }}
+                  onClick={() => navigate("/forgot-password")}
                 >
                   Forgot password?
                 </Button>
@@ -252,20 +255,28 @@ const LoginForm = () => {
               <Typography
                 variant="body2"
                 style={{
-                  fontSize: "8px",
+                  fontSize: "14px",
                   textAlign: "center",
-                  // marginTop: "1px",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
+                <Typography style={{ padding: "2px" }}>
+                  Don't have an account?
+                </Typography>
                 <Button
                   style={{
                     color: "#24344B",
                     outline: "none",
                     boxShadow: "none",
                     textTransform: "none",
+                    fontSize: "14px",
                   }}
+                  onClick={() => navigate("/")}
                 >
-                  Don't have an account? Create an account
+                  Create an account
                 </Button>
               </Typography>
             </Grid>
