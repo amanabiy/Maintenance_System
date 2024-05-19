@@ -45,7 +45,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     });
   }
 
-  async updateMaintenanceRequest(id: number, newRequestStatusTypeId: number, updateDto: UpdateMaintenanceRequestDto, currentUser: User, updateRequestStatus: UpdateRequestStatusDto): Promise<MaintenanceRequest> {
+  async updateMaintenanceRequest(id: number, newRequestStatusTypeId: number, updateDto: UpdateMaintenanceRequestDto, updateRequestStatus: UpdateRequestStatusDto, currentUser: User): Promise<MaintenanceRequest> {
     const maintenanceRequest: MaintenanceRequest = await this.maintenanceRequestService.findOne(id);
     const currentStatus = await super.findOne(-1, { where: { request: maintenanceRequest }, order: { createdAt: 'DESC' }, relations: ['statusType'] });
     const newRequestStatusType = await this.requestStatusTypeService.findOne(newRequestStatusTypeId);

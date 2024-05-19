@@ -8,6 +8,7 @@ import { FindAllResponseRequestStatusDto } from './dto/find-all-response-mainten
 import { UpdateMaintenanceRequestDto } from '../maintenance_request/dto/update-maintenance_request.dto';
 import { MaintenanceRequest } from '../maintenance_request/entities/maintenance_request.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ChangeRequestStatusDto } from './dto/change-request_status.dto';
 
 @ApiTags('Request Status')
 @Controller('maintenance-requests/:requestId/statuses')
@@ -20,10 +21,11 @@ export class RequestStatusController {
   async updateMaintenanceRequest(
     @Param('maintenanceRequestId') maintenanceRequestId: number,
     @Param('nextRequestTypeId') nextRequestTypeId: number,
-    @Body() updateDto: UpdateMaintenanceRequestDto,
+    @Body() updateDto: ChangeRequestStatusDto,
     @CurrentUser() currentUser: any,
   ): Promise<MaintenanceRequest> {
-    return await this.requestStatusService.updateMaintenanceRequest(maintenanceRequestId, nextRequestTypeId, updateDto, currentUser);
+    const {updateMaintenance, updateRequestStatus} = updateDto;
+    return await this.requestStatusService.updateMaintenanceRequest(maintenanceRequestId, nextRequestTypeId, updateMaintenance, updateRequestStatus, currentUser);
   }
 
   @Get()
