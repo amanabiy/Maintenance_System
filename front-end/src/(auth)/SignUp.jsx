@@ -19,18 +19,18 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useRegisterMutation } from "../redux/features/auth";
-import { isAsyncThunkAction } from "@reduxjs/toolkit";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const SignupForm = () => {
-  const [fullName, setFullName] = useState("");
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [fullName, setFullName] = useState("");
   const [isVisible, setIsVisible] = useState(false);
-  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [register, { isLoading, error }] = useRegisterMutation();
-  const navigate = useNavigate();
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
 
   const handleSubmit = async () => {
     if (!email || !fullName || !password) {
@@ -69,10 +69,8 @@ const SignupForm = () => {
     setErrorMessage("");
     try {
       const result = await register({ email, fullName, password }).unwrap();
-      console.log("Registration Successful", result);
       navigate("/check-your-email");
     } catch (err) {
-      console.error("Registration Failed", err);
       setErrorMessage(err.data ? err.data.message : "Failed to register");
     }
   };
@@ -175,8 +173,6 @@ const SignupForm = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-
-                  // width: '100%',
                 }}
               >
                 <InputLabel htmlFor="name" style={{ fontSize: "12px" }}>
@@ -206,8 +202,6 @@ const SignupForm = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-
-                  // width: '100%',
                 }}
               >
                 <InputLabel htmlFor="email" style={{ fontSize: "12px" }}>
@@ -254,8 +248,8 @@ const SignupForm = () => {
                         edge="end"
                         style={{
                           fontSize: "1rem",
-                          outline: "none", // Remove outline
-                          boxShadow: "none", // Remove any box shadow that might appear on focus
+                          outline: "none",
+                          boxShadow: "none",
                         }}
                       >
                         {isVisible ? (
@@ -304,8 +298,8 @@ const SignupForm = () => {
                         edge="end"
                         style={{
                           fontSize: "1rem",
-                          outline: "none", // Remove outline
-                          boxShadow: "none", // Remove any box shadow that might appear on focus
+                          outline: "none",
+                          boxShadow: "none",
                         }}
                       >
                         {isConfirmVisible ? (
@@ -341,8 +335,17 @@ const SignupForm = () => {
                 onClick={handleSubmit}
                 style={{ backgroundColor: "#24344B" }}
               >
-                {/* Add loading state here */}
-                Create Account
+                {isLoading ? (
+                  <>
+                    <CircularProgress
+                      size={24}
+                      style={{ color: "white", marginRight: 8 }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  "Create Account"
+                )}
               </Button>
             </Grid>
             <Grid item xs={12}>

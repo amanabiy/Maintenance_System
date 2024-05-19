@@ -18,17 +18,19 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useLoginMutation } from "../redux/features/auth";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slices/authSlice";
-// import { Navigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useRequestVerificationEmailMutation } from "../redux/features/auth";
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [login, { isLoading, error }] = useLoginMutation();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
+  const [requestVerificationEmail] = useRequestVerificationEmailMutation();
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -47,10 +49,13 @@ const LoginForm = () => {
       const result = await login({ email, password }).unwrap();
       if (result.user.isVerified) {
         navigate("/active");
+        dispatch(loginSuccess({ result }));
       }
-      dispatch(loginSuccess({ result }));
     } catch (err) {
-      console.error("Registration Failed", err);
+      if (err.data.message === "Please verify your email address") {
+        const res = await requestVerificationEmail(email);
+        navigate("/check-your-email");
+      }
       setErrorMessage(err.data ? err.data.message : "Failed to register");
     }
   };
@@ -139,8 +144,6 @@ const LoginForm = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-
-                  // width: '100%',
                 }}
               >
                 <InputLabel htmlFor="email" style={{ fontSize: "12px" }}>
@@ -247,8 +250,17 @@ const LoginForm = () => {
                 onClick={handleSubmit}
                 style={{ backgroundColor: "#24344B" }}
               >
-                {/* Add loading state here */}
-                Login
+                {isLoading ? (
+                  <>
+                    <CircularProgress
+                      size={24}
+                      style={{ color: "white", marginRight: 8 }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </Grid>
             <Grid item xs={12}>

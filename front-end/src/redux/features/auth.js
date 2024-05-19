@@ -7,4 +7,6 @@ export const {
     useForgotPasswordMutation,
     useResetPasswordMutation,
     useVerifyEmailMutation,
+    useRequestVerificationEmailMutation,
+    useRequestOtpMutation,
 } = authApi;
