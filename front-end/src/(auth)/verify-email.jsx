@@ -18,6 +18,7 @@ import VerifyImage from "../assets/images/verify-email.svg";
 import { useParams } from "react-router-dom";
 import { useVerifyEmailMutation } from "../redux/features/auth";
 import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const VerifyEmail = () => {
   const { token } = useParams();
@@ -28,10 +29,7 @@ const VerifyEmail = () => {
     try {
       const res = await verifyEmail(token);
       if (res.data.message === "Email verified successfully") {
-        console.log("Email verified successfully");
         navigate("/Login");
-      } else {
-        console.log("Email verification failed");
       }
     } catch (error) {
       console.log("error", error);
@@ -92,7 +90,17 @@ const VerifyEmail = () => {
             borderRadius: "10px",
           }}
         >
-          Verify your email
+          {isLoading ? (
+            <>
+              <CircularProgress
+                size={24}
+                style={{ color: "white", marginRight: 8 }}
+              />
+              Verifying...
+            </>
+          ) : (
+            "Verify Your Email"
+          )}
         </Button>
       </GridItem>
     </GridParent>

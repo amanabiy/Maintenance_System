@@ -1,28 +1,10 @@
-import React, { useState } from "react";
-import {
-  Box,
-  Button,
-  Container,
-  FormControl,
-  FormHelperText,
-  Grid,
-  IconButton,
-  InputAdornment,
-  InputLabel,
-  OutlinedInput,
-  Typography,
-} from "@mui/material";
+import React from "react";
+import { Typography } from "@mui/material";
 import GridItem from "../components/layout/GridItem";
 import GridParent from "../components/layout/GridParent";
 import CheckImage from "../assets/images/check-your-email.svg";
-import { useParams } from "react-router-dom";
 
 const CheckYourEmail = () => {
-  const handleSubmit = () => {
-    console.log("Email Sent");
-  };
-  const { token } = useParams();
-  console.log("the acquired token", token);
   return (
     <GridParent style={{}}>
       <GridItem
