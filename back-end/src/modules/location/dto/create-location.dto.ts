@@ -5,12 +5,12 @@ export class CreateLocationDto {
   @ApiProperty({ description: 'Block number of the location', example: '123A' })
   @IsNotEmpty()
   @IsString()
-  blockNumber: string;
+  blockNumber: number;
 
-  @ApiProperty({ description: 'Number of floors in the location', example: 5 })
+  @ApiProperty({ description: 'floor number', example: 5 })
   @IsNotEmpty()
   @IsNumber()
-  numberOfFloors: number;
+  floor: number;
 
   @ApiProperty({ description: 'Latitude of the location', required: false })
   @IsOptional()
@@ -25,10 +25,10 @@ export class CreateLocationDto {
   @ApiProperty({ description: 'Room number', example: '204', required: false })
   @IsOptional()
   @IsString()
-  roomNumbers?: string;
+  roomNumber?: string;
 
-  @ApiProperty({ description: 'Toilets per floor', example: true, required: false })
+  @ApiProperty({ description: 'is the location in toilet?', example: true, required: false })
   @IsOptional()
   @IsBoolean()
-  toiletsPerFloor?: boolean;
+  isToilet?: boolean;
 }
