@@ -2,12 +2,12 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, IsNumber, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateLocationDto {
-  @ApiProperty({ description: 'Block number of the location', example: '123A' })
+  @ApiProperty({ description: 'Block number of the location', example: 57 })
   @IsNotEmpty()
   @IsNumber()
   blockNumber: number;
 
-  @ApiProperty({ description: 'floor number', example: 5 })
+  @ApiProperty({ description: 'floor number', example: 2 })
   @IsNotEmpty()
   @IsNumber()
   floor: number;
@@ -27,7 +27,7 @@ export class CreateLocationDto {
   @IsString()
   roomNumber?: string;
 
-  @ApiProperty({ description: 'is the location in toilet?', example: true, required: false })
+  @ApiProperty({ description: 'is the location in toilet?', example: false, required: false })
   @IsOptional()
   @IsBoolean()
   isToilet?: boolean;
