@@ -17,7 +17,7 @@ import { ChangeRequestStatusDto } from './dto/change-request_status.dto';
 export class RequestStatusController {
   constructor(private readonly requestStatusService: RequestStatusService) {}
 
-  @Patch(':maintenanceRequestId/status/:nextRequestTypeId')
+  @Patch(':nextRequestTypeId')
   async updateMaintenanceRequest(
     @Param('maintenanceRequestId') maintenanceRequestId: number,
     @Param('nextRequestTypeId') nextRequestTypeId: number,

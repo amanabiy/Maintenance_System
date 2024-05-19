@@ -9,6 +9,10 @@ export class RequestStatusType extends BaseModelEntity {
   @Column()
   name: string;
 
+  @ApiProperty({ description: 'This status is the one that is automatically attached when a request is created' })
+  @Column({ default: false })
+  isInitialStatus: boolean;  
+
   @ApiProperty({ description: 'Indicates if it has a schedule' })
   @Column({ default: false })
   hasSchedule: boolean;

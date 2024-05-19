@@ -6,6 +6,7 @@ import {
   JoinTable,
   JoinColumn,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import {
@@ -119,5 +120,8 @@ export class MaintenanceRequest extends BaseModelEntity {
   @ApiProperty({ description: 'The statuses associated with this maintenance request' })
   @OneToMany(() => RequestStatus, requestStatus => requestStatus.request, { eager: true })
   requestStatuses: RequestStatus[];
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
 

@@ -16,6 +16,10 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
     super(requestStatusTypeRepository, 0, 10, ['allowedTransitions']);
   }
 
+  async findInitialStatusType(): Promise<RequestStatusType> {
+    return await this.findOne(-1, { where: { isInitialStatus: true } });
+  }
+
   async createRequestStatusType(createRequestStatusTypeDto: CreateRequestStatusTypeDto): Promise<RequestStatusType> {
     const { name, hasSchedule, needsFile, needsSignatures, 
       isInternal, allowsForwardToDepartment, allowsForwardToPerson, 

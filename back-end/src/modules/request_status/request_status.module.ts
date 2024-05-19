@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RequestStatusService } from './request_status.service';
 import { RequestStatusController } from './request_status.controller';
@@ -28,17 +28,20 @@ import { Location } from '../location/entities/location.entity';
 import { LocationModule } from '../location/location.module';
 import { LocationService } from '../location/location.service';
 import { MailService } from '../mail/mailer.service';
+import { RequestStatusTypeModule } from '../request_status_type/request_status_type.module';
 
 @Module({
   imports: [
             TypeOrmModule.forFeature([RequestStatus, MaintenanceRequest, User, MaintenanceRequestType,
             Department, Role, Media, RequestStatusType, Location]),
-            MaintenanceRequestModule, UserModule, MediaModule, RoleModule, MaintenanceRequestTypeModule,
+            forwardRef(() => MaintenanceRequestModule), RequestStatusModule, RequestStatusTypeModule,
+            UserModule, MediaModule, RoleModule, MaintenanceRequestTypeModule,
             DepartmentModule, LocationModule
         ],
   controllers: [RequestStatusController],
   providers: [RequestStatusService, RequestStatusTypeService, MaintenanceRequestService,
               UserService, MediaService, RoleService, MaintenanceRequestTypeService, DepartmentService,
               LocationService, MailService],
+  exports: [RequestStatusService],
 })
 export class RequestStatusModule {}

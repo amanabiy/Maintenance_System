@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RequestStatus } from './entities/request_status.entity';
@@ -23,6 +23,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     @InjectRepository(RequestStatus)
     private readonly requestStatusRepository: Repository<RequestStatus>,
     private readonly requestStatusTypeService: RequestStatusTypeService,
+    @Inject(forwardRef(() => MaintenanceRequestService))
     private readonly maintenanceRequestService: MaintenanceRequestService,
     private readonly userService: UserService,
     private readonly mediaService: MediaService,

@@ -8,5 +8,6 @@ import { RequestStatusType } from './entities/request_status_type.entity';
   imports: [TypeOrmModule.forFeature([RequestStatusType])],
   controllers: [RequestStatusTypeController],
   providers: [RequestStatusTypeService],
+  exports: [RequestStatusTypeService],
 })
 export class RequestStatusTypeModule {}

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MaintenanceRequestService } from './maintenance_request.service';
 import { MaintenanceRequestController } from './maintenance_request.controller';
@@ -20,19 +20,25 @@ import { Role } from '../role/entities/role.entity';
 import { MailService } from '../mail/mailer.service';
 import { MediaService } from '../media/media.service';
 import { Media } from '../media/entities/media.entity';
+import { RequestStatusService } from '../request_status/request_status.service';
+import { RequestStatusModule } from '../request_status/request_status.module';
+import { RequestStatus } from '../request_status/entities/request_status.entity';
+import { RequestStatusType } from '../request_status_type/entities/request_status_type.entity';
+import { RequestStatusTypeService } from '../request_status_type/request_status_type.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MaintenanceRequest, Location, User, MaintenanceRequestType,
-      Department, Role, Media]),
+      Department, Role, Media, RequestStatus, RequestStatusType]),
     LocationModule,
     UserModule,
     DepartmentModule,
-    MaintenanceRequestTypeModule
+    MaintenanceRequestTypeModule,
+    forwardRef(() => RequestStatusModule),
   ],
   controllers: [MaintenanceRequestController],
   providers: [MaintenanceRequestService, LocationService, UserService, DepartmentService,
-    MaintenanceRequestTypeService, RoleService, MailService,
+    MaintenanceRequestTypeService, RoleService, MailService, RequestStatusService, RequestStatusTypeService,
     MediaService],
 })
 export class MaintenanceRequestModule {}
