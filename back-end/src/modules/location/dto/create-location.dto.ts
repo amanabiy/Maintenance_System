@@ -4,7 +4,7 @@ import { IsNotEmpty, IsString, IsNumber, IsOptional, IsBoolean } from 'class-val
 export class CreateLocationDto {
   @ApiProperty({ description: 'Block number of the location', example: '123A' })
   @IsNotEmpty()
-  @IsString()
+  @IsNumber()
   blockNumber: number;
 
   @ApiProperty({ description: 'floor number', example: 5 })
