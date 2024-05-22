@@ -4,6 +4,7 @@ import GridItem from "../../components/layout/GridItem";
 import Widget from "../../components/widgets/Widget";
 import Featured from "../../components/widgets/Featured";
 import AreaChart from "../../components/charts/AreaChart";
+import Updates from "../../components/widgets/Updates";
 
 const Dashboard = () => {
   return (
@@ -21,6 +22,7 @@ const Dashboard = () => {
         <Widget />
         <Widget />
         <Widget />
+        <Updates />
       </GridItem>
       <GridItem
         xs={12}

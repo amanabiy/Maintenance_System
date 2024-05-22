@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 
 import Loading from "../components/loading/Loading.jsx";
+import { adminPaths } from "./paths";
 
 // Lazy loading components
 const SignUp = lazy(() => import("../(auth)/SignUp"));
@@ -28,6 +29,10 @@ const DataTable = lazy(() => import("../components/tables/DataTable.jsx"));
 const ProtectedRoute = lazy(() => import("./ProtectedRoute"));
 // admin pages
 const AdminDashboard = lazy(() => import("../pages/Admin/Dashboard"));
+const FinancialTransactions = lazy(() =>
+  import("../pages/Admin/FinancialTransactions")
+);
+const Users = lazy(() => import("../pages/Admin/Users"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
@@ -99,6 +104,7 @@ const router = createBrowserRouter(
           </Suspense>
         }
       >
+        {/* Admin Routes */}
         <Route
           path="admin-dashboard"
           element={
@@ -109,6 +115,28 @@ const router = createBrowserRouter(
         >
           <Route index element={<AdminDashboard />} />
         </Route>
+        <Route
+          path="all-users"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["admin"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<Users />} />
+        </Route>
+        <Route
+          path="financial-transactions"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["admin"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<FinancialTransactions />} />
+        </Route>
+
+        {/* Issuer Routes */}
         <Route
           path="user-dashboard"
           element={
