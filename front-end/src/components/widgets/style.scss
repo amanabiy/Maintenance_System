@@ -90,3 +90,43 @@
     }
   }
 }
+
+.updates {
+  flex: 2;
+
+  .title {
+    font-size: 14px;
+    font-weight: 600;
+    color: rgb(160, 160, 160);
+    margin-bottom: 10px;
+  }
+  .internal {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    border-radius: 5px;
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 5px 0px,
+      rgba(0, 0, 0, 0.1) 0px 0px 1px 0px;
+    padding: 10px;
+
+    .update {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px;
+      border-bottom: 0.5px solid #f0f0f0;
+
+      .left {
+        .avatar {
+          width: 32px;
+          height: 32px;
+        }
+      }
+      .right {
+        .msg {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}

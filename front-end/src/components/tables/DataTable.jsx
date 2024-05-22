@@ -38,10 +38,7 @@ const DataTable = ({ title, subTitle, rows, columns }) => {
   console.log(mockRequestData);
   return (
     <Box m="20px">
-      <AboveTableHeader
-        title={"My Reports"}
-        subTitle={"List of all my reports."}
-      />
+      <AboveTableHeader title={title} subTitle={subTitle} />
       <Box
         m="40px 0 0 0 "
         sx={{
@@ -51,8 +48,8 @@ const DataTable = ({ title, subTitle, rows, columns }) => {
         }}
       >
         <DataGrid
-          rows={mockRequestData}
-          columns={tempColumns}
+          rows={rows}
+          columns={columns}
           slots={{
             toolbar: GridToolbar,
           }}
