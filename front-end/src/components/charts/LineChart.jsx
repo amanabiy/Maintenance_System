@@ -1,7 +1,7 @@
-import React from "react";
+import "./style.scss";
 
 const LineChart = () => {
-  return <div>LineChart</div>;
+  return <div className="lineChart"></div>;
 };
 
 export default LineChart;

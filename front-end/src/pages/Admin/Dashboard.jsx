@@ -3,7 +3,7 @@ import GridParent from "../../components/layout/GridParent";
 import GridItem from "../../components/layout/GridItem";
 import Widget from "../../components/widgets/Widget";
 import Featured from "../../components/widgets/Featured";
-import LineChart from "../../components/charts/LineChart";
+import AreaChart from "../../components/charts/AreaChart";
 
 const Dashboard = () => {
   return (
@@ -44,7 +44,7 @@ const Dashboard = () => {
           padding: "20px",
         }}
       >
-        <LineChart />
+        <AreaChart />
       </GridItem>
     </GridParent>
   );
