@@ -5,6 +5,8 @@ import {
   Route,
 } from "react-router-dom";
 
+import Loading from "../components/loading/Loading.jsx";
+
 // Lazy loading components
 const SignUp = lazy(() => import("../(auth)/SignUp"));
 const Login = lazy(() => import("../(auth)/Login"));
@@ -32,7 +34,7 @@ const router = createBrowserRouter(
       <Route
         index
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <SignUp />
           </Suspense>
         }
@@ -40,7 +42,7 @@ const router = createBrowserRouter(
       <Route
         path="login"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <Login />
           </Suspense>
         }
@@ -48,7 +50,7 @@ const router = createBrowserRouter(
       <Route
         path="verify-email/:token"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <VerifyEmail />
           </Suspense>
         }
@@ -56,7 +58,7 @@ const router = createBrowserRouter(
       <Route
         path="check-your-email"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <CheckYourEmail />
           </Suspense>
         }
@@ -64,7 +66,7 @@ const router = createBrowserRouter(
       <Route
         path="forgot-password"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <ForgotPassword />
           </Suspense>
         }
@@ -72,7 +74,7 @@ const router = createBrowserRouter(
       <Route
         path="verify-otp"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <VerifyOTP />
           </Suspense>
         }
@@ -80,7 +82,7 @@ const router = createBrowserRouter(
       <Route
         path="reset-password"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <ResetPassword />
           </Suspense>
         }
@@ -88,7 +90,7 @@ const router = createBrowserRouter(
       <Route
         path="active"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <DashboardLayout />
           </Suspense>
         }
@@ -96,7 +98,7 @@ const router = createBrowserRouter(
         <Route
           path="user-dashboard"
           element={
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<Loading />}>
               <ProtectedRoute requiredRoles={["user"]} />
             </Suspense>
           }
@@ -106,7 +108,7 @@ const router = createBrowserRouter(
         <Route
           path="report-issue"
           element={
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<Loading />}>
               <ProtectedRoute requiredRoles={["user"]} />
             </Suspense>
           }
@@ -114,7 +116,7 @@ const router = createBrowserRouter(
           <Route
             index
             element={
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<Loading />}>
                 <ReportIssue />
               </Suspense>
             }
@@ -123,7 +125,7 @@ const router = createBrowserRouter(
         <Route
           path="my-reports"
           element={
-            <Suspense fallback={<div>Loading...</div>}>
+            <Suspense fallback={<Loading />}>
               <ProtectedRoute requiredRoles={["user"]} />
             </Suspense>
           }
@@ -131,7 +133,7 @@ const router = createBrowserRouter(
           <Route
             index
             element={
-              <Suspense fallback={<div>Loading...</div>}>
+              <Suspense fallback={<Loading />}>
                 <DataTable />
               </Suspense>
             }
@@ -141,7 +143,7 @@ const router = createBrowserRouter(
       <Route
         path="not-authorized"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <NotAuthorized />
           </Suspense>
         }
@@ -149,7 +151,7 @@ const router = createBrowserRouter(
       <Route
         path="*"
         element={
-          <Suspense fallback={<div>Loading...</div>}>
+          <Suspense fallback={<Loading />}>
             <NotFound />
           </Suspense>
         }

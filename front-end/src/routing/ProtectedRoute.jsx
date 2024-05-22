@@ -4,7 +4,7 @@ import { Navigate, Outlet } from "react-router-dom";
 // Mock function to get current user's role
 const getCurrentUserRole = () => {
   // This should come from your authentication logic
-  return "user"; // Example role, replace with actual logic
+  return "admin"; // Example role, replace with actual logic
 };
 
 const ProtectedRoute = ({ requiredRoles }) => {
