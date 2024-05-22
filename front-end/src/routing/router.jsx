@@ -18,12 +18,16 @@ const ResetPassword = lazy(() => import("../(auth)/ResetPassword"));
 const NotAuthorized = lazy(() =>
   import("../components/errorPages/NotAuthorized")
 );
+
+// issuer pages
 const MyRequests = lazy(() => import("../pages/Issuer/MyRequests"));
 const NotFound = lazy(() => import("../components/errorPages/NotFound"));
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
 const ReportIssue = lazy(() => import("../pages/Issuer/ReportIssue"));
 const DataTable = lazy(() => import("../components/tables/DataTable.jsx"));
 const ProtectedRoute = lazy(() => import("./ProtectedRoute"));
+// admin pages
+const AdminDashboard = lazy(() => import("../pages/Admin/Dashboard"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
@@ -95,6 +99,16 @@ const router = createBrowserRouter(
           </Suspense>
         }
       >
+        <Route
+          path="admin-dashboard"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["admin"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+        </Route>
         <Route
           path="user-dashboard"
           element={
