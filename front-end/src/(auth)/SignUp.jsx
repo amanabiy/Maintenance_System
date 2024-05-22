@@ -20,6 +20,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useRegisterMutation } from "../redux/features/auth";
 import CircularProgress from "@mui/material/CircularProgress";
+import SignUpSvg from "../assets/images/signup.svg";
 
 const SignupForm = () => {
   const navigate = useNavigate();
@@ -126,7 +127,7 @@ const SignupForm = () => {
         }}
       >
         <img
-          src="/signup.svg"
+          src={SignUpSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />

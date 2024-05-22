@@ -16,6 +16,7 @@ import { useVerifyOtpMutation } from "../redux/features/auth";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useRequestOtpMutation } from "../redux/features/auth";
+import VerifyOTPSvg from "../assets/images/verifyotp.svg";
 
 const VerifyOTP = () => {
   const navigate = useNavigate();
@@ -103,7 +104,7 @@ const VerifyOTP = () => {
         }}
       >
         <img
-          src="/verifyotp.svg"
+          src={VerifyOTPSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />

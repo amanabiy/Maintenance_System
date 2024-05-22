@@ -14,6 +14,7 @@ import {
 import { useForgotPasswordMutation } from "../redux/features/auth";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import ForgotPasswordSvg from "../assets/images/forgotpassword.svg";
 
 const ForgotPasswordForm = () => {
   const navigate = useNavigate();
@@ -75,7 +76,7 @@ const ForgotPasswordForm = () => {
         }}
       >
         <img
-          src="/forgotpassword.svg"
+          src={ForgotPasswordSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />

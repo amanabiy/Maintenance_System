@@ -23,7 +23,7 @@ import GridItem from "../components/layout/GridItem";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useRequestVerificationEmailMutation } from "../redux/features/auth";
-
+import LoginSvg from "../assets/images/login.svg";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
@@ -103,7 +103,7 @@ const LoginForm = () => {
         }}
       >
         <img
-          src="/login.svg"
+          src={LoginSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />
