@@ -8,6 +8,11 @@ import {
 // Lazy loading components
 const SignUp = lazy(() => import("../(auth)/SignUp"));
 const Login = lazy(() => import("../(auth)/Login"));
+const VerifyEmail = lazy(() => import("../(auth)/verify-email"));
+const CheckYourEmail = lazy(() => import("../(auth)/CheckYourEmail"));
+const VerifyOTP = lazy(() => import("../(auth)/VerifyOTP"));
+const ForgotPassword = lazy(() => import("../(auth)/ForgotPassword"));
+const ResetPassword = lazy(() => import("../(auth)/ResetPassword"));
 const NotAuthorized = lazy(() =>
   import("../components/errorPages/NotAuthorized")
 );
@@ -37,6 +42,46 @@ const router = createBrowserRouter(
         element={
           <Suspense fallback={<div>Loading...</div>}>
             <Login />
+          </Suspense>
+        }
+      />
+      <Route
+        path="verify-email/:token"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <VerifyEmail />
+          </Suspense>
+        }
+      />
+      <Route
+        path="check-your-email"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <CheckYourEmail />
+          </Suspense>
+        }
+      />
+      <Route
+        path="forgot-password"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <ForgotPassword />
+          </Suspense>
+        }
+      />
+      <Route
+        path="verify-otp"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <VerifyOTP />
+          </Suspense>
+        }
+      />
+      <Route
+        path="reset-password"
+        element={
+          <Suspense fallback={<div>Loading...</div>}>
+            <ResetPassword />
           </Suspense>
         }
       />

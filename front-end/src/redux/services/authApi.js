@@ -36,7 +36,25 @@ const authApi = baseApi.injectEndpoints({
                 method: 'POST',
                 body,
             })
-        })
+        }),
+        verifyEmail: builder.mutation({
+            query: (token) => ({
+                url: `auth/verify-email/${token}`,
+                method: 'POST',
+            })
+        }),
+        requestVerificationEmail: builder.mutation({
+            query: (email) => ({
+                url: `auth/request-new-token-to-verify-email/${email}`,
+                method: "GET",
+            })
+        }),
+        requestOtp: builder.mutation({
+            query: (email) => ({
+                url: `auth/request-otp/${email}`,
+                method: "POST",
+            })
+        }),
     }),
 });
 

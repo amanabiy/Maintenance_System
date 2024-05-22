@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MdOutlinePassword } from "react-icons/md";
 import { RiLockPasswordLine } from "react-icons/ri";
 import {
@@ -15,19 +16,19 @@ import {
   Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useSelector } from "react-redux";
 import { useResetPasswordMutation } from "../redux/features/auth";
+import CircularProgress from "@mui/material/CircularProgress";
 
 const ResetPasswordForm = () => {
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isVisible, setIsVisible] = useState(false);
-  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const navigate = useNavigate();
   const otp = sessionStorage.getItem("otp");
-  const email = useSelector((state) => state.auth.email);
+  const [password, setPassword] = useState("");
+  const email = sessionStorage.getItem("email");
+  const [isVisible, setIsVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isConfirmVisible, setIsConfirmVisible] = useState(false);
   const [resetPassword, { isLoading, error }] = useResetPasswordMutation();
-  console.log("the email", email, otp);
 
   const handleSubmit = async () => {
     if (!password || !confirmPassword) {
@@ -47,11 +48,16 @@ const ResetPasswordForm = () => {
       return;
     }
     setErrorMessage("");
+
     try {
       const result = await resetPassword({ email, otp, newPassword: password });
-      console.log("the result", result);
+
+      if (result.data.message == "Password reset successfully") {
+        sessionStorage.removeItem("otp");
+        sessionStorage.removeItem("email");
+        navigate("/login");
+      }
     } catch (err) {
-      console.log("the err", err);
       setErrorMessage(err.data ? err.data.message : "Failed to reset password");
     }
   };
@@ -246,8 +252,17 @@ const ResetPasswordForm = () => {
                 onClick={handleSubmit}
                 style={{ backgroundColor: "#24344B" }}
               >
-                {/* Add loading state here */}
-                Update Password
+                {isLoading ? (
+                  <>
+                    <CircularProgress
+                      size={24}
+                      style={{ color: "white", marginRight: 8 }}
+                    />
+                    Updating Password...
+                  </>
+                ) : (
+                  "Update Password"
+                )}
               </Button>
             </Grid>
           </Grid>

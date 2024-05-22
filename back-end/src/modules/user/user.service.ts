@@ -74,10 +74,15 @@ export class UserService extends GenericDAL<
       role,
       fullName,
     });
-    const token = this.jwtService.sign({ sub: createdUser.id, email: createdUser.email });
-    await this.mailService.sendUserConfirmation(createdUser.email, token);
-
+    
+    await this.sendVerifyEmailToken(createdUser);
     return plainToInstance(User, createdUser);
+  }
+
+  async sendVerifyEmailToken(user: User) {
+    const token = this.jwtService.sign({ sub: user.id, email: user.email });
+    await this.mailService.sendUserConfirmation(user.email, token);
+    return true
   }
 
   async updateUser(id: number, dto: UpdateUserDto, currentUser=null): Promise<User> {
