@@ -6,11 +6,11 @@ import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
 export class Location extends BaseModelEntity {
   @Column({ type: 'varchar', length: 255, nullable: true })
   @ApiProperty({ description: 'Block number of the location', example: 'B57' })
-  blockNumber: string;
+  blockNumber: number;
 
   @Column({ type: 'int', nullable : true })
-  @ApiProperty({ description: 'Number of floors in the location', example: 5 })
-  numberOfFloors: number;
+  @ApiProperty({ description: 'floor number', example: 5 })
+  floor: number;
 
   @Column({ type: 'float', nullable: true })
   @ApiProperty({ description: 'Latitude of the location', required: false })
@@ -26,13 +26,13 @@ export class Location extends BaseModelEntity {
     example: '204',
     required: false,
   })
-  roomNumbers: string;
+  roomNumber: string;
 
   @Column({ type: 'varchar', nullable: true })
   @ApiProperty({
-    description: 'Toilets per floor',
+    description: 'is the location in toilet?',
     example: true,
     required: false,
   })
-  toiletsPerFloor: boolean;
+  isToilet: boolean;
 }

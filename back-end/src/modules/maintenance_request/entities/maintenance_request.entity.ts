@@ -6,6 +6,7 @@ import {
   JoinTable,
   JoinColumn,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import {
@@ -28,6 +29,7 @@ import {
   MaintenanceVerificationStatusEnum,
 } from './maintenance_request.enum';
 import { Media } from 'src/modules/media/entities/media.entity';
+import { RequestStatus } from 'src/modules/request_status/entities/request_status.entity';
 
 @Entity('maintenance_requests')
 export class MaintenanceRequest extends BaseModelEntity {
@@ -51,6 +53,11 @@ export class MaintenanceRequest extends BaseModelEntity {
   @IsEnum(MaintenanceVerificationStatusEnum)
   @Column({ nullable: true })
   verificationStatus: MaintenanceVerificationStatusEnum;
+
+  @ApiProperty({ description: 'The user who requested the maintenance' })
+  @ManyToOne(() => User, { eager: true, nullable: true })
+  @JoinColumn({ name: 'requester_id' })
+  verifiedBy: Promise<User>;  
 
   @ApiProperty({ description: 'The date and time when the maintenance request was verified' })
   @IsOptional()
@@ -109,5 +116,12 @@ export class MaintenanceRequest extends BaseModelEntity {
   @OneToMany(() => Media, media => media.maintenanceRequests, { eager: true })
   @JoinColumn({ name: 'media_id'})
   mediaFiles: Media[];
+
+  @ApiProperty({ description: 'The statuses associated with this maintenance request' })
+  @OneToMany(() => RequestStatus, requestStatus => requestStatus.request, { eager: true })
+  requestStatuses: RequestStatus[];
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
 

@@ -12,6 +12,7 @@ import { MaintenanceRequestModule } from './modules/maintenance_request/maintena
 import { MailModule } from './modules/mail/mail.module';
 import { MediaModule } from './modules/media/media.module';
 import { RequestStatusModule } from './modules/request_status/request_status.module';
+import { RequestStatusTypeModule } from './modules/request_status_type/request_status_type.module';
 
 @Module({
   imports: [
@@ -34,7 +35,8 @@ import { RequestStatusModule } from './modules/request_status/request_status.mod
     MaintenanceRequestModule,
     MailModule,
     MediaModule,
-    RequestStatusModule
+    RequestStatusModule,
+    RequestStatusTypeModule
   ],
   controllers: [],
   providers: [

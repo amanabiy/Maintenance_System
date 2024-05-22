@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MaintenanceRequest } from './entities/maintenance_request.entity';
 import { In, Repository } from 'typeorm';
@@ -15,6 +15,8 @@ import { SearchMaintenanceRequestDto } from './dto/filter-maintenance_request.dt
 import findAllResponseDto from 'src/dto/find-all-response.dto';
 import { MaintenanceVerificationStatusEnum } from './entities/maintenance_request.enum';
 import { RoleService } from '../role/role.service';
+import { RequestStatusService } from '../request_status/request_status.service';
+import { RequestStatusTypeService } from '../request_status_type/request_status_type.service';
 
 @Injectable()
 export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, CreateMaintenanceRequestDto, UpdateMaintenanceRequestDto> {
@@ -27,8 +29,21 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     private readonly maintenanceRequestTypeService: MaintenanceRequestTypeService,
     private readonly mediaService: MediaService,
     private readonly roleService: RoleService,
+    @Inject(forwardRef(() => RequestStatusService))
+    private readonly requestStatusService: RequestStatusService,
+    private readonly requestStatusTypeService: RequestStatusTypeService,
   ) {
-    super(maintenanceRequestRepository);
+    super(maintenanceRequestRepository, 1, 10, 
+      [
+        'assignedPersons',
+        'maintenanceRequestTypes',
+        'handlingDepartment',
+        'requester',
+        'verifiedBy',
+        'mediaFiles',
+        'requestStatuses'
+      ]
+    );
   }
 
   async setVerificationStatus(dto: CreateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceVerificationStatusEnum> {
@@ -41,9 +56,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
   }
 
   async createRequest(dto: CreateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceRequest> {
-    const { locationId, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
+    const { locationCreate, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
 
-    const location = locationId ? await this.locationService.findOne(locationId) : null;
+    const location = locationCreate ? await this.locationService.create(locationCreate) : null;
     const requester = currentUser;
     const maintenanceRequestTypes = maintenanceRequestTypeIds ? await this.maintenanceRequestTypeService.findByIds(maintenanceRequestTypeIds) : [];
     const mediaFiles = mediaIds ? await this.mediaService.findByIds(mediaIds) : [];
@@ -58,7 +73,19 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
       mediaFiles,
     }
 
-    return super.create(toCreate);
+    const initialStatusType = await this.requestStatusTypeService.findInitialStatusType();
+
+    const maintenanceRequest = await this.create(toCreate);
+
+    // Create the initial request status
+    const initialRequestStatus = await this.requestStatusService.create({
+      request: Promise.resolve(maintenanceRequest),
+      statusType: initialStatusType,
+      statusUpdatedBy: Promise.resolve(currentUser),
+    });
+
+    maintenanceRequest.requestStatuses = [initialRequestStatus];
+    return await this.maintenanceRequestRepository.save(maintenanceRequest);
   }
 
   async updateRequest(id: number, dto: UpdateMaintenanceRequestDto, currentUser: User): Promise<MaintenanceRequest> {
@@ -126,13 +153,13 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     console.log("where", where)
     return await this.findWithPagination({
       where,
-      relations: [
-        'assignedPersons',
-        'maintenanceRequestTypes',
-        'handlingDepartment',
-        'requester',
-        // 'verifiedBy', // Add this if 'verifiedBy' is a relation
-      ],
     });
+  }
+
+  async delete(id: number): Promise<void> {
+    const result = await this.maintenanceRequestRepository.softDelete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`MaintenanceRequest with ID ${id} not found`);
+    }
   }
 }
