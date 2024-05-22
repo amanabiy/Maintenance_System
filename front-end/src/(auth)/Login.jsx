@@ -18,9 +18,12 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useLoginMutation } from "../redux/features/auth";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slices/authSlice";
+import GridParent from "../components/layout/GridParent";
+import GridItem from "../components/layout/GridItem";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useRequestVerificationEmailMutation } from "../redux/features/auth";
+
 
 const LoginForm = () => {
   const dispatch = useDispatch();
@@ -75,7 +78,7 @@ const LoginForm = () => {
   };
 
   return (
-    <Container
+    <GridParent
       style={{
         padding: 0,
         margin: 0,
@@ -86,14 +89,17 @@ const LoginForm = () => {
         flexDirection: "row",
       }}
     >
-      <Box
+      <GridItem
+        xs={6}
+        md={6}
         style={{
-          width: "50%",
+          // width: "50%",
           padding: "20px",
           backgroundColor: "#24344B",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          border: "solid red 2px",
         }}
       >
         <img
@@ -101,8 +107,10 @@ const LoginForm = () => {
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />
-      </Box>
-      <Box
+      </GridItem>
+      <GridItem
+        xs={6}
+        // md={6}
         style={{
           width: "50%",
           padding: "20px",
@@ -294,8 +302,8 @@ const LoginForm = () => {
             </Grid>
           </Grid>
         </FormControl>
-      </Box>
-    </Container>
+      </GridItem>
+    </GridParent>
   );
 };
 

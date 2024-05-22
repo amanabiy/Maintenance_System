@@ -11,13 +11,13 @@ import { issuerPaths } from "../../routing/paths";
 
 const SidebarData = {
   userButtons: {
-    main: [
-      {
-        text: "Dashboard",
-        icon: DashboardIcon,
-        path: issuerPaths.USER_DASHBOARD,
-      },
-    ],
+    // main: [
+    //   {
+    //     text: "Dashboard",
+    //     icon: DashboardIcon,
+    //     path: issuerPaths.USER_DASHBOARD,
+    //   },
+    // ],
     list: [
       {
         text: "My Reports",
@@ -31,11 +31,11 @@ const SidebarData = {
         icon: ReportIcon,
         path: issuerPaths.REPORT_ISSUE,
       },
-      {
-        text: "Notifications",
-        icon: NotificationsIcon,
-        path: issuerPaths.NOTIFICATIONS,
-      },
+      // {
+      //   text: "Notifications",
+      //   icon: NotificationsIcon,
+      //   path: issuerPaths.NOTIFICATIONS,
+      // },
     ],
     user: [
       {
@@ -43,11 +43,11 @@ const SidebarData = {
         icon: AccountCircleIcon,
         path: issuerPaths.MY_PROFILE,
       },
-      {
-        text: "Settings",
-        icon: SettingsIcon,
-        path: issuerPaths.SETTINGS,
-      },
+      // {
+      //   text: "Settings",
+      //   icon: SettingsIcon,
+      //   path: issuerPaths.SETTINGS,
+      // },
       {
         text: "Log Out",
         icon: LogoutIcon,

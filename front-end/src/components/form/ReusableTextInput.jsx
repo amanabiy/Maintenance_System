@@ -1,5 +1,6 @@
 import React from "react";
-import TextField from "@material-ui/core/TextField";
+import { TextField } from "@mui/material";
+import "./styles.scss";
 
 const ReusableTextInput = ({
   value,
@@ -8,9 +9,11 @@ const ReusableTextInput = ({
   placeholder,
   multiline,
   disabled,
+  onBlur,
 }) => {
   return (
     <TextField
+      className="reusable-text-input"
       label={label}
       placeholder={placeholder}
       value={value}
@@ -20,6 +23,7 @@ const ReusableTextInput = ({
       margin="normal"
       multiline={multiline}
       disabled={disabled}
+      onBlur={onBlur}
     />
   );
 };

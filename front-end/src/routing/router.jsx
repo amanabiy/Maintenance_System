@@ -97,7 +97,7 @@ const router = createBrowserRouter(
           path="user-dashboard"
           element={
             <Suspense fallback={<div>Loading...</div>}>
-              <ProtectedRoute requiredRoles={["admin"]} />
+              <ProtectedRoute requiredRoles={["user"]} />
             </Suspense>
           }
         >
