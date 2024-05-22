@@ -1,19 +1,42 @@
 import React from "react";
+import {
+  Avatar,
+  Button,
+  Checkbox,
+  Divider,
+  FormControl,
+  FormControlLabel,
+  FormGroup,
+  InputLabel,
+  MenuItem,
+  Select,
+  TextField,
+} from "@mui/material";
+
+import { useFormik } from "formik";
+
+// custom components
 import GridParent from "../../components/layout/GridParent";
 import GridItem from "../../components/layout/GridItem";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Select from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import Checkbox from "@mui/material/Checkbox";
-import FormGroup from "@mui/material/FormGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Divider from "@mui/material/Divider";
+import ReusableTextInput from "../../components/form/ReusableTextInput";
+import AboveTableHeader from "../../components/headers/AboveTableHeader";
 
+// form schema
+import { reportSchema } from "../../schemas";
+
+// const handleSubmit = () => {
+//   // handle form submission
+//   console.log("Form Submitted");
+// };
 const ReportIssue = () => {
+  const { values, handleBlur, handleChange, handleSubmit, errors, touched } =
+    useFormik({
+      initialValues: {
+        subject: "",
+        description: "",
+      },
+      validationSchema: reportSchema,
+    });
   return (
     <GridParent
       style={{
@@ -24,13 +47,24 @@ const ReportIssue = () => {
         alignItems: "center",
         backgroundColor: "#f9fbfd",
         borderRadius: "10px",
+        padding: "60px",
       }}
     >
-      <GridItem
-        xs={12}
+      <GridItem xs={12}>
+        <AboveTableHeader
+          title="Report Issue"
+          subTitle="Please leave as much description as you can of the issue you are facing."
+        />
+      </GridItem>
+      <form
         style={{
           padding: "20px",
+          border: " solid 1px #e0e0e0",
+          borderRadius: "10px",
+          boxShadow: "rgba(0, 0, 0, 0.1) 0px 1px 2px 0px",
+          width: "100%",
         }}
+        onSubmit={handleSubmit}
       >
         <GridParent>
           <GridItem
@@ -57,34 +91,42 @@ const ReportIssue = () => {
           </GridItem>
           <GridItem xs={12} style={{ marginTop: 20 }}>
             <GridParent style={{ justifyContent: "space-between" }}>
-              <GridItem xs={5}>
-                <TextField label="First Name" variant="outlined" fullWidth />
-              </GridItem>
-              <GridItem xs={5}>
-                <TextField label="Last Name" variant="outlined" fullWidth />
+              <GridItem xs={12} md={6}>
+                <TextField
+                  label="Subject"
+                  variant="outlined"
+                  fullWidth
+                  value={values.subject}
+                  id="subject"
+                  onChange={handleChange}
+                  placeholder="Enter a short subject explaining the issue."
+                  onBlur={handleBlur}
+                />
               </GridItem>
             </GridParent>
           </GridItem>
           <GridItem xs={12} style={{ marginTop: 10 }}>
-            <TextField
-              label="Address"
-              variant="outlined"
-              fullWidth
-              style={{ marginTop: 10 }}
-            />
-          </GridItem>
-          <GridItem xs={12} style={{ marginTop: 10 }}>
             <GridParent gap={2} style={{ justifyContent: "space-between" }}>
-              <GridItem xs={8}>
+              <GridItem xs={12} md={8}>
                 <TextField
                   label="Description"
                   multiline
                   rows={4}
                   variant="outlined"
                   fullWidth
+                  value={values.description}
+                  id="description"
+                  onChange={handleChange}
+                  placeholder="Enter a detailed description of the issue."
+                  onBlur={handleBlur}
+                  required
+                  error={errors.description && touched ? true : false}
+                  helperText={
+                    errors.description && touched ? errors.description : ""
+                  }
                 />
               </GridItem>
-              <GridItem xs={3}>
+              {/* <GridItem xs={3}>
                 <FormControl variant="outlined" fullWidth>
                   <InputLabel id="demo-simple-select-outlined-label">
                     Dropdown
@@ -99,7 +141,7 @@ const ReportIssue = () => {
                     <MenuItem value={3}>Option 3</MenuItem>
                   </Select>
                 </FormControl>
-              </GridItem>
+              </GridItem> */}
             </GridParent>
           </GridItem>
         </GridParent>
@@ -127,7 +169,7 @@ const ReportIssue = () => {
             Submit
           </Button>
         </div>
-      </GridItem>
+      </form>
     </GridParent>
   );
 };

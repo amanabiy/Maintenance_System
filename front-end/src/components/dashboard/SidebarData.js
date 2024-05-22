@@ -11,13 +11,13 @@ import { issuerPaths } from "../../routing/paths";
 
 const SidebarData = {
   userButtons: {
-    main: [
-      {
-        text: "Dashboard",
-        icon: DashboardIcon,
-        path: issuerPaths.USER_DASHBOARD,
-      },
-    ],
+    // main: [
+    //   {
+    //     text: "Dashboard",
+    //     icon: DashboardIcon,
+    //     path: issuerPaths.USER_DASHBOARD,
+    //   },
+    // ],
     list: [
       {
         text: "My Reports",
