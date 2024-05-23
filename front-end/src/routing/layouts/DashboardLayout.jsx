@@ -14,9 +14,7 @@ const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarType, setSidebarType] = useState("large-sidebar");
   const user = { user: { name: "User", role: "admin" } }; //useSelector((state) => state.auth.user) for later
-  const [sidebarButtons, setSidebarButtons] = useState(
-    SidebarData.adminButtons
-  );
+  const [sidebarButtons, setSidebarButtons] = useState(SidebarData.userButtons);
 
   const sidebarRef = useRef(null);
 
