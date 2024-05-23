@@ -19,11 +19,10 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess: (state, action) => {
-      console.log("the action", action);
       state.isAuthenticated = true;
       state.authToken = action.payload.result.accessToken;
       state.email = action.payload.result.user.email;
-      console.log("the email", state.email);
+      state.role = action.payload.result.user.role.roleName;
       setAuthTokenInCookie(action.payload.result.accessToken);
     },
     logout: (state) => {
