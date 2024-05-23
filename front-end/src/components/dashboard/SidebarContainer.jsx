@@ -7,16 +7,16 @@ import "./styles.scss";
 
 const SidebarContainer = React.forwardRef(
   ({ buttons, sidebarOpen, sidebarType }, ref) => {
-    console.log(sidebarOpen);
+    console.log(sidebarOpen, sidebarType);
     return (
       <div
         ref={ref}
         className={`sidebar ${
           sidebarType === "small-sidebar" && sidebarOpen
-            ? "small-sidebar animate-sidebar-open animate-sidebar-open-components"
+            ? "small-sidebar animate-sidebar-open"
             : sidebarType === "small-sidebar" && !sidebarOpen
             ? "small-sidebar animate-sidebar-close"
-            : "large-sidebar "
+            : "large-sidebar"
         } `}
       >
         <div className="top">
