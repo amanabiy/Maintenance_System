@@ -13,12 +13,24 @@ import "./style.scss";
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarType, setSidebarType] = useState("large-sidebar");
-  const user = { user: { name: "User", role: "admin" } }; //useSelector((state) => state.auth.user) for later
+  const userRole = sessionStorage.getItem("role");
   const [sidebarButtons, setSidebarButtons] = useState(
-    SidebarData.adminButtons
+    userRole && userRole === "STUDENT"
+      ? SidebarData.userButtons
+      : userRole && userRole === "ADMIN"
+      ? SidebarData.adminButtons
+      : []
   );
 
   const sidebarRef = useRef(null);
+
+  useEffect(() => {
+    if (userRole && userRole === "STUDENT") {
+      setSidebarButtons(SidebarData.userButtons);
+    } else if (userRole && userRole === "ADMIN") {
+      setSidebarButtons(SidebarData.adminButtons);
+    }
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -39,7 +51,11 @@ const DashboardLayout = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        sidebarType === "small-sidebar"
+      ) {
         setSidebarOpen(false);
       }
     };

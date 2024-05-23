@@ -109,7 +109,7 @@ const router = createBrowserRouter(
           path="admin-dashboard"
           element={
             <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["admin"]} />
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
             </Suspense>
           }
         >
@@ -119,7 +119,7 @@ const router = createBrowserRouter(
           path="all-users"
           element={
             <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["admin"]} />
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
             </Suspense>
           }
         >
@@ -129,7 +129,7 @@ const router = createBrowserRouter(
           path="financial-transactions"
           element={
             <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["admin"]} />
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
             </Suspense>
           }
         >
@@ -141,7 +141,7 @@ const router = createBrowserRouter(
           path="user-dashboard"
           element={
             <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["user"]} />
+              <ProtectedRoute requiredRoles={["STUDENT"]} />
             </Suspense>
           }
         >
@@ -151,7 +151,7 @@ const router = createBrowserRouter(
           path="report-issue"
           element={
             <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["user"]} />
+              <ProtectedRoute requiredRoles={["STUDENT"]} />
             </Suspense>
           }
         >
@@ -168,16 +168,14 @@ const router = createBrowserRouter(
           path="my-reports"
           element={
             <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["user"]} />
+              <ProtectedRoute requiredRoles={["STUDENT"]} />
             </Suspense>
           }
         >
           <Route
             index
             element={
-              <Suspense fallback={<Loading />}>
-                <DataTable />
-              </Suspense>
+              <Suspense fallback={<Loading />}>{/* <DataTable /> */}</Suspense>
             }
           />
         </Route>

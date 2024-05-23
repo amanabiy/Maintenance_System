@@ -8,7 +8,7 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import AboveTableHeader from "../headers/AboveTableHeader";
 
-const DataTable = ({ title, subTitle, rows, columns }) => {
+const DataTable = ({ title, subTitle, rows, columns, checkboxSelection }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const tempColumns = [
@@ -35,7 +35,6 @@ const DataTable = ({ title, subTitle, rows, columns }) => {
     },
   ];
 
-  console.log(mockRequestData);
   return (
     <Box m="20px">
       <AboveTableHeader title={title} subTitle={subTitle} />
@@ -50,6 +49,7 @@ const DataTable = ({ title, subTitle, rows, columns }) => {
         <DataGrid
           rows={rows}
           columns={columns}
+          checkboxSelection={checkboxSelection}
           slots={{
             toolbar: GridToolbar,
           }}
@@ -58,21 +58,41 @@ const DataTable = ({ title, subTitle, rows, columns }) => {
               color: colors.greenAccent[300],
             },
             "& .MuiDataGrid-columnHeader": {
-              backgroundColor: colors.blueAccent[700],
-              borderBottom: "none",
+              backgroundColor: "transparent",
+              border: "none",
             },
             "& .MuiDataGrid-root": {
               border: "none",
+              color: colors.grey[900],
             },
             "& .MuiDataGrid-cell": {
               borderTop: "none",
             },
-            "& .MuiDataGrid-virtualScroller": {
-              backgroundColor: colors.secondary[700],
+            "& .MuiDataGrid-row": {
+              borderTop: "none",
+              boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px;",
+              marginBottom: "3px",
+              marginTop: "3px",
+              marginLeft: "2px",
+
+              borderRadius: "5px",
+              width: "99.8%",
+              // margin: "5px",
+            },
+            "& .MuiDataGrid-virtualScrollerContent": {
+              color: colors.grey[100],
+            },
+            "& .MuiDataGrid-scrollbar--vertical": {
+              display: "none",
+              border: "none",
+            },
+            "& .MuiDataGrid-scrollbarFiller--borderTop": {
+              display: "none",
             },
             "& .MuiDataGrid-footerContainer": {
-              borderTop: "none",
-              backgroundColor: colors.blueAccent[700],
+              marginTop: "20px",
+
+              backgroundColor: "transparent",
             },
             "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
               color: `${colors.grey[100]} !important`,
