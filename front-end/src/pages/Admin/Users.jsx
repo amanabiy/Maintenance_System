@@ -12,6 +12,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 
 const Users = () => {
   const theme = useTheme();
@@ -85,6 +86,7 @@ const Users = () => {
           checkboxSelection={true}
         />
       </GridItem>
+      <DeleteConfirmation open={false} />
     </GridParent>
   );
 };
