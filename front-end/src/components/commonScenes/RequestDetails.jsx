@@ -16,6 +16,7 @@ import LeakingPipe1 from "../../assets/images/leakingPipe.jpg";
 import LeakingPipe2 from "../../assets/images/leaking-pipe2.webp";
 import ImageSlider from "../display/ImageSlider";
 import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import MapComponent from "../display/MapComponent";
 // import Map from "../../components/Map"; // Assuming you have a Map component for displaying the location
 
 const RequestDetails = () => {
@@ -65,7 +66,7 @@ const RequestDetails = () => {
   return (
     <div style={{ padding: "16px" }}>
       <GridParent>
-        <GridItem xs={12} md={6}>
+        <GridItem xs={12} md={7}>
           <Card
             style={{
               maxWidth: "1200px",
@@ -90,24 +91,28 @@ const RequestDetails = () => {
             </Typography>
             <Typography variant="body1" style={{ margin: "8px 0" }}>
               Provided Description:{" "}
-              <Typography variant="body2">
-                {maintenanceRequest.description}
-              </Typography>
+              <span>
+                <Typography variant="body2">
+                  {maintenanceRequest.description}
+                </Typography>
+              </span>
             </Typography>
             <Typography variant="body1">
               Location:
-              <Typography variant="body2">
-                <strong>Block: </strong>
-                {maintenanceRequest.location.blockNumber},{" "}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Room Number: </strong>
-                {maintenanceRequest.location.roomNumber},{" "}
-              </Typography>
-              <Typography variant="body2">
-                <strong>Floor: </strong>
-                {maintenanceRequest.location.floor}
-              </Typography>
+              <span>
+                <Typography variant="body2">
+                  <strong>Block: </strong>
+                  {maintenanceRequest.location.blockNumber},{" "}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Room Number: </strong>
+                  {maintenanceRequest.location.roomNumber},{" "}
+                </Typography>
+                <Typography variant="body2">
+                  <strong>Floor: </strong>
+                  {maintenanceRequest.location.floor}
+                </Typography>
+              </span>
             </Typography>
             <div>
               <Typography variant="body1">Requester:</Typography>
@@ -133,12 +138,21 @@ const RequestDetails = () => {
             </div>
           </CardContent>
         </GridItem>
-        <GridItem xs={12} md={6}>
-          <div style={{ aspectRatio: "1/1", border: "1px solid black" }}>
-            {/* <Map
-              latitude={maintenanceRequest.location.latitude}
+        <GridItem xs={12} md={5}>
+          <div
+            style={{
+              aspectRatio: "1/1.5",
+              borderRadius: "8px",
+              overflow: "hidden",
+              border: "1px solid #e0e0e0",
+              marginLeft: "10px",
+            }}
+          >
+            <MapComponent
               longitude={maintenanceRequest.location.longitude}
-            /> */}
+              latitude={maintenanceRequest.location.latitude}
+              style={{ height: "100%", width: "100%", borderRadius: "8px" }}
+            />
           </div>
         </GridItem>
       </GridParent>
