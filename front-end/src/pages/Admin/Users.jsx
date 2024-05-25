@@ -62,12 +62,22 @@ const Users = () => {
       renderCell: () => (
         <Box>
           <Tooltip title="Edit User">
-            <IconButton>
+            <IconButton
+              onClick={(event) => {
+                event.stopPropagation();
+                // Add your edit user logic here
+              }}
+            >
               <EditIcon style={{ color: colors.primary[500] }} />
             </IconButton>
           </Tooltip>
           <Tooltip title="Remove User">
-            <IconButton>
+            <IconButton
+              onClick={(event) => {
+                event.stopPropagation();
+                // Add your edit user logic here
+              }}
+            >
               <PersonRemoveIcon style={{ color: colors.redAccent[500] }} />
             </IconButton>
           </Tooltip>

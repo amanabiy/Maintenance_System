@@ -33,9 +33,11 @@ const FinancialTransactions = lazy(() =>
   import("../pages/Admin/FinancialTransactions")
 );
 const Users = lazy(() => import("../pages/Admin/Users"));
+const Requests = lazy(() => import("../pages/Admin/Requests"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
+import RequestDetails from "../components/commonScenes/RequestDetails.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -134,6 +136,18 @@ const router = createBrowserRouter(
           }
         >
           <Route index element={<FinancialTransactions />} />
+        </Route>
+        <Route
+          path="all-requests"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<Requests />} />
+          <Route path="view/:requestId" element={<RequestDetails />} />
+          <Route path="edit/:requestId" element={<RequestDetails />} />
         </Route>
 
         {/* Issuer Routes */}
