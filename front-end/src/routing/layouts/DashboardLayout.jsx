@@ -13,7 +13,7 @@ import "./style.scss";
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [sidebarType, setSidebarType] = useState("large-sidebar");
-  const userRole = sessionStorage.getItem("role");
+  const userRole = localStorage.getItem("role");
   const [sidebarButtons, setSidebarButtons] = useState(
     userRole && userRole === "STUDENT"
       ? SidebarData.userButtons

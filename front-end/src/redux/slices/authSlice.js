@@ -1,7 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const setAuthTokenInCookie = (token) => {
-  document.cookie = `authToken=${token}; path=/`;
+  const expires = new Date();
+  expires.setTime(expires.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days expiry
+  document.cookie = `authToken=${token}; path=/; expires=${expires.toUTCString()}; secure; samesite=strict`;
 };
 
 const removeAuthTokenFromCookie = () => {
@@ -10,11 +12,11 @@ const removeAuthTokenFromCookie = () => {
 };
 
 const setRoleInSession = (role) => {
-  sessionStorage.setItem("role", role);
+  localStorage.setItem("role", role);
 };
 
 const removeRoleFromSession = () => {
-  sessionStorage.removeItem("role");
+  localStorage.removeItem("role");
 };
 
 const initialState = {
@@ -29,6 +31,7 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess: (state, action) => {
+      console.log(action.payload);
       state.isAuthenticated = true;
       state.authToken = action.payload.result.accessToken;
       state.email = action.payload.result.user.email;
