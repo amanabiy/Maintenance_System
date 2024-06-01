@@ -18,14 +18,22 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useLoginMutation } from "../redux/features/auth";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/slices/authSlice";
+import GridParent from "../components/layout/GridParent";
+import GridItem from "../components/layout/GridItem";
+import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useRequestVerificationEmailMutation } from "../redux/features/auth";
+import LoginSvg from "../assets/images/login.svg";
 
 const LoginForm = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isVisible, setIsVisible] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [login, { isLoading, error }] = useLoginMutation();
-  const dispatch = useDispatch();
+  const [requestVerificationEmail] = useRequestVerificationEmailMutation();
 
   const handleSubmit = async () => {
     if (!email || !password) {
@@ -41,14 +49,16 @@ const LoginForm = () => {
 
     setErrorMessage("");
     try {
-      // Using async-await to handle the promise returned by the mutation
       const result = await login({ email, password }).unwrap();
-      console.log("Registration Successful", result);
-      dispatch(loginSuccess({ result }));
-      // You can handle further logic here, such as redirecting the user
+      if (result.user.isVerified) {
+        navigate("/active");
+        dispatch(loginSuccess({ result }));
+      }
     } catch (err) {
-      console.error("Registration Failed", err);
-      // err will contain any error response from the server, handle accordingly
+      if (err.data.message === "Please verify your email address") {
+        const res = await requestVerificationEmail(email);
+        navigate("/check-your-email");
+      }
       setErrorMessage(err.data ? err.data.message : "Failed to register");
     }
   };
@@ -68,7 +78,7 @@ const LoginForm = () => {
   };
 
   return (
-    <Container
+    <GridParent
       style={{
         padding: 0,
         margin: 0,
@@ -79,23 +89,28 @@ const LoginForm = () => {
         flexDirection: "row",
       }}
     >
-      <Box
+      <GridItem
+        xs={6}
+        md={6}
         style={{
-          width: "50%",
+          // width: "50%",
           padding: "20px",
           backgroundColor: "#24344B",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
+          border: "solid red 2px",
         }}
       >
         <img
-          src="/login.svg"
+          src={LoginSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />
-      </Box>
-      <Box
+      </GridItem>
+      <GridItem
+        xs={6}
+        // md={6}
         style={{
           width: "50%",
           padding: "20px",
@@ -137,8 +152,6 @@ const LoginForm = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-
-                  // width: '100%',
                 }}
               >
                 <InputLabel htmlFor="email" style={{ fontSize: "12px" }}>
@@ -227,6 +240,7 @@ const LoginForm = () => {
                     boxShadow: "none",
                     textTransform: "none",
                   }}
+                  onClick={() => navigate("/forgot-password")}
                 >
                   Forgot password?
                 </Button>
@@ -244,35 +258,52 @@ const LoginForm = () => {
                 onClick={handleSubmit}
                 style={{ backgroundColor: "#24344B" }}
               >
-                {/* Add loading state here */}
-                Login
+                {isLoading ? (
+                  <>
+                    <CircularProgress
+                      size={24}
+                      style={{ color: "white", marginRight: 8 }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  "Login"
+                )}
               </Button>
             </Grid>
             <Grid item xs={12}>
               <Typography
                 variant="body2"
                 style={{
-                  fontSize: "8px",
+                  fontSize: "14px",
                   textAlign: "center",
-                  // marginTop: "1px",
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
                 }}
               >
+                <Typography style={{ padding: "2px" }}>
+                  Don't have an account?
+                </Typography>
                 <Button
                   style={{
                     color: "#24344B",
                     outline: "none",
                     boxShadow: "none",
                     textTransform: "none",
+                    fontSize: "14px",
                   }}
+                  onClick={() => navigate("/")}
                 >
-                  Don't have an account? Create an account
+                  Create an account
                 </Button>
               </Typography>
             </Grid>
           </Grid>
         </FormControl>
-      </Box>
-    </Container>
+      </GridItem>
+    </GridParent>
   );
 };
 

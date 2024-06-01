@@ -15,4 +15,12 @@ export const generalPaths = {
   NOT_AUTHORIZED: "/not-authorized",
 };
 
-export const adminPaths = {};
+export const adminPaths = {
+  ADMIN_DASHBOARD: "/admin-dashboard",
+  GENERATE_REPORT: "/generate-report",
+  REQUESTS: "/all-requests",
+  FINANCIAL_TRANSACTIONS: "/financial-transactions",
+  STORE_TRANSACTIONS: "/store-transactions",
+  USERS: "/all-users",
+  MY_PROFILE: "/admin-profile",
+};

@@ -7,15 +7,17 @@ import {
   FormControl,
   FormHelperText,
   Grid,
-  IconButton,
-  InputAdornment,
   InputLabel,
   OutlinedInput,
   Typography,
 } from "@mui/material";
 import { useForgotPasswordMutation } from "../redux/features/auth";
+import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+import ForgotPasswordSvg from "../assets/images/forgotpassword.svg";
 
 const ForgotPasswordForm = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [forgotPassword, { isLoading, error }] = useForgotPasswordMutation();
@@ -33,12 +35,15 @@ const ForgotPasswordForm = () => {
     }
 
     setErrorMessage("");
-    // Call the forgotPassword mutation here
+
     try {
       const result = await forgotPassword({ email }).unwrap();
-      console.log(result);
+
+      if (result.message === "OTP sent successfully") {
+        sessionStorage.setItem("email", email);
+        navigate("/verify-otp");
+      }
     } catch (err) {
-      console.error("Forgot Password Failed", err);
       setErrorMessage(err.data ? err.data.message : "Failed to request OTP");
     }
   };
@@ -71,7 +76,7 @@ const ForgotPasswordForm = () => {
         }}
       >
         <img
-          src="/forgotpassword.svg"
+          src={ForgotPasswordSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />
@@ -98,9 +103,6 @@ const ForgotPasswordForm = () => {
           >
             FORGOT PASSWORD
           </Typography>
-          {errorMessage && (
-            <FormHelperText error>{errorMessage}</FormHelperText>
-          )}
           <Grid
             container
             spacing={2}
@@ -121,8 +123,6 @@ const ForgotPasswordForm = () => {
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-
-                  // width: '100%',
                 }}
               >
                 <InputLabel htmlFor="email" style={{ fontSize: "12px" }}>
@@ -147,9 +147,12 @@ const ForgotPasswordForm = () => {
                 />
               </FormControl>
             </Grid>
-
-            <Grid item xs={4}>
+            <Grid item xs={6}>
+              {errorMessage && (
+                <FormHelperText error>{errorMessage}</FormHelperText>
+              )}
               <Button
+                xs={4}
                 type="submit"
                 fullWidth
                 variant="contained"
@@ -157,8 +160,17 @@ const ForgotPasswordForm = () => {
                 onClick={handleSubmit}
                 style={{ backgroundColor: "#24344B" }}
               >
-                {/* Add loading state here */}
-                Submit
+                {isLoading ? (
+                  <>
+                    <CircularProgress
+                      size={24}
+                      style={{ color: "white", marginRight: 8 }}
+                    />
+                    Processing...
+                  </>
+                ) : (
+                  "Submit"
+                )}
               </Button>
             </Grid>
           </Grid>

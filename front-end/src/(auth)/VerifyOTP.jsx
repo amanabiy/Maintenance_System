@@ -13,28 +13,39 @@ import {
   Typography,
 } from "@mui/material";
 import { useVerifyOtpMutation } from "../redux/features/auth";
-import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useRequestOtpMutation } from "../redux/features/auth";
+import VerifyOTPSvg from "../assets/images/verifyotp.svg";
 
 const VerifyOTP = () => {
-  const [otp, setOTP] = useState("");
+  const navigate = useNavigate();
   const [error, setError] = useState("");
+  const email = sessionStorage.getItem("email");
   const [values, setValues] = useState(Array(6).fill(""));
   const [verifyOtp, { isLoading, err }] = useVerifyOtpMutation();
-  const email = useSelector((state) => state.auth.email);
-  console.log("the email", email);
-  const handleOTPChange = (event) => {
-    setOTP(event.target.value);
-  };
+  const [requestOtp] = useRequestOtpMutation();
 
   const handleVerifyOTP = async () => {
-    console.log("Verifying OTP:", values.join(""));
-    sessionStorage.setItem("otp", values.join(""));
     try {
       const result = await verifyOtp({ email, otp: values.join("") }).unwrap();
-      console.log("OTP Verification Successful", result);
+      if (result.message === "OTP verified successfully") {
+        sessionStorage.setItem("otp", values.join(""));
+        navigate("/reset-password");
+      }
     } catch (err) {
-      console.error("OTP Verification Failed", err);
-      setErrorMessage(err.data ? err.data.message : "Failed to send OTP");
+      setError(err.data ? err.data.message : "Failed to send OTP");
+    }
+  };
+
+  const handleResendOTP = async () => {
+    try {
+      const result = await requestOtp(email).unwrap();
+      if (result.message === "OTP sent successfully") {
+        setError("");
+      }
+    } catch (err) {
+      setError(err.data ? err.data.message : "Failed to send OTP");
     }
   };
 
@@ -93,7 +104,7 @@ const VerifyOTP = () => {
         }}
       >
         <img
-          src="/verifyotp.svg"
+          src={VerifyOTPSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />
@@ -184,6 +195,7 @@ const VerifyOTP = () => {
               textAlign: "center",
               textDecoration: "underline",
             }}
+            onClick={handleResendOTP}
           >
             Resend Code
           </Button>
@@ -196,7 +208,17 @@ const VerifyOTP = () => {
               borderRadius: "10px",
             }}
           >
-            Verify Account
+            {isLoading ? (
+              <>
+                <CircularProgress
+                  size={24}
+                  style={{ color: "white", marginRight: 8 }}
+                />
+                Verifying...
+              </>
+            ) : (
+              "Verify Account"
+            )}
           </Button>
         </div>
       </Box>
@@ -205,7 +227,3 @@ const VerifyOTP = () => {
 };
 
 export default VerifyOTP;
-
-{
-  /*  */
-}
