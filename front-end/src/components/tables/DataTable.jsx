@@ -11,29 +11,6 @@ import AboveTableHeader from "../headers/AboveTableHeader";
 const DataTable = ({ title, subTitle, rows, columns, checkboxSelection }) => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const tempColumns = [
-    { field: "id", headerName: "ID" },
-    {
-      field: "requestTitle",
-      headerName: "Request Title",
-      flex: 1,
-      cellClassName: "name-column-cell",
-    },
-    { field: "requestStatus", headerName: "Request Status", flex: 1 },
-    { field: "locationId", headerName: "Location ID", flex: 1 },
-    {
-      field: "actions",
-      headerName: "Actions",
-      flex: 1,
-      renderCell: () => (
-        <Box>
-          <AdminPanelSettingsOutlinedIcon style={{ color: colors.primary }} />
-          <LockOpenOutlinedIcon style={{ color: colors.primary }} />
-          <SecurityOutlinedIcon style={{ color: colors.primary }} />
-        </Box>
-      ),
-    },
-  ];
 
   return (
     <Box m="20px">
@@ -96,6 +73,9 @@ const DataTable = ({ title, subTitle, rows, columns, checkboxSelection }) => {
             },
             "& .MuiDataGrid-toolbarContainer .MuiButton-text": {
               color: `${colors.grey[100]} !important`,
+            },
+            "& .MuiDataGrid-filler": {
+              display: "none",
             },
           }}
         />

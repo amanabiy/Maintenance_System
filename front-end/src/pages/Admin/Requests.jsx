@@ -1,27 +1,43 @@
-import React from "react";
-import GridParent from "../../components/layout/GridParent";
-import GridItem from "../../components/layout/GridItem";
-import DataTable from "../../components/tables/DataTable";
-import { mockRequestData } from "../../data/mockRequestData";
-import { useTheme } from "@mui/material/styles";
-import { tokens } from "../../theme";
-import { IconButton, Tooltip } from "@mui/material";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { useTheme } from "@mui/material/styles";
+import {
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Box,
+  Typography,
+  Alert,
+} from "@mui/material";
 
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import EditIcon from "@mui/icons-material/Edit";
-import CheckIcon from "@mui/icons-material/Check";
-import BuildIcon from "@mui/icons-material/Build";
 import DoneAllIcon from "@mui/icons-material/DoneAll";
+import BuildIcon from "@mui/icons-material/Build";
+import GridParent from "../../components/layout/GridParent";
+import GridItem from "../../components/layout/GridItem";
+import DataTable from "../../components/tables/DataTable";
+import Loading from "../../components/loading/Loading";
+import { tokens } from "../../theme";
+import { useGetMaintenanceRequestsQuery } from "../../redux/features/maintenanceRequest";
 
 const Requests = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const navigate = useNavigate();
+
+  const { data: requests, error, status } = useGetMaintenanceRequestsQuery();
+
+  console.log(requests, error, status);
+  // const requests = [];
+  // const error = null;
+  // const status = "succeeded";
+
   const columns = [
     { field: "id", headerName: "ID" },
     { field: "createdAt", headerName: "Request Date", flex: 1 },
-    { field: "Subject", headerName: "Subject", flex: 1 },
+    { field: "subject", headerName: "Subject", flex: 1 },
     {
       field: "verificationStatus",
       headerName: "Verification Status",
@@ -51,7 +67,7 @@ const Requests = () => {
             </div>
           </div>
         ) : (
-          <div style={{ color: colors.redAccent[500] }}>Not Verified </div>
+          <div style={{ color: colors.redAccent[500] }}>Not Verified</div>
         ),
     },
     {
@@ -87,9 +103,9 @@ const Requests = () => {
         ),
     },
     {
-      field: "blockNumber",
+      field: "location",
       headerName: "Block Number",
-      renderCell: (params) => <div>B-{params.value}</div>,
+      renderCell: (params) => <div>B-{params.value.blockNumber}</div>,
     },
     {
       field: "actions",
@@ -102,7 +118,6 @@ const Requests = () => {
                 onClick={(event) => {
                   event.stopPropagation();
                   navigate(`view/${params.id}`);
-                  // Add your edit user logic here
                 }}
               >
                 <VisibilityIcon />
@@ -113,7 +128,6 @@ const Requests = () => {
                 onClick={(event) => {
                   event.stopPropagation();
                   navigate(`edit/${params.id}`);
-                  // Add your edit user logic here
                 }}
               >
                 <EditIcon />
@@ -124,10 +138,19 @@ const Requests = () => {
       },
     },
   ];
+
   return (
     <GridParent>
       <GridItem xs={12}>
-        <DataTable rows={mockRequestData} columns={columns} />
+        {status === "pending" && <Loading />}
+        {status === "failed" && (
+          <Alert severity="error">
+            Can't seem to load the data at the moment.
+          </Alert>
+        )}
+        {status === "fulfilled" && requests && requests.items && (
+          <DataTable rows={requests.items} columns={columns} />
+        )}
       </GridItem>
     </GridParent>
   );
