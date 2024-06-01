@@ -39,6 +39,9 @@ Follow these steps for the initial setup:
     docker-compose up
     ```
 
+## Running the migration
+
+
 ## Usage
 
 Once the setup is complete, use the following command to start the application, which will be hosted on localhost port 8081:
