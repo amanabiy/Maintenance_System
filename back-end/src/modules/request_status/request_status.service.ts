@@ -16,6 +16,7 @@ import { MaintenanceRequestTypeService } from '../maintenance_request_type/maint
 import { DepartmentService } from '../department/department.service';
 import { User } from '../user/entities/user.entity';
 import { UpdateRequestStatusDto } from './dto/update-request_status.dto';
+import { LocationService } from '../location/location.service';
 
 @Injectable()
 export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
@@ -30,6 +31,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     private readonly roleService: RoleService,
     private readonly maintenanceRequestTypeService: MaintenanceRequestTypeService,
     private readonly departmentService: DepartmentService,
+    private readonly locationService: LocationService,
   ) {
     super(requestStatusRepository, 0, 10, ['request', 'statusUpdatedBy', 'statusType']);
   }
@@ -53,6 +55,10 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     let internalVersionChanges = 'Internal changes\n';
 
 
+    const hasAllowedRole = newRequestStatusType.allowedRoles.some(role => role.id === currentUser.role.id);
+    if (!hasAllowedRole) {
+      throw new Error('User does not have the allowed role to update the status');
+    }
 
     // Check if the new request status type is an allowed transition
     const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => transition.id === newRequestStatusTypeId);
@@ -66,9 +72,9 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       internalVersionChanges += `Priority changed from ${oldPriority} to ${updateDto.priority}\n`;
     }
 
-    if (newRequestStatusType.needsFile && !maintenanceRequest.mediaFiles.length) {
-      throw new Error('File is required');
-    }
+    // if (newRequestStatusType.needsFile && !maintenanceRequest.mediaFiles.length) {
+    //   throw new Error('File is required');
+    // }
 
     // update for feedback, confirmationStatus, verificationStatus
     if (newRequestStatusType.allowChangeconfirmationStatus) {
@@ -110,6 +116,31 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     if (newRequestStatusType.allowsChangeRequestTypes && updateDto.maintenanceRequestTypeIds) {
       internalVersionChanges += `Maintenance request types updated from ${maintenanceRequest.maintenanceRequestTypes} to ${updateDto.maintenanceRequestTypeIds}\n`;
       maintenanceRequest.maintenanceRequestTypes = await this.maintenanceRequestTypeService.findByIds(updateDto.maintenanceRequestTypeIds);
+    }
+
+    // Update location if allowed
+    if (newRequestStatusType.allowsChangeLocation && updateDto.locationCreate) {
+      internalVersionChanges += `Location changed from ${updateDto.locationCreate} to ${maintenanceRequest.location}\n`;
+      maintenanceRequest.location = await this.locationService.create(updateDto.locationCreate);
+    }
+
+
+    // Update title and description if allowed
+    if (newRequestStatusType.allowsChangeTitleAndDescription) {
+      if (updateDto.subject !== undefined) {
+        internalVersionChanges += `Subject changed from ${maintenanceRequest.subject} to ${updateDto.subject}\n`;
+        maintenanceRequest.subject = updateDto.subject;
+      }
+      if (updateDto.description !== undefined) {
+        internalVersionChanges += `Description changed from ${maintenanceRequest.description} to ${updateDto.description}\n`;
+        maintenanceRequest.description = updateDto.description;
+      }
+    }
+
+    // Update media if allowed
+    if (newRequestStatusType.allowsChangeMedia && updateDto.mediaIds) {
+      internalVersionChanges += `Media updated to ${updateDto.mediaIds}\n`;
+      maintenanceRequest.mediaFiles = await this.mediaService.findByIds(updateDto.mediaIds);
     }
 
     // update request status

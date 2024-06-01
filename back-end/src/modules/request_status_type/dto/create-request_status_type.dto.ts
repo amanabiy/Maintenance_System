@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsBoolean, IsOptional, IsString, IsArray } from 'class-validator';
 import { Type } from 'class-transformer';
+import { Role } from 'src/modules/role/entities/role.entity';
 
 export class CreateRequestStatusTypeDto {
   @ApiProperty({
@@ -84,7 +85,7 @@ export class CreateRequestStatusTypeDto {
 
   @ApiProperty({
     description: 'Indicates if it allows forwarding to a department',
-    example: true
+    example: false
   })
   @IsBoolean()
   @IsOptional()
@@ -92,7 +93,7 @@ export class CreateRequestStatusTypeDto {
 
   @ApiProperty({
     description: 'Indicates if it allows forwarding to a person',
-    example: true
+    example: false
   })
   @IsBoolean()
   @IsOptional()
@@ -107,4 +108,45 @@ export class CreateRequestStatusTypeDto {
   @Type(() => Number)
   @IsOptional()
   allowedTransitions: number[];
+
+
+  @ApiProperty({
+    description: 'Indicates if it allows changing the location of the request',
+    example: false
+  })
+  allowsChangeLocation: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if it allows changing the title and description of the request',
+    example: false
+  })
+  @IsBoolean()
+  @IsOptional()
+  allowsChangeTitleAndDescription: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if it allows changing the media files of the request',
+    example: false
+  })
+  @IsBoolean()
+  @IsOptional()
+  allowsChangeMedia: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if it allows adding more media files to the request',
+    example: false
+  })
+  @IsBoolean()
+  @IsOptional()
+  allowsAddMoreMedia: boolean;
+
+  @ApiProperty({
+    description: 'The roles that are allowed to access and expected to update this status',
+    type: [Number],
+    example: [1, 2]
+  })
+  @IsOptional()
+  @IsArray()
+  @Type(() => Number)
+  allowedRolesIds: number[];
 }

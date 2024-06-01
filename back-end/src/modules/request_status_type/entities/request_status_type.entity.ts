@@ -2,6 +2,7 @@ import { Entity, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
 import { RequestStatus } from 'src/modules/request_status/entities/request_status.entity';
+import { Role } from 'src/modules/role/entities/role.entity';
 
 @Entity('request_status_type')
 export class RequestStatusType extends BaseModelEntity {
@@ -108,6 +109,46 @@ export class RequestStatusType extends BaseModelEntity {
   })
   @Column({ default: false })
   allowsForwardToPerson: boolean;
+
+
+  @ApiProperty({
+    description: 'Indicates if it allows changing the location of the request',
+    example: true
+  })
+  @Column({ default: false })
+  allowsChangeLocation: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if it allows changing the title and description of the request',
+    example: true
+  })
+  @Column({ default: false })
+  allowsChangeTitleAndDescription: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if it allows changing the media files of the request',
+    example: true
+  })
+  @Column({ default: false })
+  allowsChangeMedia: boolean;
+
+  @ApiProperty({
+    description: 'Indicates if it allows adding more media files to the request',
+    example: true
+  })
+  @Column({ default: false })
+  allowsAddMoreMedia: boolean;
+
+  @ApiProperty({
+    description: 'The roles that are allowed to access and expected to update this status',
+  })
+  @ManyToMany(() => Role, { cascade: ['remove'] })
+  @JoinTable({
+    name: 'request_status_type_allowed_roles',
+    joinColumn: { name: 'request_status_type_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' }
+  })
+  allowedRoles: Role[];
 
   @OneToMany(() => RequestStatus, requestStatus => requestStatus.statusType)
   requestStatuses: RequestStatus[];

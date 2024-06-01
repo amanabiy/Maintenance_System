@@ -95,10 +95,10 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
       throw new Error('Maintenance request not found');
     }
 
-    const { locationId, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
+    const { locationCreate, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
 
-    if (locationId) {
-      maintenanceRequest.location = await this.locationService.findOne(locationId);
+    if (locationCreate) {
+      maintenanceRequest.location = await this.locationService.create(locationCreate);
     }
     if (handlingDepartmentId) {
       maintenanceRequest.handlingDepartment = await this.departmentService.findOne(handlingDepartmentId);

@@ -6,12 +6,15 @@ import { CreateRequestStatusTypeDto } from './dto/create-request_status_type.dto
 import { UpdateRequestStatusTypeDto } from './dto/update-request_status_type.dto';
 import { GenericDAL } from 'src/DAL/dal';
 import { FindAllResponseRequestStatustypeDto } from './dto/find-all-response-maintenance_requestdto';
+import { Role } from '../role/entities/role.entity';
+import { RoleService } from '../role/role.service';
 
 @Injectable()
 export class RequestStatusTypeService extends GenericDAL<RequestStatusType, CreateRequestStatusTypeDto, UpdateRequestStatusTypeDto> {
   constructor(
     @InjectRepository(RequestStatusType)
     private readonly requestStatusTypeRepository: Repository<RequestStatusType>,
+    private readonly roleService: RoleService,
   ) {
     super(requestStatusTypeRepository, 0, 10, ['allowedTransitions']);
   }
@@ -21,10 +24,7 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
   }
 
   async createRequestStatusType(createRequestStatusTypeDto: CreateRequestStatusTypeDto): Promise<RequestStatusType> {
-    const { name, hasSchedule, needsFile, needsSignatures, 
-      isInternal, allowsForwardToDepartment, allowsForwardToPerson, 
-      allowChangePriority, allowChangeconfirmationStatus, 
-      allowChangeverificationStatus, allowedTransitions } = createRequestStatusTypeDto;
+    const { allowedTransitions, allowedRolesIds } = createRequestStatusTypeDto;
 
     // Find next options by IDs if provided
     let nextStatusOptions: RequestStatusType[] = [];
@@ -34,18 +34,18 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
       });
     }
 
+    let allowedRoles: Role[] = [];
+    if (allowedRolesIds && allowedRolesIds.length > 0) {
+      allowedRoles = await this.roleService.find({
+        where: { id: In(allowedRolesIds) },
+      });
+    }
+    
+
     const newStatusType = await this.create({
-      name,
-      hasSchedule,
-      needsFile,
-      needsSignatures,
-      isInternal,
-      allowChangePriority,
-      allowChangeconfirmationStatus,
-      allowChangeverificationStatus,
-      allowsForwardToDepartment,
-      allowsForwardToPerson,
+      ...createRequestStatusTypeDto,
       allowedTransitions: nextStatusOptions,
+      allowedRoles,
     });
 
     return newStatusType;
