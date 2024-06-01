@@ -22,5 +22,5 @@ export const adminPaths = {
   FINANCIAL_TRANSACTIONS: "/financial-transactions",
   STORE_TRANSACTIONS: "/store-transactions",
   USERS: "/all-users",
-  MY_PROFILE: "admin-profile",
+  MY_PROFILE: "/admin-profile",
 };

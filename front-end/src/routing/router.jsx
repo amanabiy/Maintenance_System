@@ -38,6 +38,7 @@ const Requests = lazy(() => import("../pages/Admin/Requests"));
 // paths
 import { generalPaths, issuerPaths } from "./paths";
 import RequestDetails from "../components/commonScenes/RequestDetails.jsx";
+import MyProfile from "../pages/Admin/MyProfile.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -148,6 +149,16 @@ const router = createBrowserRouter(
           <Route index element={<Requests />} />
           <Route path="view/:requestId" element={<RequestDetails />} />
           <Route path="edit/:requestId" element={<RequestDetails />} />
+        </Route>
+        <Route
+          path="admin-profile"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<MyProfile />} />
         </Route>
 
         {/* Issuer Routes */}

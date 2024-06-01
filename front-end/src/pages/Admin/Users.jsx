@@ -96,7 +96,7 @@ const Users = () => {
           checkboxSelection={true}
         />
       </GridItem>
-      <DeleteConfirmation open={false} />
+      {/* <DeleteConfirmation open={false} /> */}
     </GridParent>
   );
 };

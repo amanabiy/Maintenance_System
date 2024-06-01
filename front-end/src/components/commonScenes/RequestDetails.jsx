@@ -21,6 +21,7 @@ import MapComponent from "../display/MapComponent";
 
 const RequestDetails = () => {
   const { requestId } = useParams();
+  const LeakingPipe3 = "https://i.imgur.com/ggmPWRZ.jpeg";
 
   const maintenanceRequest = {
     createdAt: "2024-05-25T17:45:16.295Z",
@@ -76,7 +77,7 @@ const RequestDetails = () => {
               borderRadius: "8px",
             }}
           >
-            <ImageSlider images={[LeakingPipe1, LeakingPipe2]} />
+            <ImageSlider images={[LeakingPipe1, LeakingPipe2, LeakingPipe3]} />
           </Card>
           <CardContent
             style={{
@@ -92,26 +93,24 @@ const RequestDetails = () => {
             <Typography variant="body1" style={{ margin: "8px 0" }}>
               Provided Description:{" "}
               <span>
-                <Typography variant="body2">
-                  {maintenanceRequest.description}
-                </Typography>
+                {/* <Typography variant="body2"> */}
+                {maintenanceRequest.description}
+                {/* </Typography> */}
               </span>
             </Typography>
             <Typography variant="body1">
               Location:
               <span>
-                <Typography variant="body2">
-                  <strong>Block: </strong>
-                  {maintenanceRequest.location.blockNumber},{" "}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Room Number: </strong>
-                  {maintenanceRequest.location.roomNumber},{" "}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Floor: </strong>
-                  {maintenanceRequest.location.floor}
-                </Typography>
+                {/* <Typography variant="body2"> */}
+                <strong>Block: </strong>
+                {maintenanceRequest.location.blockNumber}, {/* </Typography> */}
+                {/* <Typography variant="body2"> */}
+                <strong>Room Number: </strong>
+                {maintenanceRequest.location.roomNumber}, {/* </Typography> */}
+                {/* <Typography variant="body2"> */}
+                <strong>Floor: </strong>
+                {maintenanceRequest.location.floor}
+                {/* </Typography> */}
               </span>
             </Typography>
             <div>
