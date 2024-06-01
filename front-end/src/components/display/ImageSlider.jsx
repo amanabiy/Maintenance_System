@@ -8,6 +8,7 @@ import CircleIcon from "@mui/icons-material/Circle";
 import "./style.scss";
 
 const ImageSlider = ({ images }) => {
+  console.log(images, "images");
   const [imageIndex, setImageIndex] = useState(0);
   const IMAGES = images;
 

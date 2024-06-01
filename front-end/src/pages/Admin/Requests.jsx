@@ -142,7 +142,7 @@ const Requests = () => {
   return (
     <GridParent>
       <GridItem xs={12}>
-        {status === "loading" && <Loading />}
+        {status === "pending" && <Loading />}
         {status === "failed" && (
           <Alert severity="error">
             Can't seem to load the data at the moment.
