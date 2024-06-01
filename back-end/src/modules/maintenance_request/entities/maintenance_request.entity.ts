@@ -55,9 +55,9 @@ export class MaintenanceRequest extends BaseModelEntity {
   verificationStatus: MaintenanceVerificationStatusEnum;
 
   @ApiProperty({ description: 'The user who requested the maintenance' })
-  @ManyToOne(() => User, { eager: true, nullable: true })
+  @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'requester_id' })
-  verifiedBy: Promise<User>;  
+  verifiedBy: User;  
 
   @ApiProperty({ description: 'The date and time when the maintenance request was verified' })
   @IsOptional()
@@ -94,9 +94,9 @@ export class MaintenanceRequest extends BaseModelEntity {
   feedback: string;
 
   @ApiProperty({ description: 'The user who requested the maintenance' })
-  @ManyToOne(() => User, { eager: true, lazy: true })
+  @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'requester_id' })
-  requester: () => User;  
+  requester: User;  
 
   @ApiProperty({ description: 'The users assigned to handle the maintenance request' })
   @ManyToMany(() => User, { eager: true })

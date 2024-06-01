@@ -72,8 +72,8 @@ export class User extends BaseModelEntity {
   })
   lastPasswordUpdatedAt: Date;
 
-  @ApiProperty({ description: 'Maintenance requests assigned to the user' })
-  @ManyToMany(() => MaintenanceRequest)
-  @JoinTable()
-  assignedMaintenanceRequests: MaintenanceRequest[];
+  // @ApiProperty({ description: 'Maintenance requests assigned to the user' })
+  // @ManyToMany(() => MaintenanceRequest, { lazy: true})
+  // @JoinTable()
+  // assignedMaintenanceRequests: Promise<MaintenanceRequest[]>;
 }
