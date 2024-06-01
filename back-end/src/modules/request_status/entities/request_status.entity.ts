@@ -43,7 +43,7 @@ export class RequestStatus extends BaseModelEntity {
 
   @ApiProperty({ description: 'Internal Version Changes on the maintenance request' })
   @Column({ nullable: true })
-  // @Exclude()
+  @Exclude()
   internalVersionChanges: string;
 
   @ApiProperty({ description: 'External message' })
