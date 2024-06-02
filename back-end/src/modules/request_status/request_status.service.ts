@@ -90,7 +90,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     if (newRequestStatusType.allowChangeverificationStatus && updateDto.verificationStatus !== undefined) {
       internalVersionChanges += `Verification status changed from ${maintenanceRequest.verificationStatus} to ${updateDto.verificationStatus}\n`;
       maintenanceRequest.verifiedAt = new Date();
-      maintenanceRequest.verifiedBy = Promise.resolve(currentUser);
+      maintenanceRequest.verifiedBy = currentUser;
       maintenanceRequest.verificationStatus = updateDto.verificationStatus;
     }
 
