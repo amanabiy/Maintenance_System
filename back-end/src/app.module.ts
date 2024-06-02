@@ -15,6 +15,7 @@ import { RequestStatusModule } from './modules/request_status/request_status.mod
 import { RequestStatusTypeModule } from './modules/request_status_type/request_status_type.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { MaintenanceEquipmentModule } from './modules/maintenance_equipment/maintenance_equipment.module';
+import { PermissionModule } from './modules/permission/permission.module';
 
 @Module({
   imports: [
@@ -40,7 +41,8 @@ import { MaintenanceEquipmentModule } from './modules/maintenance_equipment/main
     RequestStatusModule,
     RequestStatusTypeModule,
     PaymentModule,
-    MaintenanceEquipmentModule
+    MaintenanceEquipmentModule,
+    PermissionModule
   ],
   controllers: [],
   providers: [
