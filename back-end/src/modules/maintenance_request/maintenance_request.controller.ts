@@ -43,6 +43,66 @@ export class MaintenanceRequestController {
     return result
   }
 
+  @Get('assigned-to-me')
+  @ApiOperation({ summary: 'Filter maintenance requests assigned to the current user' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Retrieved maintenance requests assigned to the current user successfully',
+    type: FindAllResponseMaintenanceRequestDto,
+  })
+  async findAssignedToMe(
+    @CurrentUser() currentUser: User,
+    @Query('page') page = 1,
+    @Query('limit') limit = 50,
+  ): Promise<FindAllResponseMaintenanceRequestDto> {
+    const criteriaAssignedToMe: SearchMaintenanceRequestDto = {
+      assignedPersonIds: [currentUser.id]
+    }
+    const result = await this.maintenanceRequestService.searchRequests(criteriaAssignedToMe);
+    result.items.map(item => plainToInstance(MaintenanceRequest, item));
+    return result;
+  }
+
+  @Get('my-requests')
+  @ApiOperation({ summary: 'Get maintenance requests created by the current user' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Retrieved maintenance requests created by the current user successfully',
+    type: FindAllResponseMaintenanceRequestDto,
+  })
+  async findMyRequests(
+    @CurrentUser() currentUser: User,
+    @Query('page') page = 1,
+    @Query('limit') limit = 50,
+  ): Promise<FindAllResponseMaintenanceRequestDto> {
+    const criteria: SearchMaintenanceRequestDto = {
+      requesterId: currentUser.id
+    }
+    const result = await this.maintenanceRequestService.searchRequests(criteria);
+    result.items.map(item => plainToInstance(MaintenanceRequest, item));
+    return result;
+  }
+
+  @Get('my-department')
+  @ApiOperation({ summary: 'Get maintenance requests assigned to the current user\'s department' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Retrieved maintenance requests for the current user\'s department successfully',
+    type: FindAllResponseMaintenanceRequestDto,
+  })
+  async findMyDepartmentRequests(
+    @CurrentUser() currentUser: User,
+    @Query('page') page = 1,
+    @Query('limit') limit = 50,
+  ): Promise<FindAllResponseMaintenanceRequestDto> {
+    const criteria: SearchMaintenanceRequestDto = {
+      handlingDepartmentId: currentUser.department.id
+    }
+    const result = await this.maintenanceRequestService.searchRequests(criteria);
+    result.items.map(item => plainToInstance(MaintenanceRequest, item));
+    return result;
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve a maintenance request by ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Retrieved maintenance request successfully', type: MaintenanceRequest })
