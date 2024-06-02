@@ -42,14 +42,33 @@ VALUES ('admin@example.com', 'Admin User', 'admin1234!',
 #   ('DONE', false, false, false, false, false, false, false, false, false, false, false);"
 # Insert initial RequestStatusType records
 docker exec -i "$CONTAINER_NAME" mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" <<EOF
-INSERT INTO request_status_type (name, isInitialStatus, hasSchedule, needsFile, needsSignatures, isInternal, allowsForwardToDepartment, allowsForwardToPerson, allowChangePriority, allowChangeconfirmationStatus, allowChangeverificationStatus, allowsChangeRequestTypes) VALUES 
-('SUBMITTED', true, false, false, false, false, false, false, false, false, false, false),
-('VERIFIED', false, false, false, false, false, false, false, false, false, false, false),
-('REVIEWED', false, false, false, false, false, false, false, false, false, false, false),
-('MOVED_TO_DEPARTMENT', false, false, false, false, false, true, false, false, false, false, false),
-('ASSIGNED_TO_PERSON', false, false, false, false, false, false, true, false, false, false, false),
-('SCHEDULED_FOR_MAINTENANCE', false, true, false, false, false, false, false, false, false, false, false),
-('DONE', false, false, false, false, false, false, false, false, false, false, false);
+-- Inserting values into request_status_type table
+INSERT INTO request_status_type (
+  name, 
+  description,
+  isInitialStatus, 
+  hasSchedule, 
+  needsFile, 
+  needsSignatures, 
+  isInternal, 
+  allowsForwardToDepartment, 
+  allowsForwardToPerson, 
+  allowChangePriority, 
+  allowChangeconfirmationStatus, 
+  allowChangeverificationStatus, 
+  allowsChangeRequestTypes,
+  allowsChangeLocation,
+  allowsChangeTitleAndDescription,
+  allowsChangeMedia,
+  allowsAddMoreMedia
+) VALUES 
+('SUBMITTED', 'The request has been submitted and is awaiting verification.', true, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
+('VERIFIED', 'The request has been verified and is ready for review.', false, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
+('REVIEWED', 'The request has been reviewed and further action is needed.', false, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
+('MOVED_TO_DEPARTMENT', 'The request has been moved to the relevant department.', false, false, false, false, false, true, false, false, false, false, false, false, false, false, false),
+('ASSIGNED_TO_PERSON', 'The request has been assigned to a specific person for handling.', false, false, false, false, false, false, true, false, false, false, false, false, false, false, false),
+('SCHEDULED_FOR_MAINTENANCE', 'The request has been scheduled for maintenance.', false, true, false, false, false, false, false, false, false, false, false, false, false, false, false),
+('DONE', 'The maintenance request has been completed.', false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
 
 -- Example IDs, replace these with actual IDs from your database after initial insertions
 SET @submitted_id = (SELECT id FROM request_status_type WHERE name = 'SUBMITTED');

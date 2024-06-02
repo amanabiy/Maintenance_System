@@ -13,6 +13,7 @@ import { MailModule } from './modules/mail/mail.module';
 import { MediaModule } from './modules/media/media.module';
 import { RequestStatusModule } from './modules/request_status/request_status.module';
 import { RequestStatusTypeModule } from './modules/request_status_type/request_status_type.module';
+import { PaymentModule } from './modules/payment/payment.module';
 
 @Module({
   imports: [
@@ -20,9 +21,9 @@ import { RequestStatusTypeModule } from './modules/request_status_type/request_s
       type: 'mysql',
       host: process.env.MYSQL_HOST || 'localhost',
       port: parseInt(process.env.MYSQL_PORT) || 3306,
-      username: process.env.MYSQL_USER || 'aman',
-      password: process.env.MYSQL_PASSWORD || 'le_shay_buna_amans_20321',
-      database: process.env.MYSQL_DATABASE || 'le_shay_buna',
+      username: process.env.MYSQL_USER,
+      password: process.env.MYSQL_PASSWORD,
+      database: process.env.MYSQL_DATABASE,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
@@ -36,7 +37,8 @@ import { RequestStatusTypeModule } from './modules/request_status_type/request_s
     MailModule,
     MediaModule,
     RequestStatusModule,
-    RequestStatusTypeModule
+    RequestStatusTypeModule,
+    PaymentModule
   ],
   controllers: [],
   providers: [
