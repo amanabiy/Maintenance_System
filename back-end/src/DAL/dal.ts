@@ -184,6 +184,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       const options: FindManyOptions = conditions || {};
       this.applyPagination(options, page, pageSize);
       this.addDefaultRelations(options);
+      console.log(options)
       const [items, total] = await this.repository.findAndCount(options);
       return new FindAllResponseDto<Entity>(page, pageSize, total, items);
     } catch (error) {

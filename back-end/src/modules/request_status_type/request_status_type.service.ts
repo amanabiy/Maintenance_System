@@ -65,4 +65,29 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
 
     await super.delete(id);
   }
+
+  async markAsInitial(id: number): Promise<RequestStatusType> {
+    const requestStatusType = await this.findOne(id);
+    await this.disableOtherInitials();
+    requestStatusType.isInitialStatus = true;
+    return await this.requestStatusTypeRepository.save(requestStatusType);
+  }
+
+  async disableOtherInitials(): Promise<void> {
+    await this.requestStatusTypeRepository.update({ isInitialStatus: true }, { isInitialStatus: false });
+  }
+
+  async getLatestStatusTypeIds(roleIds: number[]): Promise<RequestStatusType[]> {
+    console.log(roleIds);
+    const statusTypes = await this.requestStatusTypeRepository.find({
+      where: {
+        allowedRoles: {
+          id: In(roleIds),
+        },
+      },
+      relations: ['allowedRoles'],
+    });
+    return statusTypes;
+  }
+
 }

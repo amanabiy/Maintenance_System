@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, UseGuards, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, HttpCode, UseGuards, Query, NotFoundException } from '@nestjs/common';
 import { MaintenanceRequestService } from './maintenance_request.service';
 import { CreateMaintenanceRequestDto } from './dto/create-maintenance_request.dto';
 import { UpdateMaintenanceRequestDto } from './dto/update-maintenance_request.dto';
@@ -52,13 +52,13 @@ export class MaintenanceRequestController {
   })
   async findAssignedToMe(
     @CurrentUser() currentUser: User,
-    @Query('page') page = 1,
-    @Query('limit') limit = 50,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 50,
   ): Promise<FindAllResponseMaintenanceRequestDto> {
-    const criteriaAssignedToMe: SearchMaintenanceRequestDto = {
-      assignedPersonIds: [currentUser.id]
-    }
-    const result = await this.maintenanceRequestService.searchRequests(criteriaAssignedToMe);
+    const result = await this.maintenanceRequestService.findWithPagination({
+      where: { assignedPersons: { id: currentUser.id } }
+    }, page, limit);
+
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
@@ -75,10 +75,10 @@ export class MaintenanceRequestController {
     @Query('page') page = 1,
     @Query('limit') limit = 50,
   ): Promise<FindAllResponseMaintenanceRequestDto> {
-    const criteria: SearchMaintenanceRequestDto = {
-      requesterId: currentUser.id
-    }
-    const result = await this.maintenanceRequestService.searchRequests(criteria);
+    const result = await this.maintenanceRequestService.findWithPagination({
+      where: { requester: { id: currentUser.id }}
+    }, page, limit);
+
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
@@ -95,10 +95,22 @@ export class MaintenanceRequestController {
     @Query('page') page = 1,
     @Query('limit') limit = 50,
   ): Promise<FindAllResponseMaintenanceRequestDto> {
-    const criteria: SearchMaintenanceRequestDto = {
-      handlingDepartmentId: currentUser.department.id
+    if (!currentUser.department) {
+      throw new NotFoundException('Department of the logged in user is not found');
     }
-    const result = await this.maintenanceRequestService.searchRequests(criteria);
+    const result = await this.maintenanceRequestService.findWithPagination({
+      where: { handlingDepartment: { id: currentUser.department.id } }
+    }, page, limit);
+    result.items.map(item => plainToInstance(MaintenanceRequest, item));
+    return result;
+  }
+
+  @Get('by-my-role')
+  @ApiOperation({ summary: 'Filter maintenance requests by logged in user role' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Filtered maintenance requests by role successfully', type: [MaintenanceRequest] })
+  async findByRole(@Query('page') page = 1, @Query('limit') limit = 50, @CurrentUser() currentUser: User): Promise<FindAllResponseMaintenanceRequestDto> {
+    console.log("in controller", currentUser);
+    const result = await this.maintenanceRequestService.findAllByRole(currentUser.role.id, page, limit);
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
@@ -136,8 +148,19 @@ export class MaintenanceRequestController {
   @ApiResponse({ status: 200, description: 'Successful search', type: FindAllResponseMaintenanceRequestDto })
   async searchRequests(
     @Body() criteria: SearchMaintenanceRequestDto,
+    @CurrentUser() currentUser: User,
   ): Promise<findAllResponseDto<MaintenanceRequest>> {
     console.log(criteria);
-    return await this.maintenanceRequestService.searchRequests(criteria);
+    return await this.maintenanceRequestService.searchRequests(criteria, currentUser);
+  }
+
+  @Get('by-status/:statusTypeId')
+  @ApiOperation({ summary: 'Filter maintenance requests by their latest status' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Filtered maintenance requests by their latest status successfully', type: [MaintenanceRequest] })
+  async findByLatestStatus(@Param('statusTypeId') statusTypeId: number, @Query('page') page = 1, @Query('limit') limit = 50): Promise<FindAllResponseMaintenanceRequestDto> {
+    console.log("c", statusTypeId)
+    const result = await this.maintenanceRequestService.findAllByLatestStatus(statusTypeId, page, limit);
+    result.items.map(item => plainToInstance(MaintenanceRequest, item));
+    return result;
   }
 }

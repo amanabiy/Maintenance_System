@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { Permission } from './entities/permission.entity';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { UpdatePermissionDto } from './dto/update-permission.dto';
+import { User } from '../user/entities/user.entity';
 
 @Injectable()
 export class PermissionService extends GenericDAL<
@@ -17,5 +18,9 @@ export class PermissionService extends GenericDAL<
     private readonly PermissionRepository: Repository<Permission>,
   ) {
     super(PermissionRepository);
+  }
+
+  hasPermission(user: User, permission: string): boolean {
+    return user.role.permissions.some(p => p.name === permission);
   }
 }

@@ -177,4 +177,44 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
 
     return maintenanceRequest;
   }
+
+  async getLatestStatusIds(statusTypeId: number): Promise<RequestStatus[]> {
+    const latestStatusSubquery = this.requestStatusRepository
+      .createQueryBuilder('requestStatus')
+      .select('MAX(requestStatus.id)', 'id')
+      .groupBy('requestStatus.request')
+      .where('requestStatus.statusType.id IN (SELECT id FROM request_status_type WHERE id = :statusTypeId)')
+      .getQuery();
+    
+    const latestStatuses = await this.requestStatusRepository
+      .createQueryBuilder('rs')
+      .where(`rs.id IN (${latestStatusSubquery})`)
+      .leftJoinAndSelect('rs.statusType', 'statusType')
+      .setParameter('statusTypeId', statusTypeId)
+      .getMany();
+    
+    return latestStatuses;
+  }
+
+  async getLatestStatusByStatusTypeIds(statusTypeIds: number[]): Promise<RequestStatus[]> {
+
+    // Subquery to get the latest status ID for each request
+    const latestStatusSubquery = this.requestStatusRepository
+      .createQueryBuilder('requestStatus')
+      .select('MAX(requestStatus.id)', 'id')
+      .groupBy('requestStatus.request')
+      .where('requestStatus.statusType.id IN (:...statusTypeIds)', { statusTypeIds })
+      .getQuery();
+
+      // Main query to get the request statuses
+    const latestStatuses = await this.requestStatusRepository
+      .createQueryBuilder('rs')
+      .where(`rs.id IN (${latestStatusSubquery})`)
+      .leftJoinAndSelect('rs.statusType', 'statusType')
+      .setParameter('statusTypeIds', statusTypeIds)
+      .getMany();
+
+    console.log(latestStatuses);
+    return latestStatuses;
+  }
 }
