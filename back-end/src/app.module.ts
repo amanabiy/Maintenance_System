@@ -14,6 +14,7 @@ import { MediaModule } from './modules/media/media.module';
 import { RequestStatusModule } from './modules/request_status/request_status.module';
 import { RequestStatusTypeModule } from './modules/request_status_type/request_status_type.module';
 import { PaymentModule } from './modules/payment/payment.module';
+import { MaintenanceEquipmentModule } from './modules/maintenance_equipment/maintenance_equipment.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { PaymentModule } from './modules/payment/payment.module';
     MediaModule,
     RequestStatusModule,
     RequestStatusTypeModule,
-    PaymentModule
+    PaymentModule,
+    MaintenanceEquipmentModule
   ],
   controllers: [],
   providers: [
