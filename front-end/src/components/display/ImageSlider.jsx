@@ -18,7 +18,7 @@ const ImageSlider = ({ images }) => {
   const showPreviousImage = () => {
     setImageIndex((imageIndex - 1 + IMAGES.length) % IMAGES.length);
   };
-  return (
+  return images.length > 0 ? (
     <div style={{ width: "100%", height: "100%" }} className="img-slider">
       <div
         style={{
@@ -81,6 +81,19 @@ const ImageSlider = ({ images }) => {
           );
         })}
       </div>
+    </div>
+  ) : (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflow: "hidden",
+      }}
+    >
+      No Images to Display
     </div>
   );
 };

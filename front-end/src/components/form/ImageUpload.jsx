@@ -6,7 +6,7 @@ const ImageUpload = ({ base64Image, handleFileChange, errors, touched }) => {
   return (
     <Box sx={{ width: "100%", mt: 2 }}>
       <Typography variant="body2" color="textSecondary" align="left">
-        Startup Logo <span style={{ color: "red" }}>*</span>
+        Images <span style={{ color: "red" }}>*</span>
       </Typography>
       {!base64Image ? (
         <Box

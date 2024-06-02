@@ -20,7 +20,7 @@ const SidebarContainer = React.forwardRef(
         } `}
       >
         <div className="top">
-          <span className="logo">Maintenance System</span>
+          <span className="logo">SmartMaint</span>
         </div>
         <div>
           <hr />

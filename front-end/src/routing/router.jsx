@@ -39,6 +39,7 @@ const Requests = lazy(() => import("../pages/Admin/Requests"));
 import { generalPaths, issuerPaths } from "./paths";
 import RequestDetails from "../components/commonScenes/RequestDetails.jsx";
 import MyProfile from "../pages/Admin/MyProfile.jsx";
+import RequestStatusDetails from "../components/commonScenes/RequestStatusDetails.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -147,6 +148,10 @@ const router = createBrowserRouter(
           }
         >
           <Route index element={<Requests />} />
+          <Route
+            path="view/:requestId/more-details"
+            element={<RequestStatusDetails />}
+          />
           <Route path="view/:requestId" element={<RequestDetails />} />
           <Route path="edit/:requestId" element={<RequestDetails />} />
         </Route>
