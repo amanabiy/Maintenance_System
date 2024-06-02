@@ -149,7 +149,12 @@ const Requests = () => {
           </Alert>
         )}
         {status === "fulfilled" && requests && requests.items && (
-          <DataTable rows={requests.items} columns={columns} />
+          <DataTable
+            rows={requests.items}
+            columns={columns}
+            title={"All Requests"}
+            subTitle={"All maintenance requests from users."}
+          />
         )}
       </GridItem>
     </GridParent>
