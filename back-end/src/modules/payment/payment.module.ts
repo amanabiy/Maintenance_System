@@ -22,13 +22,15 @@ import { Location } from '../location/entities/location.entity';
 import { MaintenanceRequestType } from '../maintenance_request_type/entities/maintenance_request_type.entity';
 import { Media } from '../media/entities/media.entity';
 import { RequestStatus } from '../request_status/entities/request_status.entity';
+import { Permission } from '../permission/entities/permission.entity';
+import { PermissionService } from '../permission/permission.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Payment, User, MaintenanceRequest, Department, Role, Location,
-              MaintenanceRequestType, Media, RequestStatus, RequestStatusType])],
+              MaintenanceRequestType, Media, RequestStatus, RequestStatusType, Permission])],
   providers: [PaymentService, UserService, MaintenanceRequestService, DepartmentService, RoleService,
               MailService, LocationService, MaintenanceRequestTypeService, MediaService, RequestStatusService,
-              RequestStatusTypeService],
+              RequestStatusTypeService, PermissionService],
   controllers: [PaymentController],
   exports: [PaymentService]
 })

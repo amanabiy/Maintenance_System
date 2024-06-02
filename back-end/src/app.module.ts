@@ -16,6 +16,7 @@ import { RequestStatusTypeModule } from './modules/request_status_type/request_s
 import { PaymentModule } from './modules/payment/payment.module';
 import { MaintenanceEquipmentModule } from './modules/maintenance_equipment/maintenance_equipment.module';
 import { PermissionModule } from './modules/permission/permission.module';
+import { Permission } from './modules/permission/entities/permission.entity';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PermissionModule } from './modules/permission/permission.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([Permission]),
     UserModule,
     AuthModule,
     RoleModule,

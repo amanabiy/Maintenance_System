@@ -89,7 +89,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
         delete options.where['id'];
       }
       this.addDefaultRelations(options);
-      // console.log(options)
+      console.log(options)
       const result = await this.repository.findOne(options);
       if (!result) {
         throw new NotFoundException(

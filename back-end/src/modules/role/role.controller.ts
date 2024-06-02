@@ -3,7 +3,7 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity';
-import { ApiTags, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
 import { DeleteResponseDto } from 'src/dto/delete-response.dto';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
 import { FindAllResponseRoleDto } from './dto/find-all-response-role.dto';
@@ -51,5 +51,38 @@ export class RoleController {
   async remove(@Param('id') id: string): Promise<DeleteResponseDto> {
     await this.roleService.delete(+id);
     return new DeleteResponseDto();
+  }
+
+
+  @Post(':roleId/permission/:permissionId')
+  @ApiOperation({ summary: 'Add permission to role' })
+  @ApiParam({ name: 'roleId', description: 'Role ID' })
+  @ApiParam({ name: 'permissionId', description: 'Permission ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Permission added successfully',
+    type: Role,
+  })
+  addPermissionToRole(
+    @Param('roleId') roleId: number,
+    @Param('permissionId') permissionId: number,
+  ): Promise<Role> {
+    return this.roleService.addPermissionToRole(roleId, permissionId);
+  }
+
+  @Delete(':roleId/permission/:permissionId')
+  @ApiOperation({ summary: 'Remove permission from role' })
+  @ApiParam({ name: 'roleId', description: 'Role ID' })
+  @ApiParam({ name: 'permissionId', description: 'Permission ID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Permission removed successfully',
+    type: Role,
+  })
+  removePermissionFromRole(
+    @Param('roleId') roleId: number,
+    @Param('permissionId') permissionId: number,
+  ): Promise<Role> {
+    return this.roleService.removePermissionFromRole(roleId, permissionId);
   }
 }

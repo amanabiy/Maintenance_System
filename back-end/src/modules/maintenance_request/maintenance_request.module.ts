@@ -25,11 +25,13 @@ import { RequestStatusModule } from '../request_status/request_status.module';
 import { RequestStatus } from '../request_status/entities/request_status.entity';
 import { RequestStatusType } from '../request_status_type/entities/request_status_type.entity';
 import { RequestStatusTypeService } from '../request_status_type/request_status_type.service';
+import { PermissionService } from '../permission/permission.service';
+import { Permission } from '../permission/entities/permission.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MaintenanceRequest, Location, User, MaintenanceRequestType,
-      Department, Role, Media, RequestStatus, RequestStatusType]),
+      Department, Role, Media, RequestStatus, RequestStatusType, Permission]),
     LocationModule,
     UserModule,
     DepartmentModule,
@@ -39,6 +41,6 @@ import { RequestStatusTypeService } from '../request_status_type/request_status_
   controllers: [MaintenanceRequestController],
   providers: [MaintenanceRequestService, LocationService, UserService, DepartmentService,
     MaintenanceRequestTypeService, RoleService, MailService, RequestStatusService, RequestStatusTypeService,
-    MediaService],
+    MediaService, PermissionService],
 })
 export class MaintenanceRequestModule {}
