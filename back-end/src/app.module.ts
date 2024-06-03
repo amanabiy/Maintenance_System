@@ -17,6 +17,8 @@ import { PaymentModule } from './modules/payment/payment.module';
 import { MaintenanceEquipmentModule } from './modules/maintenance_equipment/maintenance_equipment.module';
 import { PermissionModule } from './modules/permission/permission.module';
 import { Permission } from './modules/permission/entities/permission.entity';
+import { StatsModule } from './modules/stats/stats.module';
+import { RequestStatusTimeModule } from './modules/request_status_time/request_status_time.module';
 
 @Module({
   imports: [
@@ -44,7 +46,9 @@ import { Permission } from './modules/permission/entities/permission.entity';
     RequestStatusTypeModule,
     PaymentModule,
     MaintenanceEquipmentModule,
-    PermissionModule
+    PermissionModule,
+    StatsModule,
+    RequestStatusTimeModule
   ],
   controllers: [],
   providers: [

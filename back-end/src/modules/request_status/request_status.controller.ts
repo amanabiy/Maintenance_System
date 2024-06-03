@@ -19,13 +19,20 @@ export class RequestStatusController {
 
   @Patch(':nextRequestTypeId')
   async updateMaintenanceRequest(
-    @Param('maintenanceRequestId') maintenanceRequestId: number,
+    @Param('requestId') requestId: number,
     @Param('nextRequestTypeId') nextRequestTypeId: number,
     @Body() updateDto: ChangeRequestStatusDto,
     @CurrentUser() currentUser: any,
   ): Promise<MaintenanceRequest> {
-    const {updateMaintenance, updateRequestStatus} = updateDto;
-    return await this.requestStatusService.updateMaintenanceRequest(maintenanceRequestId, nextRequestTypeId, updateMaintenance, updateRequestStatus, currentUser);
+    console.log("request id", requestId);
+    const { updateMaintenance, updateRequestStatus } = updateDto;
+    return await this.requestStatusService.updateMaintenanceRequest(
+      requestId,
+      nextRequestTypeId,
+      updateMaintenance,
+      updateRequestStatus,
+      currentUser
+    );
   }
 
   @Get()
@@ -51,3 +58,4 @@ export class RequestStatusController {
     return status;
   }
 }
+

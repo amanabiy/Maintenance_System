@@ -142,7 +142,7 @@ export class RequestStatusType extends BaseModelEntity {
   @ApiProperty({
     description: 'The roles that are allowed to access and expected to update this status',
   })
-  @ManyToMany(() => Role, { cascade: ['remove'] })
+  @ManyToMany(() => Role, { cascade: ['remove'], eager: true })
   @JoinTable({
     name: 'request_status_type_allowed_roles',
     joinColumn: { name: 'request_status_type_id', referencedColumnName: 'id' },

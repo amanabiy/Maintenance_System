@@ -17,6 +17,7 @@ import { DepartmentService } from '../department/department.service';
 import { User } from '../user/entities/user.entity';
 import { UpdateRequestStatusDto } from './dto/update-request_status.dto';
 import { LocationService } from '../location/location.service';
+import { RequestStatusTimeService } from '../request_status_time/request_status_time.service';
 
 @Injectable()
 export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
@@ -32,6 +33,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     private readonly maintenanceRequestTypeService: MaintenanceRequestTypeService,
     private readonly departmentService: DepartmentService,
     private readonly locationService: LocationService,
+    private readonly requestStatusTimeService: RequestStatusTimeService,
   ) {
     super(requestStatusRepository, 0, 10, ['request', 'statusUpdatedBy', 'statusType']);
   }
@@ -50,19 +52,24 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
 
   async updateMaintenanceRequest(id: number, newRequestStatusTypeId: number, updateDto: UpdateMaintenanceRequestDto, updateRequestStatus: UpdateRequestStatusDto, currentUser: User): Promise<MaintenanceRequest> {
     const maintenanceRequest: MaintenanceRequest = await this.maintenanceRequestService.findOne(id);
-    const currentStatus = await super.findOne(-1, { where: { request: maintenanceRequest }, order: { createdAt: 'DESC' }, relations: ['statusType'] });
+    // console.log("here", id,  maintenanceRequest)
+    const currentStatus = await super.findOne(-1, { where: { request: { id: maintenanceRequest.id } }, order: { createdAt: 'DESC' }, relations: ['statusType', 'statusType.allowedTransitions', 'statusType.allowedRoles'] });
+
     const newRequestStatusType = await this.requestStatusTypeService.findOne(newRequestStatusTypeId);
     let internalVersionChanges = 'Internal changes\n';
 
 
-    const hasAllowedRole = newRequestStatusType.allowedRoles.some(role => role.id === currentUser.role.id);
+    const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
     if (!hasAllowedRole) {
       throw new Error('User does not have the allowed role to update the status');
     }
 
     // Check if the new request status type is an allowed transition
-    const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => transition.id === newRequestStatusTypeId);
+    const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => {
+      return transition.id == newRequestStatusTypeId
+    });
     if (!isAllowedTransition) {
+      console.log(isAllowedTransition);
       throw new Error('Invalid status transition');
     }
 
@@ -173,7 +180,12 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const createdRequestStatus = await this.create(newRequestStatus);
 
     maintenanceRequest.requestStatuses.push(createdRequestStatus);
-    await this.maintenanceRequestService.update(maintenanceRequest.id, maintenanceRequest);
+    const data = await this.maintenanceRequestService.update(maintenanceRequest.id, maintenanceRequest);
+
+    const startTime = currentStatus.createdAt;
+    const endTime = createdRequestStatus.createdAt;
+    const timeSpent = await this.requestStatusTimeService.calculateSpentTime(startTime, endTime);
+    await this.requestStatusTimeService.create(currentStatus.statusType, createdRequestStatus.statusType, maintenanceRequest, currentUser, timeSpent);
 
     return maintenanceRequest;
   }

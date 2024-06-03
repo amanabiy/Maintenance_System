@@ -16,7 +16,7 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
     private readonly requestStatusTypeRepository: Repository<RequestStatusType>,
     private readonly roleService: RoleService,
   ) {
-    super(requestStatusTypeRepository, 0, 10, ['allowedTransitions']);
+    super(requestStatusTypeRepository, 0, 10, ['allowedTransitions', 'allowedRoles']);
   }
 
   async findInitialStatusType(): Promise<RequestStatusType> {

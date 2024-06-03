@@ -27,11 +27,13 @@ import { RequestStatusType } from '../request_status_type/entities/request_statu
 import { RequestStatusTypeService } from '../request_status_type/request_status_type.service';
 import { PermissionService } from '../permission/permission.service';
 import { Permission } from '../permission/entities/permission.entity';
+import { RequestStatusTimeService } from '../request_status_time/request_status_time.service';
+import { RequestStatusTime } from '../request_status_time/entities/request_status_time.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([MaintenanceRequest, Location, User, MaintenanceRequestType,
-      Department, Role, Media, RequestStatus, RequestStatusType, Permission]),
+      Department, Role, Media, RequestStatus, RequestStatusType, Permission, RequestStatusTime]),
     LocationModule,
     UserModule,
     DepartmentModule,
@@ -41,6 +43,6 @@ import { Permission } from '../permission/entities/permission.entity';
   controllers: [MaintenanceRequestController],
   providers: [MaintenanceRequestService, LocationService, UserService, DepartmentService,
     MaintenanceRequestTypeService, RoleService, MailService, RequestStatusService, RequestStatusTypeService,
-    MediaService, PermissionService],
+    MediaService, PermissionService, RequestStatusTimeService],
 })
 export class MaintenanceRequestModule {}
