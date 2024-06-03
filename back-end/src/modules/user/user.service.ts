@@ -34,7 +34,7 @@ export class UserService extends GenericDAL<
     private readonly mailService: MailService,
 
   ) {
-    super(userRepository);
+    super(userRepository, 1, 10, ['role', 'department']);
   }
 
   async determineRoleByEmail(email: string): Promise<Role> {

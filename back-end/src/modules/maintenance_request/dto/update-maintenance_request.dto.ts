@@ -2,6 +2,7 @@ import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateMaintenanceRequestDto } from './create-maintenance_request.dto';
 import { IsNotEmpty, IsEnum, IsOptional, IsNumber, Min, Max, IsString, IsDate, IsArray, IsInt } from 'class-validator';
 import { MaintenanceConfirmationStatusEnum, MaintenanceVerificationStatusEnum } from '../entities/maintenance_request.enum';
+import { CreateLocationDto } from 'src/modules/location/dto/create-location.dto';
 
 export class UpdateMaintenanceRequestDto extends PartialType(CreateMaintenanceRequestDto) {
   @ApiProperty({ description: 'The subject of the maintenance request' })
@@ -13,10 +14,12 @@ export class UpdateMaintenanceRequestDto extends PartialType(CreateMaintenanceRe
   @IsString()
   description: string;
 
-  @ApiProperty({ description: 'The location ID of the maintenance request' })
+  @ApiProperty({
+    description: 'The location of the maintenance request',
+    type: CreateLocationDto,
+  })
   @IsNotEmpty()
-  @IsNumber()
-  locationId: number;
+  locationCreate: CreateLocationDto;
 
   @ApiProperty({ enum: MaintenanceVerificationStatusEnum, description: 'The verification status of the maintenance request' })
   @IsOptional()
