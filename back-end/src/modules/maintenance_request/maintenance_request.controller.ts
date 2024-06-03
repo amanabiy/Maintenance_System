@@ -16,9 +16,8 @@ import findAllResponseDto from 'src/dto/find-all-response.dto';
 
 @ApiTags('Maintenance Request')
 @Controller('maintenance-request')
-@UseGuards(JwtAuthGuard)
 @ApiBearerAuth('bearerAuth')
-@UseGuards(RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class MaintenanceRequestController {
   constructor(private readonly maintenanceRequestService: MaintenanceRequestService) {}
 
@@ -163,4 +162,6 @@ export class MaintenanceRequestController {
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
+
+
 }

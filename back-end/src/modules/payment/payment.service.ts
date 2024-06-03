@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GenericDAL } from 'src/DAL/dal';
@@ -7,6 +7,10 @@ import { UpdatePaymentDto } from './dto/update-payment.dto';
 import { UserService } from 'src/modules/user/user.service';
 import { Payment } from './entities/payment.entity';
 import { MaintenanceRequestService } from '../maintenance_request/maintenance_request.service';
+import { MediaService } from '../media/media.service';
+import { PaymentStatus } from './entities/payment_status.enum';
+import { User } from '../user/entities/user.entity';
+import { ChangePaymentStatusDto } from './dto/change-payment-status.dto';
 
 @Injectable()
 export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, UpdatePaymentDto> {
@@ -15,13 +19,12 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     private readonly paymentRepository: Repository<Payment>,
     private readonly userService: UserService,
     private readonly maintenanceRequestService: MaintenanceRequestService,
-    // private readonly requestService: RequestService,
-    // private readonly equipmentService: EquipmentService,
+    private readonly mediaService: MediaService,
   ) {
     super(paymentRepository, 1, 10, [
       'user',
       'request',
-      'equipment'
+      // 'equipment'
     ]);
   }
 
@@ -30,7 +33,6 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
       userId,
       requestId,
       ...rest
-      // equipmentId
     } = paymentData;
 
     const user = await this.userService.findOne(userId);
@@ -38,14 +40,6 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     if (requestId) {
       request = await this.maintenanceRequestService.findOne(requestId);
     }
-
-    // let equipment = null;
-    // if (equipmentId) {
-    //   equipment = await this.equipmentService.findOne(equipmentId);
-    //   if (!equipment) {
-    //     throw new Error('Equipment not found');
-    //   }
-    // }
 
     
     const payment = await super.create({
@@ -57,4 +51,23 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     return payment;
   }
 
+  async addReceipt(paymentId: number, receiptId: number): Promise<Payment> {
+    const payment = await this.findOne(paymentId);
+    const receipt = await this.mediaService.findOne(receiptId);
+
+    payment.receipt = receipt;
+    payment.receiptApprovalStatus = PaymentStatus.PENDING;
+
+    return await this.update(payment.id, payment);
+  }
+
+  async changeStatus(paymentId: number, changePaymentStatusDto: ChangePaymentStatusDto, currentUser: User): Promise<Payment> {
+    const payment = await this.findOne(paymentId);
+
+    payment.receiptApprovalStatus = changePaymentStatusDto.status;
+    payment.receiptApprovedBy = currentUser;
+    payment.receiptComment = changePaymentStatusDto.comment;
+
+    return await this.update(payment.id, payment);
+  }
 }

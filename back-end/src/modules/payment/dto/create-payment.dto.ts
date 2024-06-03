@@ -35,6 +35,10 @@ export class CreatePaymentDto {
   @IsOptional()
   requestId?: number;
 
+  @ApiProperty({ description: 'The ID of the receipt media file', example: 1 })
+  @IsOptional()
+  @IsNumber()
+  receiptId?: number;
 //   @ApiProperty({ description: 'ID of the equipment related to the payment', example: 1 })
 //   @IsOptional()
 //   equipmentId?: number;
