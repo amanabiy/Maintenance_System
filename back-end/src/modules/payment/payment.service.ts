@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { GenericDAL } from 'src/DAL/dal';
@@ -11,6 +11,7 @@ import { MediaService } from '../media/media.service';
 import { PaymentStatus } from './entities/payment_status.enum';
 import { User } from '../user/entities/user.entity';
 import { ChangePaymentStatusDto } from './dto/change-payment-status.dto';
+import { FindAllResponsePaymentDto } from './dto/find-all-response-payment.dto';
 
 @Injectable()
 export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, UpdatePaymentDto> {
@@ -21,9 +22,9 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     private readonly maintenanceRequestService: MaintenanceRequestService,
     private readonly mediaService: MediaService,
   ) {
-    super(paymentRepository, 1, 10, [
+    super(paymentRepository, 1, 1000, [
       'user',
-      'request',
+      // 'request',
       // 'equipment'
     ]);
   }
@@ -43,7 +44,7 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
 
     
     const payment = await super.create({
-      ...request,
+      ...rest,
       user,
       request
     })
@@ -51,9 +52,13 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     return payment;
   }
 
-  async addReceipt(paymentId: number, receiptId: number): Promise<Payment> {
+  async addReceipt(paymentId: number, receiptId: number, currentUser: User): Promise<Payment> {
     const payment = await this.findOne(paymentId);
     const receipt = await this.mediaService.findOne(receiptId);
+
+    if (payment.user.id !== currentUser.id) {
+      throw new ForbiddenException('The user who is requested to pay is the only one who can attach receipt');
+    }
 
     payment.receipt = receipt;
     payment.receiptApprovalStatus = PaymentStatus.PENDING;
@@ -69,5 +74,47 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     payment.receiptComment = changePaymentStatusDto.comment;
 
     return await this.update(payment.id, payment);
+  }
+
+  async filterPaymentsByStatus(user: User, status: PaymentStatus): Promise<FindAllResponsePaymentDto> {
+    const where = {
+      user: { id: user.id },
+    }
+
+    if (status) {
+      where['receiptApprovalStatus'] = status;
+    }
+
+    return this.findWithPagination({
+      where,
+    });
+  }
+
+  async filterPayments(
+    currentUser: User,
+    status?: PaymentStatus,
+    userId?: number,
+    maintenanceRequestId?: number,
+  ): Promise<FindAllResponsePaymentDto> {
+    const where: any = {};
+
+    if (userId) {
+      where.user = { id: userId };
+    }
+
+    if (status) {
+      where.receiptApprovalStatus = status;
+    }
+
+    if (maintenanceRequestId) {
+      where.request = { id: maintenanceRequestId };
+    }
+  
+    console.log(where);
+    
+    return await this.findWithPagination({
+      where,
+      // relations: ['receipt', 'user', 'request'],
+    });
   }
 }

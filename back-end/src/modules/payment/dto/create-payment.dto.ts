@@ -18,10 +18,6 @@ export class CreatePaymentDto {
   @IsString()
   paymentMethod: string;
 
-  @ApiProperty({ enum: PaymentStatus, description: 'The status of the payment', example: PaymentStatus.PENDING })
-  @IsEnum(PaymentStatus)
-  status: PaymentStatus;
-
   @ApiProperty({ description: 'Any additional information about the payment', example: 'Payment was made in two installments' })
   @IsString()
   @IsOptional()
@@ -35,10 +31,10 @@ export class CreatePaymentDto {
   @IsOptional()
   requestId?: number;
 
-  @ApiProperty({ description: 'The ID of the receipt media file', example: 1 })
-  @IsOptional()
-  @IsNumber()
-  receiptId?: number;
+  // @ApiProperty({ description: 'The ID of the receipt media file', example: 1 })
+  // @IsOptional()
+  // @IsNumber()
+  // receiptId?: number;
 //   @ApiProperty({ description: 'ID of the equipment related to the payment', example: 1 })
 //   @IsOptional()
 //   equipmentId?: number;

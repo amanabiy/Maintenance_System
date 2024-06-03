@@ -3,10 +3,7 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-valida
 import { PaymentStatus } from '../entities/payment_status.enum';
 
 export class ChangePaymentStatusDto {
-  @ApiProperty({ description: 'The status to be changed to and the comment', example: {
-    status: PaymentStatus.REJECTED,
-    comment: "The photo is not visible"
-    }
+  @ApiProperty({ description: 'The status to be changed to and the comment', example: PaymentStatus.REJECTED,
   })
   @IsNotEmpty()
   @IsEnum(PaymentStatus)
