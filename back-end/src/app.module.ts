@@ -19,6 +19,7 @@ import { PermissionModule } from './modules/permission/permission.module';
 import { Permission } from './modules/permission/entities/permission.entity';
 import { StatsModule } from './modules/stats/stats.module';
 import { RequestStatusTimeModule } from './modules/request_status_time/request_status_time.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -48,7 +49,8 @@ import { RequestStatusTimeModule } from './modules/request_status_time/request_s
     MaintenanceEquipmentModule,
     PermissionModule,
     StatsModule,
-    RequestStatusTimeModule
+    RequestStatusTimeModule,
+    NotificationModule
   ],
   controllers: [],
   providers: [
