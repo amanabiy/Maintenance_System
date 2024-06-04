@@ -32,11 +32,19 @@ export class AuthService {
       userId: user.id,
       lastPasswordUpdatedAt: user.lastPasswordUpdatedAt,
     };
-    const accessToken = this.jwtService.sign(payload);
+    const accessToken = await this.getAccessToken(payload);
+    const refreshToken = this.jwtService.sign(
+      {
+        userId: user.id,
+        lastPasswordUpdatedAt: user.lastPasswordUpdatedAt,
+      }, { expiresIn: '7d' });
+
     const response: AuthResponseDto = {
       accessToken,
+      refreshToken,
       user,
     };
+
     await this.mailService.sendUserConfirmation(user.email, user.fullName)
     return response;
   }
@@ -100,4 +108,24 @@ export class AuthService {
     await this.userService.sendVerifyEmailToken(user);
     return true;
   }
+
+  async getAccessToken(payload: any): Promise<string> {
+    return this.jwtService.sign(payload, { expiresIn: '3h' });
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<string> {
+    const decoded = this.jwtService.verify(refreshToken);
+    const user = await this.userService.findOne(decoded.sub);
+    if (!user) {
+      throw new BadRequestException('Invalid token');
+    }
+
+    const payload = {
+      email: user.email,
+      userId: user.id,
+      lastPasswordUpdatedAt: user.lastPasswordUpdatedAt,
+    };
+    return await this.getAccessToken(payload);
+  }
+
 }
