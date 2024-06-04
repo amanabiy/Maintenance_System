@@ -69,7 +69,6 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       return transition.id == newRequestStatusTypeId
     });
     if (!isAllowedTransition) {
-      console.log(isAllowedTransition);
       throw new Error('Invalid status transition');
     }
 

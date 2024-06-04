@@ -91,7 +91,6 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       this.addDefaultRelations(options);
       console.log(options)
       const result = await this.repository.findOne(options);
-      console.log("asdfasdf", result)
       if (!result) {
         throw new NotFoundException(
           `No ${this.entityName} found with id ${id}`
