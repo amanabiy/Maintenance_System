@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdOutlineEmail } from "react-icons/md";
 import { MdOutlinePassword } from "react-icons/md";
 import {
@@ -24,6 +24,7 @@ import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import { useRequestVerificationEmailMutation } from "../redux/features/auth";
 import LoginSvg from "../assets/images/login.svg";
+import { getCookie } from "../utils/cookies";
 
 const LoginForm = () => {
   const dispatch = useDispatch();
@@ -34,6 +35,13 @@ const LoginForm = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [login, { isLoading, error }] = useLoginMutation();
   const [requestVerificationEmail] = useRequestVerificationEmailMutation();
+  const token = getCookie("authToken");
+
+  useEffect(() => {
+    if (token) {
+      navigate("/active");
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async () => {
     if (!email || !password) {
