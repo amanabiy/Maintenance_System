@@ -34,6 +34,7 @@ import { UserRoleEnum } from './entities/user-role.enum';
 import { PermissionsGuard } from '../permission/guard/permissions.guard';
 import { UserRoutePermissionEnum } from './entities/user-route-permission.enum';
 import { Permissions } from '../permission/decorator/permissions.decorator';
+import { plainToClass, plainToInstance } from 'class-transformer';
 
 @Controller('users')
 @ApiTags('User')
@@ -183,6 +184,8 @@ export class UserController {
     type: [User],
   })
   async fuzzySearch(@Param('term') term: string): Promise<User[]> {
-    return await this.userService.fuzzySearch(term);
+    const users = await this.userService.fuzzySearch(term)
+    const u = users.map((item) => plainToClass(User, item))
+    return u;
   }
 }
