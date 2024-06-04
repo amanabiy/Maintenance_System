@@ -1,6 +1,7 @@
 import { IsEmail, IsEnum, IsInt, IsNotEmpty, IsOptional, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserRoleEnum } from '../entities/user-role.enum';
+import { IsPhoneNumber } from '../validator/is_phone_number.validator';
 
 export class CreateUserDto {
   @IsEmail()
@@ -27,6 +28,14 @@ export class CreateUserDto {
   })
   password: string;
 
+
+  @ApiProperty({
+    description: 'Phone number of the user (including country code) format: +251XXXXXXXXX',
+    required: true,
+  })
+  @IsOptional()
+  @IsPhoneNumber() // Use the custom decorator
+  phoneNumber: string;
   // @IsEnum(UserRoleEnum)
   // @ApiProperty({
   //   description: 'Role of the user',
