@@ -28,21 +28,39 @@ import { useCreateMaintenanceRequestMutation } from "../../redux/features/mainte
 import { reportSchema } from "../../schemas";
 
 const ReportIssue = () => {
-  const [base64Image, setBase64Image] = useState(null);
-  const [image, setImage] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [base64Images, setBase64Images] = useState([]);
   const [uploadMedia] = useUploadMediaMutation();
   const [fuzzySearch] = useFuzzySearchMutation();
   const [createMaintenanceRequest] = useCreateMaintenanceRequestMutation();
   const [type, setType] = useState("");
 
   const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    setImage(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setBase64Image(reader.result);
-    };
-    reader.readAsDataURL(file);
+    const files = Array.from(event.target.files);
+    const readerPromises = files.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+      });
+    });
+
+    Promise.all(readerPromises)
+      .then((newBase64Images) => {
+        setImageFiles([...imageFiles, ...files]);
+        setBase64Images([...base64Images, ...newBase64Images]);
+        // handleFileChange([...imageFiles, ...files], [...base64Images, ...newBase64Images]); // Notify parent component of the change
+      })
+      .catch((error) => console.error("Error reading files:", error));
+  };
+
+  const handleRemoveImage = (index) => {
+    const updatedImageFiles = imageFiles.filter((_, i) => i !== index);
+    const updatedBase64Images = base64Images.filter((_, i) => i !== index);
+    setImageFiles(updatedImageFiles);
+    setBase64Images(updatedBase64Images);
+    // handleFileChange(updatedImages); // Notify parent component of the change
   };
 
   const handleCheckboxChange = (event) => {
@@ -79,10 +97,12 @@ const ReportIssue = () => {
         values.locationCreate.floor = 0;
       }
 
-      if (image) {
-        const formData = new FormData();
-        formData.append("file", image);
-        handleUploadImage(formData);
+      {
+        imageFiles.map((image) => {
+          const formData = new FormData();
+          formData.append("file", image);
+          handleUploadImage(formData);
+        });
       }
 
       if (type) {
@@ -117,8 +137,10 @@ const ReportIssue = () => {
   };
 
   const handleUploadImage = async (formData) => {
+    console.log("the data", formData);
     try {
       const res = await uploadMedia(formData);
+      console.log(res);
       values.mediaIds.push(res.data.id);
     } catch (err) {
       console.log("error", err);
@@ -167,8 +189,9 @@ const ReportIssue = () => {
         <GridParent gap={2}>
           <GridItem xs={6}>
             <ImageUpload
-              base64Image={base64Image}
+              images={base64Images}
               handleFileChange={handleFileChange}
+              handleRemoveImage={handleRemoveImage}
               errors={errors}
               touched={touched}
             />
