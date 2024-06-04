@@ -23,4 +23,5 @@ export const adminPaths = {
   STORE_TRANSACTIONS: "/store-transactions",
   USERS: "/all-users",
   MY_PROFILE: "/admin-profile",
+  ROLES: "/roles",
 };
