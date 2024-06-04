@@ -20,11 +20,6 @@ export class CreateRequestStatusDto {
   @IsString()
   internalNote?: string;
 
-  @ApiProperty({ description: 'Internal Version Changes on the maintenance request' })
-  @IsOptional()
-  @IsString()
-  internalVersionChanges?: string;
-
   @ApiProperty({ description: 'External message' })
   @IsOptional()
   @IsString()

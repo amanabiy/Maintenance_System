@@ -10,6 +10,7 @@ import { AuthRegisterDto } from './dto/auth-register.dto';
 import { MessageResponseDto } from 'src/dto/message-response.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { ResetPasswordWithOtpDto } from './dto/reset-with-otp.dto';
+import { AuthRefreshTokenDto } from './dto/auth-refresh_token.dto';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -39,6 +40,27 @@ export class AuthController {
   async login(@Body() loginUserDto: LoginUserDto): Promise<AuthResponseDto> {
     return this.authService.login(loginUserDto);
   }
+
+  @Get('refresh-token/:refreshToken')
+  @ApiOperation({ summary: 'Refresh access token for a user' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'New access token and potentially other user info',
+    type: AuthRefreshTokenDto,
+  })
+  async refreshToken(
+    @Param('refreshToken') refreshToken: string,
+  ): Promise<AuthRefreshTokenDto> {
+    const newAccessToken = await this.authService.refreshAccessToken(refreshToken);
+  
+    const response: AuthRefreshTokenDto = {
+      accessToken: newAccessToken,
+    };
+  
+    return response;
+  }
+
+  
 
 
   @Get('request-new-token-to-verify-email/:email')

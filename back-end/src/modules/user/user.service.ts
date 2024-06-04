@@ -4,7 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FindOneOptions, Repository } from 'typeorm';
+import { FindOneOptions, Like, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { GenericDAL } from '../../DAL/dal';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -34,7 +34,7 @@ export class UserService extends GenericDAL<
     private readonly mailService: MailService,
 
   ) {
-    super(userRepository);
+    super(userRepository, 1, 10, ['role', 'department']);
   }
 
   async determineRoleByEmail(email: string): Promise<Role> {
@@ -160,5 +160,16 @@ export class UserService extends GenericDAL<
     } catch {
       throw new UnauthorizedException('Invalid credentials');
     }
+  }
+
+  async fuzzySearch(searchTerm: string): Promise<User[]> {
+    const searchLike = `%${searchTerm.toLowerCase()}%`;
+
+    return await this.find({
+      where: [
+        { email: Like(searchLike) },
+        { fullName: Like(searchLike) },
+      ],
+    });
   }
 }

@@ -12,8 +12,9 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import StoreIcon from "@mui/icons-material/Store";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import logoutFunction from "../../functions/logoutFunction";
 
-import { adminPaths, issuerPaths } from "../../routing/paths";
+import { adminPaths, generalPaths, issuerPaths } from "../../routing/paths";
 
 const SidebarData = {
   userButtons: {
@@ -57,10 +58,8 @@ const SidebarData = {
       {
         text: "Log Out",
         icon: LogoutIcon,
-        path: "/",
-        onclick: () => {
-          console.log("Log out");
-        },
+        // path: generalPaths.LOGIN,
+        onclick: logoutFunction,
       },
     ],
   },
@@ -116,10 +115,8 @@ const SidebarData = {
       {
         text: "Log Out",
         icon: LogoutIcon,
-        path: "/",
-        onclick: () => {
-          console.log("Log out");
-        },
+        // path: generalPaths.LOGIN,
+        onclick: logoutFunction,
       },
     ],
   },

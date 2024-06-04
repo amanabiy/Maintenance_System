@@ -16,6 +16,8 @@ import { MaintenanceRequestTypeService } from '../maintenance_request_type/maint
 import { DepartmentService } from '../department/department.service';
 import { User } from '../user/entities/user.entity';
 import { UpdateRequestStatusDto } from './dto/update-request_status.dto';
+import { LocationService } from '../location/location.service';
+import { RequestStatusTimeService } from '../request_status_time/request_status_time.service';
 
 @Injectable()
 export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
@@ -30,6 +32,8 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     private readonly roleService: RoleService,
     private readonly maintenanceRequestTypeService: MaintenanceRequestTypeService,
     private readonly departmentService: DepartmentService,
+    private readonly locationService: LocationService,
+    private readonly requestStatusTimeService: RequestStatusTimeService,
   ) {
     super(requestStatusRepository, 0, 10, ['request', 'statusUpdatedBy', 'statusType']);
   }
@@ -48,14 +52,22 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
 
   async updateMaintenanceRequest(id: number, newRequestStatusTypeId: number, updateDto: UpdateMaintenanceRequestDto, updateRequestStatus: UpdateRequestStatusDto, currentUser: User): Promise<MaintenanceRequest> {
     const maintenanceRequest: MaintenanceRequest = await this.maintenanceRequestService.findOne(id);
-    const currentStatus = await super.findOne(-1, { where: { request: maintenanceRequest }, order: { createdAt: 'DESC' }, relations: ['statusType'] });
+    // console.log("here", id,  maintenanceRequest)
+    const currentStatus = await super.findOne(-1, { where: { request: { id: maintenanceRequest.id } }, order: { createdAt: 'DESC' }, relations: ['statusType', 'statusType.allowedTransitions', 'statusType.allowedRoles'] });
+
     const newRequestStatusType = await this.requestStatusTypeService.findOne(newRequestStatusTypeId);
     let internalVersionChanges = 'Internal changes\n';
 
 
+    const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
+    if (!hasAllowedRole) {
+      throw new Error('User does not have the allowed role to update the status');
+    }
 
     // Check if the new request status type is an allowed transition
-    const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => transition.id === newRequestStatusTypeId);
+    const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => {
+      return transition.id == newRequestStatusTypeId
+    });
     if (!isAllowedTransition) {
       throw new Error('Invalid status transition');
     }
@@ -66,9 +78,9 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       internalVersionChanges += `Priority changed from ${oldPriority} to ${updateDto.priority}\n`;
     }
 
-    if (newRequestStatusType.needsFile && !maintenanceRequest.mediaFiles.length) {
-      throw new Error('File is required');
-    }
+    // if (newRequestStatusType.needsFile && !maintenanceRequest.mediaFiles.length) {
+    //   throw new Error('File is required');
+    // }
 
     // update for feedback, confirmationStatus, verificationStatus
     if (newRequestStatusType.allowChangeconfirmationStatus) {
@@ -112,6 +124,31 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       maintenanceRequest.maintenanceRequestTypes = await this.maintenanceRequestTypeService.findByIds(updateDto.maintenanceRequestTypeIds);
     }
 
+    // Update location if allowed
+    if (newRequestStatusType.allowsChangeLocation && updateDto.locationCreate) {
+      internalVersionChanges += `Location changed from ${updateDto.locationCreate} to ${maintenanceRequest.location}\n`;
+      maintenanceRequest.location = await this.locationService.create(updateDto.locationCreate);
+    }
+
+
+    // Update title and description if allowed
+    if (newRequestStatusType.allowsChangeTitleAndDescription) {
+      if (updateDto.subject !== undefined) {
+        internalVersionChanges += `Subject changed from ${maintenanceRequest.subject} to ${updateDto.subject}\n`;
+        maintenanceRequest.subject = updateDto.subject;
+      }
+      if (updateDto.description !== undefined) {
+        internalVersionChanges += `Description changed from ${maintenanceRequest.description} to ${updateDto.description}\n`;
+        maintenanceRequest.description = updateDto.description;
+      }
+    }
+
+    // Update media if allowed
+    if (newRequestStatusType.allowsChangeMedia && updateDto.mediaIds) {
+      internalVersionChanges += `Media updated to ${updateDto.mediaIds}\n`;
+      maintenanceRequest.mediaFiles = await this.mediaService.findByIds(updateDto.mediaIds);
+    }
+
     // update request status
     const newRequestStatus: Partial<RequestStatus> = {
       request: Promise.resolve(maintenanceRequest),
@@ -142,8 +179,53 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const createdRequestStatus = await this.create(newRequestStatus);
 
     maintenanceRequest.requestStatuses.push(createdRequestStatus);
-    await this.maintenanceRequestService.update(maintenanceRequest.id, maintenanceRequest);
+    const data = await this.maintenanceRequestService.update(maintenanceRequest.id, maintenanceRequest);
+
+    const startTime = currentStatus.createdAt;
+    const endTime = createdRequestStatus.createdAt;
+    const timeSpent = await this.requestStatusTimeService.calculateSpentTime(startTime, endTime);
+    await this.requestStatusTimeService.create(currentStatus.statusType, createdRequestStatus.statusType, maintenanceRequest, currentUser, timeSpent);
 
     return maintenanceRequest;
+  }
+
+  async getLatestStatusIds(statusTypeId: number): Promise<RequestStatus[]> {
+    const latestStatusSubquery = this.requestStatusRepository
+      .createQueryBuilder('requestStatus')
+      .select('MAX(requestStatus.id)', 'id')
+      .groupBy('requestStatus.request')
+      .where('requestStatus.statusType.id IN (SELECT id FROM request_status_type WHERE id = :statusTypeId)')
+      .getQuery();
+    
+    const latestStatuses = await this.requestStatusRepository
+      .createQueryBuilder('rs')
+      .where(`rs.id IN (${latestStatusSubquery})`)
+      .leftJoinAndSelect('rs.statusType', 'statusType')
+      .setParameter('statusTypeId', statusTypeId)
+      .getMany();
+    
+    return latestStatuses;
+  }
+
+  async getLatestStatusByStatusTypeIds(statusTypeIds: number[]): Promise<RequestStatus[]> {
+
+    // Subquery to get the latest status ID for each request
+    const latestStatusSubquery = this.requestStatusRepository
+      .createQueryBuilder('requestStatus')
+      .select('MAX(requestStatus.id)', 'id')
+      .groupBy('requestStatus.request')
+      .where('requestStatus.statusType.id IN (:...statusTypeIds)', { statusTypeIds })
+      .getQuery();
+
+      // Main query to get the request statuses
+    const latestStatuses = await this.requestStatusRepository
+      .createQueryBuilder('rs')
+      .where(`rs.id IN (${latestStatusSubquery})`)
+      .leftJoinAndSelect('rs.statusType', 'statusType')
+      .setParameter('statusTypeIds', statusTypeIds)
+      .getMany();
+
+    console.log(latestStatuses);
+    return latestStatuses;
   }
 }

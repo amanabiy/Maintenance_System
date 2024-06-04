@@ -47,6 +47,7 @@ export class SearchMaintenanceRequestDto {
     example: -1,
     default: -1,
   })
+  @IsOptional()
   @IsInt()
-  priority: number;
+  priority?: number;
 }

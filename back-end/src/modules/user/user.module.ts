@@ -13,10 +13,12 @@ import { MailModule } from '../mail/mail.module';
 import { MailService } from '../mail/mailer.service';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { SharedModule } from '../shared/shared.module';
+import { Permission } from '../permission/entities/permission.entity';
+import { PermissionService } from '../permission/permission.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Permission]),
     TypeOrmModule.forFeature([Role]),
     TypeOrmModule.forFeature([Department]),
     PassportModule.register({ defaultStrategy: 'jwt' }),
@@ -24,7 +26,7 @@ import { SharedModule } from '../shared/shared.module';
     SharedModule
   ],
   controllers: [UserController],
-  providers: [UserService, DepartmentService, RoleService, MailService, JwtService],
+  providers: [UserService, DepartmentService, RoleService, MailService, JwtService, PermissionService],
   exports: [UserService],
 })
 export class UserModule {}

@@ -13,6 +13,8 @@ import { RoleService } from '../role/role.service';
 import { Role } from '../role/entities/role.entity';
 import { Department } from '../department/entities/department.entity';
 import { MailService } from '../mail/mailer.service';
+import { Permission } from '../permission/entities/permission.entity';
+import { PermissionService } from '../permission/permission.service';
 
 @Module({
   imports: [
@@ -22,9 +24,9 @@ import { MailService } from '../mail/mailer.service';
       secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '48h' },
     }),
-    TypeOrmModule.forFeature([User, Department, Role]),
+    TypeOrmModule.forFeature([User, Department, Role, Permission]),
   ],
-  providers: [AuthService, UserService, JwtStrategy, DepartmentService, RoleService, MailService],
+  providers: [AuthService, UserService, JwtStrategy, DepartmentService, RoleService, MailService, PermissionService],
   controllers: [AuthController],
   exports: [JwtModule, AuthModule],
 })

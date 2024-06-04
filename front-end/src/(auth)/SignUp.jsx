@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { MdOutlineEmail } from "react-icons/md";
 import { MdOutlinePassword } from "react-icons/md";
@@ -21,6 +21,7 @@ import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useRegisterMutation } from "../redux/features/auth";
 import CircularProgress from "@mui/material/CircularProgress";
 import SignUpSvg from "../assets/images/signup.svg";
+import { getCookie } from "../utils/cookies";
 
 const SignupForm = () => {
   const navigate = useNavigate();
@@ -32,6 +33,13 @@ const SignupForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [register, { isLoading, error }] = useRegisterMutation();
   const [isConfirmVisible, setIsConfirmVisible] = useState(false);
+  const token = getCookie("authToken");
+
+  useEffect(() => {
+    if (token) {
+      navigate("/active");
+    }
+  }, [token, navigate]);
 
   const handleSubmit = async () => {
     if (!email || !fullName || !password) {
