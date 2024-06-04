@@ -173,4 +173,16 @@ export class UserController {
     await this.userService.delete(+id);
     return new DeleteResponseDto();
   }
+
+  @Get('fuzzy-search/:term')
+  @ApiOperation({ summary: 'Fuzzy search user by users ' })
+  @ApiParam({ name: 'term', description: 'The term to search for' })
+  @ApiResponse({
+    status: 200,
+    description: 'Array of users that match the search criteria',
+    type: [User],
+  })
+  async fuzzySearch(@Param('term') term: string): Promise<User[]> {
+    return await this.userService.fuzzySearch(term);
+  }
 }
