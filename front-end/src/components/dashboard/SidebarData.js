@@ -11,6 +11,7 @@ import PeopleIcon from "@mui/icons-material/People";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import StoreIcon from "@mui/icons-material/Store";
 import BarChartIcon from "@mui/icons-material/BarChart";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import logoutFunction from "../../functions/logoutFunction";
 
 import { adminPaths, generalPaths, issuerPaths } from "../../routing/paths";
@@ -97,6 +98,11 @@ const SidebarData = {
         text: "Generate Report",
         icon: BarChartIcon,
         path: adminPaths.GENERATE_REPORT,
+      },
+      {
+        text: "Manage Roles",
+        icon: ManageAccountsIcon,
+        path: adminPaths.ROLES,
       },
     ],
     user: [

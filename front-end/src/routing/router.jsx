@@ -34,12 +34,17 @@ const FinancialTransactions = lazy(() =>
 );
 const Users = lazy(() => import("../pages/Admin/Users"));
 const Requests = lazy(() => import("../pages/Admin/Requests"));
+const RequestDetails = lazy(
+  () => "../components/commonScenes/RequestDetails.jsx"
+);
+const MyProfile = lazy(() => import("../pages/Admin/MyProfile"));
+const RequestStatusDetails = lazy(
+  () => "../components/commonScenes/RequestStatusDetails.jsx"
+);
+const Roles = lazy(() => import("../pages/Admin/Roles"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
-import RequestDetails from "../components/commonScenes/RequestDetails.jsx";
-import MyProfile from "../pages/Admin/MyProfile.jsx";
-import RequestStatusDetails from "../components/commonScenes/RequestStatusDetails.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -164,6 +169,17 @@ const router = createBrowserRouter(
           }
         >
           <Route index element={<MyProfile />} />
+        </Route>
+
+        <Route
+          path="roles"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<Roles />} />
         </Route>
 
         {/* Issuer Routes */}
