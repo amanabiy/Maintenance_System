@@ -444,6 +444,22 @@ const TransitionModalFields = (
     );
   }
 
+  //  COMMENT INPUT----------------------------------------------------------
+
+  fields.push(
+    <TextField
+      key="externalNote"
+      fullWidth
+      margin="normal"
+      label="Comment"
+      name="comment"
+      value={values.comment}
+      onChange={(e) => setFieldValue("externalNote", e.target.value)}
+      error={Boolean(errors.externalNote)}
+      helperText={<ErrorMessage name="externalNote" />}
+    />
+  );
+
   return fields;
 };
 

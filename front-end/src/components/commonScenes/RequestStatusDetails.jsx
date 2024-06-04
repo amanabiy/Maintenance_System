@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useGetMaintenanceRequestByIdQuery } from "../../redux/features/maintenanceRequest";
-import { useGetRequestStatusTypeByIdQuery } from "../../redux/features/requestStatus";
+import { useGetRequestStatusTypeByIdQuery } from "../../redux/features/requestStatusType";
 import { useParams } from "react-router-dom";
 
 import {
