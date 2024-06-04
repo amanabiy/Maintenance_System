@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import {
   Avatar,
   Button,
@@ -20,16 +20,24 @@ import GridParent from "../../components/layout/GridParent";
 import GridItem from "../../components/layout/GridItem";
 import AboveTableHeader from "../../components/headers/AboveTableHeader";
 import ImageUpload from "../../components/form/ImageUpload";
-import { useState } from "react";
+import { useUploadMediaMutation } from "../../redux/features/media";
+import { useFuzzySearchMutation } from "../../redux/features/maintenanceRequestTypes";
+import { useCreateMaintenanceRequestMutation } from "../../redux/features/maintenanceRequest";
 
 // form schema
 import { reportSchema } from "../../schemas";
 
 const ReportIssue = () => {
   const [base64Image, setBase64Image] = useState(null);
+  const [image, setImage] = useState(null);
+  const [uploadMedia] = useUploadMediaMutation();
+  const [fuzzySearch] = useFuzzySearchMutation();
+  const [createMaintenanceRequest] = useCreateMaintenanceRequestMutation();
+  const [type, setType] = useState("");
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
+    setImage(file);
     const reader = new FileReader();
     reader.onloadend = () => {
       setBase64Image(reader.result);
@@ -37,21 +45,94 @@ const ReportIssue = () => {
     reader.readAsDataURL(file);
   };
 
-  const { values, handleBlur, handleChange, handleSubmit, errors, touched } =
-    useFormik({
-      initialValues: {
-        subject: "",
-        description: "",
-        type: "",
-        blockNumber: "",
+  const handleCheckboxChange = (event) => {
+    setFieldValue("locationCreate.isToilet", event.target.checked);
+  };
+
+  const {
+    values,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    errors,
+    touched,
+    setFieldValue,
+  } = useFormik({
+    initialValues: {
+      subject: "",
+      description: "",
+      locationCreate: {
+        blockNumber: 0,
         roomNumber: "",
+        floor: 0,
+        isToilet: false,
       },
-      validationSchema: reportSchema,
-      onSubmit: (values) => {
-        // Handle form submission
-        console.log("Form Submitted", values);
-      },
-    });
+      mediaIds: [],
+      maintenanceRequestTypeIds: [],
+    },
+    validationSchema: reportSchema,
+    onSubmit: (values) => {
+      // Handle form submission
+      if (values.locationCreate.isToilet) {
+        values.locationCreate.roomNumber = "";
+      } else {
+        values.locationCreate.floor = 0;
+      }
+
+      if (image) {
+        const formData = new FormData();
+        formData.append("file", image);
+        handleUploadImage(formData);
+      }
+
+      if (type) {
+        handleFuzzySearch(type);
+      }
+
+      console.log("Form Submitted", values);
+      handleSubmitAll(values);
+    },
+  });
+
+  const handleSubmitAll = async (values) => {
+    try {
+      const res = await createMaintenanceRequest(values);
+      if (res.data.verificationStatus == "PENDING") {
+        console.log("Request successful");
+      }
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
+
+  const handleFuzzySearch = async (term) => {
+    try {
+      const res = await fuzzySearch(term);
+      if (res.data && res.data[0].id) {
+        values.maintenanceRequestTypeIds.push(res.data[0].id);
+      }
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
+
+  const handleUploadImage = async (formData) => {
+    try {
+      const res = await uploadMedia(formData);
+      values.mediaIds.push(res.data.id);
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
+
+  const handleSelectChange = (event) => {
+    const { value } = event.target;
+    if (values.locationCreate.isToilet) {
+      setFieldValue("locationCreate.floor", value);
+    } else {
+      setFieldValue("locationCreate.roomNumber", value);
+    }
+  };
 
   return (
     <GridParent
@@ -75,7 +156,7 @@ const ReportIssue = () => {
       <form
         style={{
           padding: "20px",
-          border: " solid 1px #e0e0e0",
+          border: "solid 1px #e0e0e0",
           borderRadius: "10px",
           boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
           backgroundColor: "#ffffff",
@@ -112,8 +193,8 @@ const ReportIssue = () => {
               <InputLabel>Type</InputLabel>
               <Select
                 label="Type"
-                value={values.type}
-                onChange={handleChange}
+                value={type}
+                onChange={(e) => setType(e.target.value)}
                 onBlur={handleBlur}
                 id="type"
                 name="type"
@@ -131,35 +212,87 @@ const ReportIssue = () => {
               <InputLabel>Block Number</InputLabel>
               <Select
                 label="Block Number"
-                value={values.blockNumber}
-                onChange={handleChange}
+                value={values.locationCreate.blockNumber}
+                onChange={(e) =>
+                  setFieldValue(
+                    "locationCreate.blockNumber",
+                    parseInt(e.target.value, 10)
+                  )
+                }
                 onBlur={handleBlur}
-                id="blockNumber"
-                name="blockNumber"
+                id="locationCreate.blockNumber"
+                name="locationCreate.blockNumber"
                 style={{ height: "40px" }}
               >
-                <MenuItem value="B64">B64</MenuItem>
-                <MenuItem value="B47">B47</MenuItem>
-                <MenuItem value="B57">B57</MenuItem>
+                <MenuItem value="64">64</MenuItem>
+                <MenuItem value="47">47</MenuItem>
+                <MenuItem value="57">57</MenuItem>
               </Select>
             </FormControl>
           </GridItem>
 
+          <GridItem xs={12} style={{ marginBottom: 20 }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={values.locationCreate.isToilet}
+                  onChange={handleCheckboxChange}
+                  sx={{
+                    color: "#4caf50",
+                    "&.Mui-checked": {
+                      color: "#4caf50",
+                    },
+                  }}
+                />
+              }
+              label="Is Toilet"
+            />
+          </GridItem>
+
           <GridItem xs={4} md={2} style={{ marginBottom: 20 }}>
             <FormControl variant="outlined" fullWidth>
-              <InputLabel>Room Number</InputLabel>
+              <InputLabel>
+                {values.locationCreate.isToilet ? "Floor" : "Room Number"}
+              </InputLabel>
               <Select
-                label="Room Number"
-                value={values.roomNumber}
-                onChange={handleChange}
+                label={values.locationCreate.isToilet ? "Floor" : "Room Number"}
+                value={
+                  values.locationCreate.isToilet
+                    ? values.locationCreate.floor
+                    : values.locationCreate.roomNumber
+                }
+                onChange={(e) =>
+                  values.locationCreate.isToilet
+                    ? setFieldValue(
+                        "locationCreate.floor",
+                        parseInt(e.target.value, 10)
+                      )
+                    : setFieldValue("locationCreate.roomNumber", e.target.value)
+                }
                 onBlur={handleBlur}
-                id="roomNumber"
-                name="roomNumber"
+                id={
+                  values.locationCreate.isToilet
+                    ? "locationCreate.floor"
+                    : "locationCreate.roomNumber"
+                }
+                name={
+                  values.locationCreate.isToilet
+                    ? "locationCreate.floor"
+                    : "locationCreate.roomNumber"
+                }
                 style={{ height: "40px" }}
               >
-                <MenuItem value="R4-005">R4-005</MenuItem>
-                <MenuItem value="R1-003">R1-003</MenuItem>
-                <MenuItem value="R2-010">R2-010</MenuItem>
+                {values.locationCreate.isToilet
+                  ? [0, 1, 2, 3, 4, 5].map((floor) => (
+                      <MenuItem key={floor} value={floor}>
+                        {floor}
+                      </MenuItem>
+                    ))
+                  : ["R4-005", "R1-003", "R2-010"].map((room) => (
+                      <MenuItem key={room} value={room}>
+                        {room}
+                      </MenuItem>
+                    ))}
               </Select>
             </FormControl>
           </GridItem>
@@ -183,37 +316,6 @@ const ReportIssue = () => {
               }
               style={{ backgroundColor: "#f9f9f9" }}
             />
-          </GridItem>
-
-          <GridItem xs={12}>
-            <FormGroup row>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    sx={{
-                      color: "#4caf50",
-                      "&.Mui-checked": {
-                        color: "#4caf50",
-                      },
-                    }}
-                  />
-                }
-                label="Option 1"
-              />
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    sx={{
-                      color: "#f44336",
-                      "&.Mui-checked": {
-                        color: "#f44336",
-                      },
-                    }}
-                  />
-                }
-                label="Option 2"
-              />
-            </FormGroup>
           </GridItem>
 
           <Divider style={{ marginTop: 20, width: "100%" }} />

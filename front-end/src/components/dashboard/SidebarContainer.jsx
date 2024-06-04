@@ -7,7 +7,7 @@ import "./styles.scss";
 
 const SidebarContainer = React.forwardRef(
   ({ buttons, sidebarOpen, sidebarType }, ref) => {
-    console.log(sidebarOpen, sidebarType);
+    // console.log(sidebarOpen, sidebarType);
     return (
       <div
         ref={ref}
@@ -65,10 +65,17 @@ const SidebarContainer = React.forwardRef(
               buttons.user &&
               buttons.user.map((button, index) => (
                 <li key={index}>
-                  <NavLink to={`/active${button.path}`} className="nav-link">
-                    <button.icon className="icon" />
-                    <span>{button.text}</span>
-                  </NavLink>
+                  {button.onClick ? (
+                    <div onClick={button.onClick}>
+                      <button.icon className="icon" />
+                      <span>{button.text}</span>
+                    </div>
+                  ) : (
+                    <NavLink to={`/active${button.path}`} className="nav-link">
+                      <button.icon className="icon" />
+                      <span>{button.text}</span>
+                    </NavLink>
+                  )}
                 </li>
               ))}
           </ul>
