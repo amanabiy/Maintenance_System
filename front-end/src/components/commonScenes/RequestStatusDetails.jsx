@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useGetMaintenanceRequestByIdQuery } from "../../redux/features/maintenanceRequest";
+import { useGetRequestStatusTypeByIdQuery } from "../../redux/features/requestStatus";
 import { useParams } from "react-router-dom";
 
 import {
@@ -23,27 +24,52 @@ import GridItem from "../layout/GridItem";
 
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import GetAppIcon from "@mui/icons-material/GetApp";
+import { transformation } from "leaflet";
+import TransitionModal from "../modals/TransitionModal";
 
 const RequestStatusDetails = () => {
   const [activeStep, setActiveStep] = useState(0);
+  const [currentRequestStatusId, setRequestCurrentStatusId] = useState(null);
+  const [currentRequestStatus, setCurrentRequestStatus] = useState({});
+  const [currentTransitionState, setCurrentTransitionState] = useState({});
+  const [transitionModalOpen, setTransitionModalOpen] = useState(false);
   const { requestId } = useParams();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const {
-    data: requests,
+    data: request,
     error,
     status,
   } = useGetMaintenanceRequestByIdQuery(requestId);
-  const requestStatuses = requests?.requestStatuses || [];
+  const requestStatuses = request?.requestStatuses || [];
 
-  console.log("Request Statuses", requestStatuses);
+  const {
+    data: currentRequestStatusType,
+    status: requestStatus,
+    error: requestError,
+  } = useGetRequestStatusTypeByIdQuery(currentRequestStatusId, {
+    skip: !currentRequestStatusId,
+  });
+
+  useEffect(() => {
+    if (requestStatuses.length > 0) {
+      setRequestCurrentStatusId(requestStatuses[activeStep]?.statusType?.id);
+      setCurrentRequestStatus(requestStatuses[activeStep]);
+    }
+  }, [activeStep, requestStatuses]);
 
   const handleStepClick = (index) => {
     setActiveStep(index);
+    setRequestCurrentStatusId(requestStatuses[index]?.statusType?.id);
+    setCurrentRequestStatus(requestStatuses[index]);
     console.log("Step clicked", index);
   };
+  const handleTransitionModalClose = () => {
+    setTransitionModalOpen(false);
+  };
 
-  if (error || status === "failed") {
+  if (error || requestError || status === "failed") {
+    console.log("Error", error, requestError);
     return (
       <Alert severity="error">
         Can't seem to load the data at the moment. Try refreshing the page.
@@ -51,10 +77,16 @@ const RequestStatusDetails = () => {
     );
   }
 
-  if (!requestStatuses || status === "pending") {
+  if (!requestStatuses || requestStatus === "pending" || status === "pending") {
     return <Loading />;
   }
 
+  console.log("Requests", request);
+  console.log("current Request Status TYpe", currentRequestStatusType);
+  // console.log("Request Statuses", requestStatuses, currentRequestStatusId);
+  // console.log("Current Request Status", currentRequestStatusType);
+  // console.log("current Reaest status and error", requestStatus, requestError);
+  // console.log("current transition state", currentTransitionState);
   return (
     <GridParent className="request-status-details">
       <GridItem
@@ -108,13 +140,15 @@ const RequestStatusDetails = () => {
         </Stepper>
       </GridItem>
       <GridItem xs={10} className="details-section">
-        {requestStatuses.length > 0 && (
-          <Box>
+        {currentRequestStatusType && (
+          <Box
+            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
+          >
             <Typography variant="h5">
-              {requestStatuses[activeStep].statusType.name}
+              {currentRequestStatusType.name}
             </Typography>
             <Typography variant="caption">
-              {new Date(requestStatuses[activeStep].updatedAt).toDateString()}
+              {new Date(currentRequestStatusType.updatedAt).toDateString()}
             </Typography>
             <Box>
               <Typography
@@ -134,7 +168,7 @@ const RequestStatusDetails = () => {
                 <EditNoteOutlinedIcon
                   style={{ position: "absolute", top: "0", right: "0" }}
                 />
-                {requestStatuses[activeStep].externalNote}
+                {currentRequestStatusType.externalNote}
               </Typography>
               <Typography
                 variant="body1"
@@ -157,24 +191,26 @@ const RequestStatusDetails = () => {
                     right: "0",
                   }}
                 />
-                {requestStatuses[activeStep].internalNote}
+                {currentRequestStatusType.internalNote}
               </Typography>
             </Box>
 
-            <Button
-              variant="contained"
-              startIcon={<GetAppIcon />}
-              onClick={() => {}}
-              size="small"
-            >
-              Download Files
-            </Button>
+            <Box>
+              <Button
+                variant="contained"
+                startIcon={<GetAppIcon />}
+                onClick={() => {}}
+                size="small"
+              >
+                Download Files
+              </Button>
+            </Box>
 
             <Box>
               <Typography variant="h6">Scheduling</Typography>
               <Typography variant="body1">
                 <strong>Start Date:</strong>{" "}
-                {requestStatuses[activeStep].scheduleMaintenanceStartDateTime
+                {currentRequestStatusType.scheduleMaintenanceStartDateTime
                   ? new Date(
                       requestStatuses[
                         activeStep
@@ -184,9 +220,9 @@ const RequestStatusDetails = () => {
               </Typography>
               <Typography variant="body1">
                 <strong>End Date:</strong>{" "}
-                {requestStatuses[activeStep].scheduleMaintenanceEndDateTime
+                {currentRequestStatusType.scheduleMaintenanceEndDateTime
                   ? new Date(
-                      requestStatuses[activeStep].scheduleMaintenanceEndDateTime
+                      currentRequestStatusType.scheduleMaintenanceEndDateTime
                     ).toDateString()
                   : "Not Scheduled"}
               </Typography>
@@ -194,17 +230,54 @@ const RequestStatusDetails = () => {
             <Box>
               <Typography variant="h6">Signed By</Typography>
               <Typography variant="body1">
-                {requestStatuses[activeStep].signatureByName || "Not Signed"}
+                {currentRequestStatusType.signatureByName || "Not Signed"}
               </Typography>
+            </Box>
+
+            <Box>
+              <Typography variant="h6">Transition To:</Typography>
+              {currentRequestStatusType.allowedTransitions.length > 0 ? (
+                currentRequestStatusType.allowedTransitions.map(
+                  (transitionState) => {
+                    return (
+                      <Button
+                        key={transitionState.id}
+                        variant="contained"
+                        onClick={() => {
+                          console.log(
+                            "Transitioning State to",
+                            transitionState.id
+                          );
+                          setCurrentTransitionState(transitionState);
+                          setTransitionModalOpen(true);
+                        }}
+                        size="small"
+                      >
+                        {transitionState.name}
+                      </Button>
+                    );
+                  }
+                )
+              ) : (
+                <div>This is a Final State.</div>
+              )}
             </Box>
 
             <Typography variant="caption">
               Most Recent Update:{" "}
-              {new Date(requestStatuses[activeStep].updatedAt).toDateString()}
+              {new Date(currentRequestStatusType.updatedAt).toDateString()}
             </Typography>
           </Box>
         )}
       </GridItem>
+      <TransitionModal
+        open={transitionModalOpen}
+        transitionState={currentTransitionState}
+        currentRequest={request}
+        currentRequestStatus={currentRequestStatus}
+        currentRequestStatusType={currentRequestStatusType}
+        onClose={handleTransitionModalClose}
+      />
     </GridParent>
   );
 };

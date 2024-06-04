@@ -21,7 +21,7 @@ import MapComponent from "../display/MapComponent";
 import Loading from "../loading/Loading";
 
 // functions
-import { generateImageLinks } from "../../functions/imageFunctions";
+import { generateMediaLinks } from "../../functions/mediaFunctions";
 
 // icons
 import BusinessIcon from "@mui/icons-material/Business";
@@ -94,7 +94,7 @@ const RequestDetails = ({ isEdit }) => {
                   }}
                 >
                   <ImageSlider
-                    images={generateImageLinks(maintenanceRequest.mediaFiles)}
+                    images={generateMediaLinks(maintenanceRequest.mediaFiles)}
                   />
                 </Card>
               </GridItem>
@@ -195,13 +195,11 @@ const RequestDetails = ({ isEdit }) => {
                         <div className="types">
                           {maintenanceRequest.maintenanceRequestTypes.map(
                             (type, index) => (
-                              <>
-                                <Chip
-                                  key={index}
-                                  label={type.name}
-                                  className="chip"
-                                />
-                              </>
+                              <Chip
+                                key={index}
+                                label={type.name}
+                                className="chip"
+                              />
                             )
                           )}
                         </div>
