@@ -56,4 +56,12 @@ export class RequestStatusTypeController {
     await this.requestStatusTypeService.delete(+id);
     return new DeleteResponseDto();
   }
+
+  @Patch(':id/mark-initial')
+  @ApiOperation({ summary: 'Mark a request status type as initial' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Request status type has been successfully marked as initial', type: RequestStatusType })
+  @ApiNotFoundResponse({ description: 'Request status type with the specified ID not found' })
+  async markAsInitial(@Param('id') id: string): Promise<RequestStatusType> {
+    return await this.requestStatusTypeService.markAsInitial(+id);
+  }
 }

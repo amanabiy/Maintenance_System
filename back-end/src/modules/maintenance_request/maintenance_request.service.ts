@@ -1,4 +1,4 @@
-import { Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MaintenanceRequest } from './entities/maintenance_request.entity';
 import { In, Repository } from 'typeorm';
@@ -17,6 +17,9 @@ import { MaintenanceVerificationStatusEnum } from './entities/maintenance_reques
 import { RoleService } from '../role/role.service';
 import { RequestStatusService } from '../request_status/request_status.service';
 import { RequestStatusTypeService } from '../request_status_type/request_status_type.service';
+import { PermissionService } from '../permission/permission.service';
+import { MaintenanceRequestPermissionEnum } from './entities/maintenance_request-permission.entum';
+import { RequestStatus } from '../request_status/entities/request_status.entity';
 
 @Injectable()
 export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, CreateMaintenanceRequestDto, UpdateMaintenanceRequestDto> {
@@ -32,6 +35,7 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     @Inject(forwardRef(() => RequestStatusService))
     private readonly requestStatusService: RequestStatusService,
     private readonly requestStatusTypeService: RequestStatusTypeService,
+    private readonly permissionService: PermissionService,
   ) {
     super(maintenanceRequestRepository, 1, 10, 
       [
@@ -95,10 +99,10 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
       throw new Error('Maintenance request not found');
     }
 
-    const { locationId, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
+    const { locationCreate, handlingDepartmentId, assignedPersonIds, maintenanceRequestTypeIds, mediaIds, ...rest } = dto;
 
-    if (locationId) {
-      maintenanceRequest.location = await this.locationService.findOne(locationId);
+    if (locationCreate) {
+      maintenanceRequest.location = await this.locationService.create(locationCreate);
     }
     if (handlingDepartmentId) {
       maintenanceRequest.handlingDepartment = await this.departmentService.findOne(handlingDepartmentId);
@@ -119,41 +123,102 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
   }
 
 
-  async searchRequests(criteria: SearchMaintenanceRequestDto): Promise<findAllResponseDto<MaintenanceRequest>> {
+  async searchRequests(criteria: SearchMaintenanceRequestDto, currentUser: User): Promise<findAllResponseDto<MaintenanceRequest>> {
     const where: any = {};
-    console.log("sdfsd")
+
     if (criteria.assignedPersonIds && criteria.assignedPersonIds.length > 0) {
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_ASSIGNED_PERSON_IDS)) {
+        throw new ForbiddenException('You do not have permission to search by assigned person IDs');
+      }
       where.assignedPersons = { id: In(criteria.assignedPersonIds) };
     }
 
     if (criteria.maintenanceRequestTypeIds && criteria.maintenanceRequestTypeIds.length > 0) {
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUEST_TYPE_IDS)) {
+        throw new ForbiddenException('You do not have permission to search by request type IDs');
+      }
       where.maintenanceRequestTypes = { id: In(criteria.maintenanceRequestTypeIds) };
     }
 
     if (criteria.handlingDepartmentId) {
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_HANDLING_DEPARTMENT_ID)) {
+        throw new ForbiddenException('You do not have permission to search by handling department ID');
+      }
       where.handlingDepartment = { id: criteria.handlingDepartmentId };
     }
 
     if (criteria.requesterId) {
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUESTER_ID)) {
+        throw new ForbiddenException('You do not have permission to search by requester ID');
+      }
       where.requester = { id: criteria.requesterId };
     }
 
     if (criteria.confirmationStatus) {
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_CONFIRMATION_STATUS)) {
+        throw new ForbiddenException('You do not have permission to search by confirmation status');
+      }
       where.confirmationStatus = criteria.confirmationStatus;
     }
 
     if (criteria.verificationStatus) {
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFICATION_STATUS)) {
+        throw new ForbiddenException('You do not have permission to search by verification status');
+      }
       where.verificationStatus = criteria.verificationStatus;
     }
 
     if (criteria.verifiedById) {
-      where.verifiedBy = { id: criteria.verifiedById }; // Assuming 'verifiedBy' is a relation with 'User'
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFIED_BY_ID)) {
+        throw new ForbiddenException('You do not have permission to search by verified by ID');
+      }
+      where.verifiedBy = { id: criteria.verifiedById };
     }
-    console.log("here")
-    console.log("where", where)
+
+    if (criteria.priority) {
+      if (!this.permissionService.hasPermission(currentUser, MaintenanceRequestPermissionEnum.CAN_SEARCH_MAINTENANCE_REQUESTS_BY_PRIORITY)) {
+        throw new ForbiddenException('You do not have permission to search by priority');
+      }
+      where.priority = criteria.priority;
+    }
+
+    console.log("here");
+    console.log("where", where);
+
     return await this.findWithPagination({
       where,
     });
+  }
+
+  async findAllByLatestStatus(statusTypeId: number, page = 1, limit = 10): Promise<findAllResponseDto<MaintenanceRequest>> {
+    const latestStatusIds: RequestStatus[] = await this.requestStatusService.getLatestStatusIds(statusTypeId);
+    const statusIds = latestStatusIds.map((status) => status.id);
+    const result = await this.findWithPagination({
+      where: {
+        requestStatuses: {
+          id: In(statusIds),
+          statusType: {
+            id: statusTypeId,
+          },
+        },
+      },
+    }, page, limit);
+    return result;
+  }
+
+  async findAllByRole(roleId: number, page = 1, limit = 10): Promise<findAllResponseDto<MaintenanceRequest>> {
+    const statusTypes = await this.requestStatusTypeService.getLatestStatusTypeIds([roleId]);
+    const statusTypeIds = statusTypes.map((statusType) => statusType.id);
+    console.log(statusTypeIds)
+    const latestStatusIds = await this.requestStatusService.getLatestStatusByStatusTypeIds(statusTypeIds);
+    const requestStatusIds = latestStatusIds.map((status) => status.id);
+    return await this.findWithPagination({
+      where: {
+        requestStatuses: {
+          id: In(requestStatusIds),
+        },
+      },
+    }, page, limit);
   }
 
   async delete(id: number): Promise<void> {

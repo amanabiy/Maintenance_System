@@ -89,7 +89,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
         delete options.where['id'];
       }
       this.addDefaultRelations(options);
-      // console.log(options)
+      console.log(options)
       const result = await this.repository.findOne(options);
       if (!result) {
         throw new NotFoundException(
@@ -184,6 +184,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
       const options: FindManyOptions = conditions || {};
       this.applyPagination(options, page, pageSize);
       this.addDefaultRelations(options);
+      console.log(options)
       const [items, total] = await this.repository.findAndCount(options);
       return new FindAllResponseDto<Entity>(page, pageSize, total, items);
     } catch (error) {

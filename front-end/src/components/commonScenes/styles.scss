@@ -1,0 +1,127 @@
+.more-details {
+  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  //   border: solid 1px black;
+
+  .title {
+    text-align: center;
+    width: 100%;
+  }
+  .detail-card {
+    min-width: 250px;
+    min-height: 200px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px; //to be changed
+    border-radius: 8px;
+    padding: 8px;
+    flex: 1;
+    .header {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 30px;
+      padding: 4px;
+      .icon {
+        color: plum; //to be changed
+      }
+      .title {
+        font-size: 14px;
+        font-weight: bold;
+      }
+      .priority {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        right: 0;
+        top: 0;
+        background-color: lightcoral; //to be changed
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+      }
+    }
+    .internal {
+      //   background-color: bisque; //to be changed
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      align-items: center;
+      margin-top: 8px;
+      & > * {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        text-align: left;
+        gap: 5px;
+        .desc {
+          text-align: center;
+        }
+      }
+
+      .chip {
+        height: 20px;
+        font-size: 10px;
+      }
+      .verifiedBy {
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        padding: 4px;
+        .avatar {
+          width: 24px;
+          height: 24px;
+        }
+      }
+      .missing {
+        position: relative;
+        font-size: 12px;
+        font-style: italic;
+        color: red;
+        display: flex;
+        align-items: center;
+        .icon {
+          width: 15px;
+        }
+      }
+    }
+  }
+}
+
+.request-status-details {
+  padding: 8px;
+  .steppers-section {
+    padding: 8px;
+    .stepper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      //   border: solid 1px black;
+    }
+    .step {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      //   border: solid 1px black;
+    }
+    .step-label {
+      width: 50%;
+      padding: 4px;
+    }
+  }
+  .details-section {
+    padding: 8px;
+    border-left: 0.5px solid #f0f0f0;
+  }
+}
