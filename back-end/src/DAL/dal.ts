@@ -59,7 +59,7 @@ export class GenericDAL<Entity, DTO, UpdateDTO> {
 
   async findAll(
     page: number = 1,
-    pageSize: number = 10,
+    pageSize: number = 10000,
   ): Promise<FindAllResponseDto<Entity>> {
     try {
       const options: any = {};
