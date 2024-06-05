@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as https from 'https';
 import * as http from 'http';
 import { ExpressAdapter } from '@nestjs/platform-express';
-import express from 'express';
+import * as express from 'express';
 
 async function bootstrap() {
   const httpsOptions = {
@@ -27,7 +27,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe());
   setupSwagger(app);
-  
+
   dotenv.config();
 
   app.enableCors({
