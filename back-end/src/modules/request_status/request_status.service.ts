@@ -1,4 +1,4 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { RequestStatus } from './entities/request_status.entity';
@@ -64,7 +64,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       console.log(hasAllowedRole);
       console.log(currentUser.role.id);
       console.log(currentStatus.statusType.allowedRoles);
-      throw new Error('User does not have the allowed role to update the status');
+      throw new ForbiddenException('User does not have the allowed role to update the status');
     }
 
     // Check if the new request status type is an allowed transition
@@ -72,7 +72,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       return transition.id == newRequestStatusTypeId
     });
     if (!isAllowedTransition) {
-      throw new Error('Invalid status transition');
+      throw new ForbiddenException('Invalid status transition');
     }
 
     if (newRequestStatusType.allowChangePriority && updateDto.priority !== undefined) {
