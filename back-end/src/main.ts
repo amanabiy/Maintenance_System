@@ -26,7 +26,6 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe());
-  setupSwagger(app);
 
   dotenv.config();
 
@@ -36,6 +35,8 @@ async function bootstrap() {
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
+
+  setupSwagger(app);
 
   const httpServer = http.createServer(server).listen(8081);
   const httpsServer = https.createServer(httpsOptions, server).listen(443);
