@@ -26,6 +26,8 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe());
+  setupSwagger(app);
+  
   dotenv.config();
 
   app.enableCors({
