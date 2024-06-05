@@ -37,7 +37,7 @@ class Api {
               requestOptions: e.requestOptions,
               response: e.response,
             );
-            handler.next(refreshTokenError);
+            return handler.next(refreshTokenError);
           }
         }
         return handler.next(e); //continue
@@ -62,11 +62,12 @@ class Api {
     try {
       final token = await _storage.read(key: 'refreshToken');
       log(token.toString());
-      final refreshTokenResponse = await dio.post(Endpoints.refresh, data: {
-        "refreshToken": token,
-      });
+      final url = '${Endpoints.refresh}/$token';
+      print(url);
+      final refreshTokenResponse = await dio.get(url);
+      print(refreshTokenResponse.data);
 
-      if (refreshTokenResponse.statusCode == 200) {
+      if (refreshTokenResponse.statusCode == 200 || refreshTokenResponse.statusCode == 201) {
         // save new token
         final accessToken = refreshTokenResponse.data["accessToken"];
         // save new token
@@ -130,9 +131,13 @@ class Api {
   // post multipartData
   Future<Response> upload(String url, FormData data) async {
     try {
-      return await dio.post(url, data: data);
+      print(url);
+      final response =  await dio.post(url, data: data);
+      print(response.data);
+      return response;
     } on DioError catch (e) {
       // Empty body
+      print(e);
       throw Exception(e.response?.data['message']);
     }
   }

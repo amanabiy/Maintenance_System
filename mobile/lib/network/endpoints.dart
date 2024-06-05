@@ -6,4 +6,6 @@ class Endpoints {
   static String forgotPasswordRequestOtp = "$baseUrl/auth/request-otp";
   static String request = "$baseUrl/maintenance-request";
   static String createRequest = "$baseUrl/maintenance-request";
+  static String uploadFile = "$baseUrl/media/upload";
+  static String deleteFile = "$baseUrl/media";
 }

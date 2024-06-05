@@ -386,7 +386,7 @@ class StatusType {
     final bool? allowsChangeTitleAndDescription;
     final bool? allowsChangeMedia;
     final bool? allowsAddMoreMedia;
-    final List<String> allowedRoles;
+    final List<Role> allowedRoles;
 
     factory StatusType.fromJson(Map<String, dynamic> json){ 
         return StatusType(
@@ -410,7 +410,7 @@ class StatusType {
             allowsChangeTitleAndDescription: json["allowsChangeTitleAndDescription"],
             allowsChangeMedia: json["allowsChangeMedia"],
             allowsAddMoreMedia: json["allowsAddMoreMedia"],
-            allowedRoles: json["allowedRoles"] == null ? [] : List<String>.from(json["allowedRoles"]!.map((x) => x)),
+            allowedRoles: json["allowedRoles"] == null ? [] : List<Role>.from(json["allowedRoles"]!.map((x) => Role.fromJson(x))),
         );
     }
 
