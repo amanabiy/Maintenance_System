@@ -61,6 +61,8 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
 
     const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
     if (!hasAllowedRole) {
+      console.log(hasAllowedRole);
+      console.log(currentStatus.statusType.allowedRoles);
       throw new Error('User does not have the allowed role to update the status');
     }
 
