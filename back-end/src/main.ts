@@ -21,7 +21,6 @@ async function bootstrap() {
     new ExpressAdapter(server),
   );
 
-  await app.init();
   
 
   app.setGlobalPrefix('api/v1');
@@ -37,6 +36,8 @@ async function bootstrap() {
   });
 
   setupSwagger(app);
+
+  await app.init();
 
   const httpServer = http.createServer(server).listen(8081);
   const httpsServer = https.createServer(httpsOptions, server).listen(443);
