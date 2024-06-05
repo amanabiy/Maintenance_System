@@ -35,8 +35,7 @@ class _AddRequestPageState extends State<AddRequestPage> {
     final XFile image;
     if (source == ImageSource.camera) {
       image = (await picker.pickImage(source: ImageSource.camera))!;
-    }
-    else {
+    } else {
       image = (await picker.pickImage(source: ImageSource.gallery))!;
     }
 
@@ -44,7 +43,6 @@ class _AddRequestPageState extends State<AddRequestPage> {
       setState(() {
         _selectedImages.add(image);
       });
-      await _uploadFile(image);
     }
   }
 
@@ -98,14 +96,16 @@ class _AddRequestPageState extends State<AddRequestPage> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         final fileUrl = response.data['fileUrl'];
         setState(() {
-          _uploadedFiles.add({'id': response.data['id'], 'name': file.name, 'path': fileUrl});
+          _uploadedFiles.add(
+              {'id': response.data['id'], 'name': file.name, 'path': fileUrl});
         });
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('File uploaded successfully')),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error uploading file: ${response.statusMessage}')),
+          SnackBar(
+              content: Text('Error uploading file: ${response.statusMessage}')),
         );
       }
     } catch (e) {
@@ -157,7 +157,8 @@ class _AddRequestPageState extends State<AddRequestPage> {
           );
         });
       } else {
-        final errorMessage = response.data['message'] ?? 'Error submitting request. Please try again.';
+        final errorMessage = response.data['message'] ??
+            'Error submitting request. Please try again.';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(errorMessage)),
         );
@@ -189,164 +190,181 @@ class _AddRequestPageState extends State<AddRequestPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Subject'),
-                  controller: _subject,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a subject.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                TextFormField(
-                  decoration: const InputDecoration(labelText: 'Description'),
-                  controller: _description,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter a description.';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16.0),
-                Row(
+        child: Card(
+          elevation: 8.0,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
                   children: [
-                    const Text('Block Number:'),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(hintText: 'Enter block number'),
-                        controller: _blockNumber,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a block number.';
-                          }
-                          return null;
-                        },
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Subject',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.subject),
                       ),
+                      controller: _subject,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a subject.';
+                        }
+                        return null;
+                      },
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8.0),
-                Row(
-                  children: [
-                    const Text('Floor:'),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: TextFormField(
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(hintText: 'Enter floor number'),
-                        controller: _floor,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter a floor number.';
-                          }
-                          return null;
-                        },
+                    const SizedBox(height: 16.0),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        labelText: 'Description',
+                        border: OutlineInputBorder(),
+                        prefixIcon: Icon(Icons.description),
                       ),
+                      controller: _description,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a description.';
+                        }
+                        return null;
+                      },
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8.0),
-                Row(
-                  children: [
-                    const Text('Room Number:'),
-                    const SizedBox(width: 8.0),
-                    Expanded(
-                      child: TextFormField(
-                        decoration: const InputDecoration(hintText: 'Enter room number (optional)'),
-                        controller: _roomNumber,
-                      ),
+                    const SizedBox(height: 16.0),
+                    Row(
+                      children: [
+                        const Text('Block Number:'),
+                        const SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Enter block number',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.location_city),
+                            ),
+                            controller: _blockNumber,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a block number.';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 8.0),
-                Row(
-                  children: [
-                    const Text('Is Toilet:'),
-                    const SizedBox(width: 8.0),
-                    Checkbox(
-                      value: _isToilet,
-                      onChanged: (value) => setState(() => _isToilet = value!),
+                    const SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        const Text('Floor:'),
+                        const SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            keyboardType: TextInputType.number,
+                            decoration: InputDecoration(
+                              hintText: 'Enter floor number',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.layers),
+                            ),
+                            controller: _floor,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter a floor number.';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                const SizedBox(height: 16.0),
-                _selectedImages.isNotEmpty
-                    ? Wrap(
-                        spacing: 8.0,
-                        runSpacing: 8.0,
-                        children: _selectedImages.map((image) {
-                          return Stack(
-                            children: [
-                              Image.file(
-                                File(image.path),
-                                width: 100,
-                                height: 100,
-                                fit: BoxFit.cover,
-                              ),
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedImages.remove(image);
-                                      _removeFile(image.name);
-                                    });
-                                  },
-                                  child: Container(
-                                    color: Colors.red,
-                                    child: const Icon(
-                                      Icons.close,
-                                      color: Colors.white,
+                    const SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        const Text('Room Number:'),
+                        const SizedBox(width: 8.0),
+                        Expanded(
+                          child: TextFormField(
+                            decoration: InputDecoration(
+                              hintText: 'Enter room number (optional)',
+                              border: OutlineInputBorder(),
+                              prefixIcon: Icon(Icons.meeting_room),
+                            ),
+                            controller: _roomNumber,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8.0),
+                    Row(
+                      children: [
+                        const Text('Is Toilet:'),
+                        const SizedBox(width: 8.0),
+                        Checkbox(
+                          value: _isToilet,
+                          onChanged: (value) =>
+                              setState(() => _isToilet = value!),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16.0),
+                    _selectedImages.isNotEmpty
+                        ? SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: _selectedImages.map((image) {
+                                return Stack(
+                                  children: [
+                                    Image.file(
+                                      File(image.path),
+                                      width: 100,
+                                      height: 100,
+                                      fit: BoxFit.cover,
                                     ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                      )
-                    : Container(),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: pickImage,
-                  child: const Text('Select Images'),
+                                    Positioned(
+                                      right: 0,
+                                      top: 0,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _selectedImages.remove(image);
+                                            _removeFile(image.path);
+                                          });
+                                        },
+                                        child: Container(
+                                          color: Colors.red,
+                                          child: const Icon(
+                                            Icons.close,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
+                          )
+                        : Container(),
+                    const SizedBox(height: 16.0),
+                    IconButton(
+                      icon: Icon(Icons.upload_file),
+                      onPressed: pickImage,
+                    ),
+                    const SizedBox(height: 16.0),
+                    ElevatedButton(
+                      onPressed: () => _submitRequest(
+                          _subject.text,
+                          _description.text,
+                          _blockNumber.text,
+                          _floor.text,
+                          _roomNumber.text,
+                          _isToilet),
+                      child: const Text('Submit Request'),
+                    ),
+                  ],
                 ),
-                // _uploadedFiles.isNotEmpty
-                //     ? Column(
-                //         children: _uploadedFiles.map((file) {
-                //           return ListTile(
-                //             title: Text(file['name']),
-                //             trailing: IconButton(
-                //               icon: Icon(Icons.delete, color: Colors.red),
-                //               onPressed: () => _removeFile(file['name']),
-                //             ),
-                //           );
-                //         }).toList(),
-                //       )
-                //     : Container(),
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () => _submitRequest(
-                      _subject.text,
-                      _description.text,
-                      _blockNumber.text,
-                      _floor.text,
-                      _roomNumber.text,
-                      _isToilet),
-                  child: const Text('Submit Request'),
-                ),
-              ],
+              ),
             ),
           ),
         ),
