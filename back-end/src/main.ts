@@ -24,8 +24,34 @@ async function bootstrap() {
     cert: fs.readFileSync('/usr/src/app/ssl/csr.pem'),
   };
 
-  await app.listen(443, '0.0.0.0', () => {
+  // Redirect HTTP to HTTPS
+  app.use((req, res, next) => {
+    if (!req.secure) {
+      return res.redirect('https://' + req.headers.host + req.url);
+    }
+    next();
+  });
+
+  const expressApp = app.getHttpAdapter().getInstance();
+  
+  // Create HTTPS server
+  https.createServer(httpsOptions, expressApp).listen(443, '0.0.0.0', () => {
     console.log('Application is running on https://localhost:443');
+  });
+
+  // Create HTTP server for redirecting to HTTPS
+  https.createServer((req, res) => {
+    res.writeHead(301, { 'Location': 'https://' + req.headers.host + req.url });
+    res.end();
+  }).listen(80);
+
+  // Create HTTP server for testing on port 8081
+  https.createServer((req, res) => {
+    res.writeHead(200, { 'Content-Type': 'text/plain' });
+    res.write('Testing server is running on port 8081');
+    res.end();
+  }).listen(8081, '0.0.0.0', () => {
+    console.log('Testing server is running on http://localhost:8081');
   });
 }
 
