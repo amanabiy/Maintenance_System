@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { RequestStatusType } from './entities/request_status_type.entity';
@@ -8,6 +8,7 @@ import { GenericDAL } from 'src/DAL/dal';
 import { FindAllResponseRequestStatustypeDto } from './dto/find-all-response-maintenance_requestdto';
 import { Role } from '../role/entities/role.entity';
 import { RoleService } from '../role/role.service';
+import { MaintenanceRequestType } from '../maintenance_request_type/entities/maintenance_request_type.entity';
 
 @Injectable()
 export class RequestStatusTypeService extends GenericDAL<RequestStatusType, CreateRequestStatusTypeDto, UpdateRequestStatusTypeDto> {
@@ -89,5 +90,29 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
     });
     return statusTypes;
   }
+
+  async updateRequestStatusType(id: number, updateMaintenanceRequestTypeDto: UpdateRequestStatusTypeDto): Promise<RequestStatusType> {
+    const maintenanceRequestType = await this.findOne(id, { relations: ['allowedRoles', 'allowedTransitions'] });
+    if (!maintenanceRequestType) {
+      throw new NotFoundException(`Maintenance request type with id ${id} not found`);
+    }
+
+    // Update basic properties
+    const { allowedRolesIds, allowedTransitions, ...rest } = updateMaintenanceRequestTypeDto;
+    Object.assign(maintenanceRequestType, rest);
+
+    // Update allowed roles
+    if (allowedRolesIds) {
+      maintenanceRequestType.allowedRoles = await this.roleService.findByIds(allowedRolesIds);
+    }
+
+    // Update allowed transitions
+    if (allowedTransitions) {
+      maintenanceRequestType.allowedTransitions = await this.findByIds(allowedTransitions);
+    }
+
+    return await super.update(maintenanceRequestType.id, maintenanceRequestType);
+  }
+
 
 }
