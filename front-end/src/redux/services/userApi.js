@@ -13,7 +13,7 @@ const userApi = baseApi.injectEndpoints({
       query: (page = 1, limit = 1000) => `users/?page=${page}&limit=${limit}`, //temp adjusted limit
     }),
     getUsersFuzzy: builder.query({
-      query: (term) => `users/fuzzy-search/?term=${term}`,
+      query: (term) => `users/fuzzy-search/${term}`,
     }),
     getUserById: builder.query({
       query: (id) => `users/${id}`,

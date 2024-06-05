@@ -15,15 +15,21 @@ import {
   Avatar,
   Autocomplete,
   FormControlLabel,
+  Chip,
 } from "@mui/material";
+// mui-x
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+
 import { ErrorMessage } from "formik";
 import { generateMediaLinks } from "../../functions/mediaFunctions";
-import {
-  useGetAllUsersQuery,
-  useGetUsersFuzzyQuery,
-} from "../../redux/features/user";
+import { useGetUsersFuzzyQuery } from "../../redux/features/user";
 import { useGetAllDepartmentsQuery } from "../../redux/features/department";
+import { useFuzzySearchMaintenanceRequestTypesQuery } from "../../redux/features/maintenanceRequestTypes";
+// Icons
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
+import CloseIcon from "@mui/icons-material/Close";
 
 const TransitionModalFields = (
   values,
@@ -128,7 +134,16 @@ const TransitionModalFields = (
   //   LOCATION INPUT----------------------------------------------------------
   if (transitionState.allowsChangeLocation) {
     fields.push(
-      <div key="location" style={{ margin: "16px 0" }}>
+      <div
+        key="location"
+        style={{
+          margin: "16px 0",
+          border: "dashed 1px lightgrey",
+          borderRadius: "2px",
+          padding: "10px",
+        }}
+      >
+        <Typography variant="h5">Location</Typography>
         <TextField
           fullWidth
           margin="normal"
@@ -226,30 +241,105 @@ const TransitionModalFields = (
 
   //  REQUEST TYPES INPUT----------------------------------------------------------
 
-  //   if (transitionState.allowsChangeRequestTypes) {
-  //     fields.push(
-  //       <div key="requestTypes" style={{ margin: "16px 0" }}>
-  //         <Typography variant="h6">Request Types</Typography>
-  //         {currentRequest.maintenanceRequestTypes.map((type, index) => (
-  //           <div key={index} style={{ display: "inline-block", margin: "4px" }}>
-  //             <Button
-  //               variant="contained"
-  //               color="secondary"
-  //               onClick={() =>
-  //                 setFieldValue(
-  //                   "maintenanceRequestTypes",
-  //                   values.maintenanceRequestTypes.filter((_, i) => i !== index)
-  //                 )
-  //               }
-  //             >
-  //               {type.name}
-  //             </Button>
-  //           </div>
-  //         ))}
-  //         {/* Add logic to search and add new request types */}
-  //       </div>
-  //     );
-  //   }
+  if (transitionState.allowsChangeRequestTypes) {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [selectedRequestTypes, setSelectedRequestTypes] = useState(
+      currentRequest.maintenanceRequestTypes || []
+    );
+
+    const {
+      data: requestTypesList,
+      error,
+      status,
+    } = useFuzzySearchMaintenanceRequestTypesQuery(debouncedSearchTerm);
+
+    // Debounce the search term
+    const handleSearchChange = useCallback(
+      debounce((term) => {
+        setDebouncedSearchTerm(term);
+      }, 300),
+      []
+    );
+
+    const handleInputChange = (event, value) => {
+      setSearchTerm(value);
+      handleSearchChange(value);
+    };
+
+    const handleAddRequestType = (event, newValue) => {
+      if (
+        newValue &&
+        !selectedRequestTypes.some((type) => type.id === newValue.id)
+      ) {
+        setSelectedRequestTypes([...selectedRequestTypes, newValue]);
+        setFieldValue("maintenanceRequestTypes", [
+          ...values.maintenanceRequestTypes,
+          newValue,
+        ]);
+      }
+    };
+
+    const handleRemoveRequestType = (index) => {
+      const updatedRequestTypes = values.maintenanceRequestTypes.filter(
+        (_, i) => i !== index
+      );
+      setFieldValue("maintenanceRequestTypes", updatedRequestTypes);
+      setSelectedRequestTypes(updatedRequestTypes);
+    };
+
+    fields.push(
+      <div key="requestTypes" style={{ margin: "16px 0" }}>
+        <Typography variant="h6">Request Types</Typography>
+        {selectedRequestTypes.length > 0 ? (
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+            {selectedRequestTypes.map((type, index) => (
+              <Chip
+                key={index}
+                label={type.name}
+                onDelete={() => handleRemoveRequestType(index)}
+                deleteIcon={<CloseIcon />}
+              />
+            ))}
+          </div>
+        ) : (
+          <Typography>No Request Types added yet</Typography>
+        )}
+        <Autocomplete
+          options={requestTypesList || []}
+          getOptionLabel={(option) => option.name}
+          onInputChange={handleInputChange}
+          onChange={handleAddRequestType}
+          loading={status === "PENDING"}
+          isOptionEqualToValue={(option, value) => option.id === value.id}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              label="Add Request Type"
+              variant="outlined"
+              style={{ marginTop: "16px" }}
+              InputProps={{
+                ...params.InputProps,
+                endAdornment: (
+                  <>
+                    {status === "PENDING" ? (
+                      <CircularProgress color="inherit" size={20} />
+                    ) : null}
+                    {params.InputProps.endAdornment}
+                  </>
+                ),
+              }}
+            />
+          )}
+          renderOption={(props, option) => (
+            <li {...props} key={option.id}>
+              <strong>{option.name}</strong>
+            </li>
+          )}
+        />
+      </div>
+    );
+  }
 
   //   SUBJECT AND DESCRIPTION INPUT----------------------------------------------------------
   if (transitionState.allowsChangeTitleAndDescription) {
@@ -289,7 +379,7 @@ const TransitionModalFields = (
       status: departmentStatus,
     } = useGetAllDepartmentsQuery();
 
-    console.log(departments, "departments");
+    // console.log(departments, "departments");
 
     fields.push(
       <FormControl key="department" fullWidth margin="normal">
@@ -331,7 +421,7 @@ const TransitionModalFields = (
     const handleSearchChange = useCallback(
       debounce((term) => {
         setDebouncedSearchTerm(term);
-      }, 500),
+      }, 300),
       []
     );
 
@@ -367,7 +457,7 @@ const TransitionModalFields = (
               <Chip
                 key={index}
                 avatar={<Avatar src={person.avatarUrl} />}
-                label={person.fullName}
+                label={person.email}
                 onDelete={() => handleRemovePerson(index)}
                 deleteIcon={<CloseIcon />}
               />
@@ -382,6 +472,7 @@ const TransitionModalFields = (
           onInputChange={handleInputChange}
           onChange={handleAddPerson}
           loading={status === "PENDING"}
+          isOptionEqualToValue={(option, value) => option.id === value.id} // Use isOptionEqualToValue instead of getOptionSelected
           renderInput={(params) => (
             <TextField
               {...params}
@@ -401,6 +492,11 @@ const TransitionModalFields = (
               }}
             />
           )}
+          renderOption={(props, option) => (
+            <li {...props} key={option.id}>
+              <strong>{option.fullName}</strong> - {option.email}
+            </li>
+          )}
         />
       </div>
     );
@@ -408,6 +504,46 @@ const TransitionModalFields = (
 
   //   SCHEDULE INPUT----------------------------------------------------------
   if (transitionState.hasSchedule) {
+    fields.push(
+      <div key="scheduleInputs" style={{ margin: "16px 0" }}>
+        <div
+          style={{
+            marginBottom: "16px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <p>Start Date:</p>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              value={values.scheduleMaintenanceStartDateTime}
+              onChange={(date) =>
+                setFieldValue("scheduleMaintenanceStartDateTime", date)
+              }
+              // renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+        </div>
+        <div
+          style={{
+            marginBottom: "16px",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <p>End Date:</p>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DatePicker
+              value={values.scheduleMaintenanceEndDateTime}
+              onChange={(date) =>
+                setFieldValue("scheduleMaintenanceEndDateTime", date)
+              }
+              // renderInput={(params) => <TextField {...params} />}
+            />
+          </LocalizationProvider>
+        </div>
+      </div>
+    );
   }
 
   //   FILE INPUT----------------------------------------------------------
@@ -416,31 +552,15 @@ const TransitionModalFields = (
       <div key="fileInput" style={{ margin: "16px 0" }}>
         <input
           type="file"
-          name="requiredFile"
+          name="requiredFiles"
           accept="*/*"
           required
+          multiple={true}
           onChange={(e) =>
-            setFieldValue("requiredFile", e.currentTarget.files[0])
+            setFieldValue("requiredFiles", e.currentTarget.files)
           }
         />
       </div>
-    );
-  }
-
-  //   SIGNATURE INPUT----------------------------------------------------------
-  if (transitionState.needsSignatures) {
-    fields.push(
-      <TextField
-        key="signature"
-        fullWidth
-        margin="normal"
-        label="Signature"
-        name="signature"
-        value={values.signature}
-        onChange={(e) => setFieldValue("signature", e.target.value)}
-        error={Boolean(errors.signature)}
-        helperText={<ErrorMessage name="signature" />}
-      />
     );
   }
 
@@ -460,6 +580,39 @@ const TransitionModalFields = (
     />
   );
 
+  // INTERNAL NOTE INPUT----------------------------------------------------------
+  if (transitionState.isInternal) {
+    fields.push(
+      <TextField
+        key="internalNote"
+        fullWidth
+        margin="normal"
+        label="Internal Note"
+        name="internalNote"
+        value={values.internalNote}
+        onChange={(e) => setFieldValue("internalNote", e.target.value)}
+        error={Boolean(errors.internalNote)}
+        helperText={<ErrorMessage name="internalNote" />}
+      />
+    );
+  }
+
+  //   SIGNATURE INPUT----------------------------------------------------------
+  if (transitionState.needsSignatures) {
+    fields.push(
+      <TextField
+        key="signature"
+        fullWidth
+        margin="normal"
+        label="Signature"
+        name="signature"
+        value={values.signature}
+        onChange={(e) => setFieldValue("signature", e.target.value)}
+        error={Boolean(errors.signature)}
+        helperText={<ErrorMessage name="signature" />}
+      />
+    );
+  }
   return fields;
 };
 
