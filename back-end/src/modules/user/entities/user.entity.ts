@@ -40,6 +40,13 @@ export class User extends BaseModelEntity {
   @Exclude()
   password: string;
 
+  @Column({ nullable: true })
+  @ApiProperty({
+    description: 'Phone number of the user',
+    required: true,
+  })
+  phoneNumber: string;
+
   @ManyToOne(() => Department, { eager: true }) 
   @JoinColumn({ name: 'department_id' })
   @ApiProperty({ description: 'Department ID of the user' })

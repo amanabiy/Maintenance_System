@@ -56,7 +56,7 @@ export class UserService extends GenericDAL<
       throw new ConflictException('User with this email already exists');
     }
 
-    const { email, departmentId, roleId, fullName } = dto;
+    const { email, departmentId, roleId, fullName, phoneNumber } = dto;
     const password = await this.hashPassword(dto.password);
 
     // find department and role
@@ -73,6 +73,37 @@ export class UserService extends GenericDAL<
       department,
       role,
       fullName,
+      phoneNumber
+    });
+    
+    await this.sendVerifyEmailToken(createdUser);
+    return plainToInstance(User, createdUser);
+  }
+
+  async adminCreate(dto: CreateUserDto): Promise<User> {
+    const existingUser = await this.userRepository.findOne({
+      where: { email: dto.email },
+    });
+    if (existingUser) {
+      throw new ConflictException('User with this email already exists');
+    }
+
+    const { email, departmentId, roleId, fullName, phoneNumber } = dto;
+    const password = await this.hashPassword(dto.password);
+
+    const role = await this.roleService.findOne(roleId);
+    let department = null;
+    if (departmentId) {
+        department = await this.departmentService.findOne(departmentId);
+    }
+
+    const createdUser = await super.create({
+      email,
+      password,
+      department,
+      role,
+      fullName,
+      phoneNumber
     });
     
     await this.sendVerifyEmailToken(createdUser);
@@ -86,17 +117,14 @@ export class UserService extends GenericDAL<
   }
 
   async updateUser(id: number, dto: UpdateUserDto, currentUser=null): Promise<User> {
-    const { email, departmentId, roleId, fullName } = dto;
+    const { email, departmentId, roleId, fullName, phoneNumber } = dto;
     const toUpdateUser = await this.findOne(id);
     let { role, department } = toUpdateUser;
-    const adminRoleId = this.roleService.findByName('ADMIN');
-    if (currentUser && currentUser.role.id === adminRoleId) {
-      if (departmentId) {
-        department = await this.departmentService.findOne(departmentId);
-      }
-      if (roleId) {
-        role = await this.roleService.findOne(roleId);
-      }
+    if (departmentId) {
+      department = await this.departmentService.findOne(departmentId);
+    }
+    if (roleId) {
+      role = await this.roleService.findOne(roleId);
     }
 
     const userToUpdate: Partial<User> = {};
@@ -104,6 +132,7 @@ export class UserService extends GenericDAL<
     if (fullName) userToUpdate.fullName = fullName;
     if (department) userToUpdate.department = department;
     if (role) userToUpdate.role = role;
+    if (phoneNumber) userToUpdate.phoneNumber = phoneNumber;
 
     // Hash the password before updating the user
     if (dto.password) {
@@ -169,6 +198,7 @@ export class UserService extends GenericDAL<
       where: [
         { email: Like(searchLike) },
         { fullName: Like(searchLike) },
+        { phoneNumber: Like(searchLike) }
       ],
     });
   }

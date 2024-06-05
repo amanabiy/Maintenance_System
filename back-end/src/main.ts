@@ -3,11 +3,29 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as https from 'https';
+import * as http from 'http';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import * as express from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('/usr/src/app/ssl/key.pem'),
+    cert: fs.readFileSync('/usr/src/app/ssl/cert.pem'),
+  };
+  
+  const server = express();
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(server),
+  );
+
+  
+
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe());
+
   dotenv.config();
 
   app.enableCors({
@@ -18,7 +36,11 @@ async function bootstrap() {
   });
 
   setupSwagger(app);
-  await app.listen(8081);
+
+  await app.init();
+
+  const httpServer = http.createServer(server).listen(8081);
+  const httpsServer = https.createServer(httpsOptions, server).listen(443);
 }
 
 function setupSwagger(app) {

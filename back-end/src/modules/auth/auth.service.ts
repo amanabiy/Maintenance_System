@@ -128,4 +128,8 @@ export class AuthService {
     return await this.getAccessToken(payload);
   }
 
+  async adminCreate(createUserDto: CreateUserDto): Promise<User> {
+    return await this.userService.adminCreate(createUserDto);
+  }
+
 }

@@ -44,7 +44,7 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new user' })
+  @ApiOperation({ summary: 'Create a new user admin' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: HttpStatus.CREATED,
@@ -53,7 +53,7 @@ export class UserController {
   })
   @Permissions(UserRoutePermissionEnum.CAN_CREATE_USER)
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.create(createUserDto);
+    return this.userService.adminCreate(createUserDto);
   }
 
   @Get()
@@ -128,7 +128,8 @@ export class UserController {
     @Body() updateUserDto: UpdateUserDto,
     @CurrentUser() currentUser: User,
   ): Promise<User> {
-    return this.userService.updateUser(currentUser.id, updateUserDto, currentUser);
+    const { email, fullName, password } = updateUserDto;
+    return this.userService.updateUser(currentUser.id, { email, fullName, password }, currentUser);
   }
 
   @Patch(':id')
