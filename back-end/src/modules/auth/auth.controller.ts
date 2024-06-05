@@ -1,8 +1,8 @@
 
-import { Controller, Post, Body, HttpStatus, BadRequestException, Param, Get } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, BadRequestException, Param, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { User } from '../user/entities/user.entity';
 import { AuthResponseDto } from './dto/auth-response.dto';
 import { LoginUserDto } from './dto/login.user.dto';
@@ -11,11 +11,27 @@ import { MessageResponseDto } from 'src/dto/message-response.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { ResetPasswordWithOtpDto } from './dto/reset-with-otp.dto';
 import { AuthRefreshTokenDto } from './dto/auth-refresh_token.dto';
+import { AuthGuard } from '@nestjs/passport';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 @ApiTags('Auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Post('create-user')
+  @ApiOperation({ summary: 'Create a new user admin' })
+  @ApiBody({ type: CreateUserDto })
+  @ApiResponse({
+    status: HttpStatus.CREATED,
+    description: 'User created successfully',
+    type: User,
+  })
+  @ApiBearerAuth('bearerAuth')
+  @UseGuards(JwtAuthGuard)
+  createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
+    return this.authService.adminCreate(createUserDto);
+  }
 
   @Post('register')
   @ApiOperation({ summary: 'Register a new user' })

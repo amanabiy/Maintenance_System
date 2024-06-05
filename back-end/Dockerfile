@@ -21,8 +21,13 @@ COPY ./public ./public
 COPY ./src ./src
 COPY ./test ./test
 
+COPY ./ssl /usr/src/app/ssl
+
 # Expose the port that your app runs on
-EXPOSE 3000
+EXPOSE 443
+EXPOSE 80
+EXPOSE 8081
+
 
 # Command to run your app
 CMD ["npm", "run", "start:dev"]
