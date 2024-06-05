@@ -44,6 +44,7 @@ export class RoleService extends GenericDAL<
       throw new NotFoundException(`Role with ID ${roleId} not found`);
     }
     role.permissions = role.permissions.filter(permission => permission.id !== permissionId);
-    return await this.roleRepository.save(role);
+    console.log(role);
+    return await this.update(role.id, role);
   }
 }
