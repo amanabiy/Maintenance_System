@@ -58,6 +58,10 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
       throw new Error('Request status type not found');
     }
 
+    if (requestStatusType.isInitialStatus) {
+      throw new Error('Cannot delete initial status type');
+    }
+
     await this.requestStatusTypeRepository
       .createQueryBuilder()
       .relation(RequestStatusType, 'allowedTransitions')
