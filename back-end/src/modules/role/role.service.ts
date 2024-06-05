@@ -6,6 +6,7 @@ import { Role } from './entities/role.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PermissionService } from '../permission/permission.service';
+import { type } from 'os';
 
 @Injectable()
 export class RoleService extends GenericDAL<
@@ -43,8 +44,8 @@ export class RoleService extends GenericDAL<
     if (!role) {
       throw new NotFoundException(`Role with ID ${roleId} not found`);
     }
-    role.permissions = role.permissions.filter(permission => permission.id !== permissionId);
-    console.log(role);
+    role.permissions = role.permissions.filter(permission => permission.id != permissionId);
+    console.log(role, typeof role.permissions[0].id, typeof permissionId);
     return await this.update(role.id, role);
   }
 }
