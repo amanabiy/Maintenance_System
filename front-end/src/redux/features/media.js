@@ -1,5 +1,10 @@
 import mediaApi from "../services/mediaApi";
 
 export const {
-    useUploadMediaMutation,
+  useUploadMediaMutation,
+  useGetAllMediaQuery,
+  useGetMediaByIdQuery,
+  useDeleteMediaByIdMutation,
+  useDownloadMediaByIdQuery,
+  useServeMediaByIdQuery,
 } = mediaApi;

@@ -34,6 +34,7 @@ const FinancialTransactions = lazy(() =>
 );
 const Users = lazy(() => import("../pages/Admin/Users"));
 const Requests = lazy(() => import("../pages/Admin/Requests"));
+const ManageWorkFlow = lazy(() => import("../pages/Admin/ManageWorkFlow"));
 const RequestDetails = lazy(
   () => "../components/commonScenes/RequestDetails.jsx"
 );
@@ -169,6 +170,16 @@ const router = createBrowserRouter(
           }
         >
           <Route index element={<MyProfile />} />
+        </Route>
+        <Route
+          path="manage-workflows"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<ManageWorkFlow />} />
         </Route>
 
         <Route

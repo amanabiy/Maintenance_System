@@ -24,4 +24,5 @@ export const adminPaths = {
   USERS: "/all-users",
   MY_PROFILE: "/admin-profile",
   ROLES: "/roles",
+  MANAGE_WORKFLOWS: "/manage-workflows",
 };
