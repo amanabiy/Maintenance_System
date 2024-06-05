@@ -22,7 +22,7 @@ export class RoleService extends GenericDAL<
   }
   
   async findByName(roleName: string): Promise<Role> {
-    return this.findOne(-1, { where: { roleName } });
+    return await this.findOne(-1, { where: { roleName } });
   }
 
   async addPermissionToRole(roleId: number, permissionId: number): Promise<Role> {
