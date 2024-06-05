@@ -21,7 +21,7 @@ async function bootstrap() {
 
   const httpsOptions = {
     key: fs.readFileSync('/usr/src/app/ssl/key.pem'),
-    cert: fs.readFileSync('/usr/src/app/ssl/csr.pem'),
+    cert: fs.readFileSync('/usr/src/app/ssl/cert.pem'),
   };
 
   // Redirect HTTP to HTTPS
