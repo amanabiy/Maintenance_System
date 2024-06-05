@@ -6,4 +6,5 @@ export const {
   useGetRequestStatusTypeByIdQuery,
   useDeleteRequestStatusTypeMutation,
   useMarkInitialRequestStatusTypeMutation,
+  useUpdateRequestStatusTypeByIdMutation,
 } = requestStatusTypeApi;

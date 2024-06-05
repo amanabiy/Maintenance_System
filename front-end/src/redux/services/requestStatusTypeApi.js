@@ -33,6 +33,13 @@ const requestStatusTypeApi = baseApi.injectEndpoints({
         method: "PATCH",
       }),
     }),
+    updateRequestStatusTypeById: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `request-status-type/${id}`,
+        method: "PATCH",
+        body,
+      }),
+    }),
   }),
 });
 
