@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
+import * as fs from 'fs';
+import * as https from 'https';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -17,8 +19,14 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  setupSwagger(app);
-  await app.listen(8081);
+  const httpsOptions = {
+    key: fs.readFileSync('/usr/src/app/ssl/key.pem'),
+    cert: fs.readFileSync('/usr/src/app/ssl/csr.pem'),
+  };
+
+  await app.listen(443, '0.0.0.0', () => {
+    console.log('Application is running on https://localhost:443');
+  });
 }
 
 function setupSwagger(app) {
