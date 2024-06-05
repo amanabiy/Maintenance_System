@@ -5,9 +5,25 @@ import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as https from 'https';
+import * as http from 'http';
+import { ExpressAdapter } from '@nestjs/platform-express';
+import express from 'express';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const httpsOptions = {
+    key: fs.readFileSync('./secrets/private-key.pem'),
+    cert: fs.readFileSync('./secrets/public-certificate.pem'),
+  };
+  
+  const server = express();
+  const app = await NestFactory.create(
+    AppModule,
+    new ExpressAdapter(server),
+  );
+
+  await app.init();
+  
+
   app.setGlobalPrefix('api/v1');
   app.useGlobalPipes(new ValidationPipe());
   dotenv.config();
@@ -19,40 +35,8 @@ async function bootstrap() {
     optionsSuccessStatus: 204,
   });
 
-  const httpsOptions = {
-    key: fs.readFileSync('/usr/src/app/ssl/key.pem'),
-    cert: fs.readFileSync('/usr/src/app/ssl/cert.pem'),
-  };
-
-  // Redirect HTTP to HTTPS
-  app.use((req, res, next) => {
-    if (!req.secure) {
-      return res.redirect('https://' + req.headers.host + req.url);
-    }
-    next();
-  });
-
-  const expressApp = app.getHttpAdapter().getInstance();
-  
-  // Create HTTPS server
-  https.createServer(httpsOptions, expressApp).listen(443, '0.0.0.0', () => {
-    console.log('Application is running on https://localhost:443');
-  });
-
-  // Create HTTP server for redirecting to HTTPS
-  https.createServer((req, res) => {
-    res.writeHead(301, { 'Location': 'https://' + req.headers.host + req.url });
-    res.end();
-  }).listen(80);
-
-  // Create HTTP server for testing on port 8081
-  https.createServer((req, res) => {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.write('Testing server is running on port 8081');
-    res.end();
-  }).listen(8081, '0.0.0.0', () => {
-    console.log('Testing server is running on http://localhost:8081');
-  });
+  const httpServer = http.createServer(server).listen(8081);
+  const httpsServer = https.createServer(httpsOptions, server).listen(443);
 }
 
 function setupSwagger(app) {
