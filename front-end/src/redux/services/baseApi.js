@@ -20,6 +20,7 @@ const baseApi = createApi({
       return headers;
     },
   }),
+  tagTypes: ["Role"],
   endpoints: (builder) => ({}),
 });
 
