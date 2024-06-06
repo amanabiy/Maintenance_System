@@ -8,6 +8,7 @@ import { AuthResponseDto } from './dto/auth-response.dto';
 import { AuthRegisterDto } from './dto/auth-register.dto';
 import { MailService } from '../mail/mailer.service';
 import { randomBytes } from 'crypto';
+import { UpdateUserDto } from '../user/dto/update-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -134,4 +135,24 @@ export class AuthService {
     return createdUser;
   }
 
+  async updateLoggedInUser(id: number, updateUserDto: UpdateUserDto, currentUser: User): Promise<User> {
+    const createdUser = await this.userService.updateUser(currentUser.id, updateUserDto, currentUser);
+    if (createdUser.email !== updateUserDto.email) {
+      await this.changeEmail(createdUser, updateUserDto.email);
+    }
+    return createdUser;
+  }
+
+  async sendVerifyEmailToken(user: User) {
+    const token = this.jwtService.sign({ sub: user.id, email: user.email });
+    await this.mailService.sendUserConfirmation(user.email, token);
+    return true
+  }
+
+  async changeEmail(user: User, newEmail: string) {
+    user.email = newEmail;
+    user.isVerified = false;
+    await this.sendVerifyEmailToken(user);
+    return this.userService.update(user.id, user);
+  }
 }

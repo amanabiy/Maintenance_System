@@ -134,6 +134,7 @@ export class UserService extends GenericDAL<
 
   async changeEmail(user: User, newEmail: string) {
     user.email = newEmail;
+    user.isVerified = false;
     await this.sendVerifyEmailToken(user);
     return this.update(user.id, user);
   }
@@ -163,15 +164,15 @@ export class UserService extends GenericDAL<
     if (phoneNumber) userToUpdate.phoneNumber = phoneNumber;
 
     // Hash the password before updating the user
-    if (dto.password) {
-      const hashedPassword = await this.hashPassword(dto.password);
-      userToUpdate['password'] = hashedPassword;
-      userToUpdate['lastPasswordUpdatedAt'] = new Date();
-    }
+    // if (dto.password) {
+    //   const hashedPassword = await this.hashPassword(dto.password);
+    //   userToUpdate['password'] = hashedPassword;
+    //   userToUpdate['lastPasswordUpdatedAt'] = new Date();
+    // }
 
     const result = await super.update(id, userToUpdate);
-    const afterChangingEmail = await this.changeEmail(result, email);
-    return plainToInstance(User, afterChangingEmail);
+    // const afterChangingEmail = await this.changeEmail(result, email);
+    return plainToInstance(User, result);
   }
 
   async findAllCensored(

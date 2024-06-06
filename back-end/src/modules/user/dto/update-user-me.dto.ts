@@ -19,16 +19,6 @@ export class UpdateUserMeDto {
   @IsNotEmpty()
   fullName: string;
 
-  @IsOptional()
-  @MinLength(6)
-  @ApiProperty({
-    description: 'Password for the user account',
-    required: true,
-    minLength: 6,
-  })
-  password: string;
-
-
   @ApiProperty({
     description: 'Phone number of the user (including country code) format: +251XXXXXXXXX',
     required: true,

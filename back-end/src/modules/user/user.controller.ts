@@ -125,7 +125,6 @@ export class UserController {
     type: User,
   })
   async updateMe(
-    @Param('id') id: string,
     @Body() updateUserDto: UpdateUserMeDto,
     @CurrentUser() currentUser: User,
   ): Promise<User> {
