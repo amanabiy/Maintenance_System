@@ -129,7 +129,9 @@ export class AuthService {
   }
 
   async adminCreate(createUserDto: CreateUserDto): Promise<User> {
-    return await this.userService.adminCreate(createUserDto);
+    const createdUser = await this.userService.adminCreate(createUserDto);
+    await this.requestOtp(createdUser.email);
+    return createdUser;
   }
 
 }

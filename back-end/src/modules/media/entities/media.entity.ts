@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
@@ -28,4 +28,8 @@ export class Media extends BaseModelEntity {
   @ManyToOne(() => MaintenanceRequest, request => request.mediaFiles, {cascade: true})
   @JoinColumn({ name: 'maintenance_request' })
   maintenanceRequests: MaintenanceRequest[];
+
+  @OneToOne(() => User, user => user.avatar, { cascade: true, nullable: true })
+  @JoinColumn({ name: 'avatar_of_user' })
+  userAvatar: User;
 }

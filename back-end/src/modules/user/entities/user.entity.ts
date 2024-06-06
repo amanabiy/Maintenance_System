@@ -1,10 +1,11 @@
-import { Entity, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, ManyToOne, JoinColumn, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { Exclude } from 'class-transformer';
 import { BaseModelEntity } from '../../BaseEntity/base-model.entity';
 import { Department } from 'src/modules/department/entities/department.entity';
 import { Role } from 'src/modules/role/entities/role.entity';
 import { MaintenanceRequest } from 'src/modules/maintenance_request/entities/maintenance_request.entity';
+import { Media } from 'src/modules/media/entities/media.entity';
 
 @Entity('users')
 export class User extends BaseModelEntity {
@@ -35,6 +36,15 @@ export class User extends BaseModelEntity {
     required: true,
   })
   fullName: string;
+
+
+  @OneToOne(() => Media, { eager: true, cascade: true, nullable: true })
+  @JoinColumn({ name: 'avatar_id' })
+  @ApiProperty({
+    description: 'Media entity representing the user avatar',
+    nullable: true,
+  })
+  avatar: Media;
 
   @Column()
   @Exclude()

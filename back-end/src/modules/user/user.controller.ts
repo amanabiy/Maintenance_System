@@ -35,6 +35,7 @@ import { PermissionsGuard } from '../permission/guard/permissions.guard';
 import { UserRoutePermissionEnum } from './entities/user-route-permission.enum';
 import { Permissions } from '../permission/decorator/permissions.decorator';
 import { plainToClass, plainToInstance } from 'class-transformer';
+import { UpdateUserMeDto } from './dto/update-user-me.dto';
 
 @Controller('users')
 @ApiTags('User')
@@ -125,11 +126,10 @@ export class UserController {
   })
   async updateMe(
     @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
+    @Body() updateUserDto: UpdateUserMeDto,
     @CurrentUser() currentUser: User,
   ): Promise<User> {
-    const { email, fullName, password } = updateUserDto;
-    return this.userService.updateUser(currentUser.id, { email, fullName, password }, currentUser);
+    return this.userService.updateUser(currentUser.id, updateUserDto, currentUser);
   }
 
   @Patch(':id')

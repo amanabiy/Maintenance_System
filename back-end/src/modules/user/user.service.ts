@@ -18,6 +18,8 @@ import { RoleService } from '../role/role.service';
 import { Role } from '../role/entities/role.entity';
 import { JwtService } from '@nestjs/jwt';
 import { MailService } from '../mail/mailer.service';
+import { UpdateUserMeDto } from './dto/update-user-me.dto';
+import { Media } from '../media/entities/media.entity';
 
 @Injectable()
 export class UserService extends GenericDAL<
@@ -28,6 +30,8 @@ export class UserService extends GenericDAL<
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Media)
+    private readonly mediaRepository: Repository<Media>,
     private readonly departmentService: DepartmentService,
     private readonly roleService: RoleService,
     private readonly jwtService: JwtService,
@@ -99,7 +103,7 @@ export class UserService extends GenericDAL<
 
     const createdUser = await super.create({
       email,
-      password,
+      password: this.generateRandomPassword(20),
       department,
       role,
       fullName,
@@ -110,14 +114,32 @@ export class UserService extends GenericDAL<
     return plainToInstance(User, createdUser);
   }
 
+  generateRandomPassword(length: number = 12): string {
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[]{}|;:,.<>?';
+    let password = '';
+  
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+  
+    return password;
+  }
+
   async sendVerifyEmailToken(user: User) {
     const token = this.jwtService.sign({ sub: user.id, email: user.email });
     await this.mailService.sendUserConfirmation(user.email, token);
     return true
   }
 
+  async changeEmail(user: User, newEmail: string) {
+    user.email = newEmail;
+    await this.sendVerifyEmailToken(user);
+    return this.update(user.id, user);
+  }
+
   async updateUser(id: number, dto: UpdateUserDto, currentUser=null): Promise<User> {
-    const { email, departmentId, roleId, fullName, phoneNumber } = dto;
+    const { email, departmentId, roleId, fullName, phoneNumber, avatarId } = dto;
     const toUpdateUser = await this.findOne(id);
     let { role, department } = toUpdateUser;
     if (departmentId) {
@@ -126,9 +148,15 @@ export class UserService extends GenericDAL<
     if (roleId) {
       role = await this.roleService.findOne(roleId);
     }
+    if (avatarId) {
+      const avatar = await this.mediaRepository.findOne({where: {id: avatarId}});
+      if (avatar) {
+        toUpdateUser.avatar = avatar;
+      }
+    }
 
     const userToUpdate: Partial<User> = {};
-    if (email) userToUpdate.email = email;
+    // if (email) userToUpdate.email = email;
     if (fullName) userToUpdate.fullName = fullName;
     if (department) userToUpdate.department = department;
     if (role) userToUpdate.role = role;
@@ -141,8 +169,9 @@ export class UserService extends GenericDAL<
       userToUpdate['lastPasswordUpdatedAt'] = new Date();
     }
 
-    const result = super.update(id, userToUpdate);
-    return plainToInstance(User, result);
+    const result = await super.update(id, userToUpdate);
+    const afterChangingEmail = await this.changeEmail(result, email);
+    return plainToInstance(User, afterChangingEmail);
   }
 
   async findAllCensored(
