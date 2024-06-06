@@ -118,7 +118,7 @@ export class UserController {
 
   @Patch('me')
   @ApiOperation({ summary: 'Update current logged in user' })
-  @ApiBody({ type: UpdateUserDto })
+  @ApiBody({ type: UpdateUserMeDto })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User updated successfully',
