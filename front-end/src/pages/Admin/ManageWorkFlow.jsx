@@ -61,6 +61,8 @@ const ManageWorkFlow = () => {
   const [updateRequestStatusTypeById, data] =
     useUpdateRequestStatusTypeByIdMutation();
 
+  useEffect(() => {}, [requestStatusTypes]);
+
   const [nodes, setNodes] = useState(
     initialState.map((state) => ({
       id: state.id,
@@ -134,15 +136,16 @@ const ManageWorkFlow = () => {
   };
 
   const handleSubmit = async (updatedValues) => {
-    //   try {
-    //     const response = await updateRequestStatusTypeById({
-    //       id: transitionState.id,
-    //       body: updatedValues,
-    //     });
-    //     console.log(response, "response");
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
+    console.log(updatedValues, "updatedValues");
+    try {
+      const response = await updateRequestStatusTypeById({
+        id: transitionState.id,
+        body: updatedValues,
+      });
+      console.log(response, "response");
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const initialValues = {
@@ -168,12 +171,17 @@ const ManageWorkFlow = () => {
       transitionState?.allowsChangeTitleAndDescription || false,
     allowsChangeMedia: transitionState?.allowsChangeMedia || false,
     allowsAddMoreMedia: transitionState?.allowsAddMoreMedia || false,
+    allowedRolesIds:
+      transitionState?.allowedRoles?.map((role) => role.id) || [],
+    allowedTransitions:
+      transitionState?.allowedTransitions?.map((state) => state.id) || [],
   };
 
   if (getRequestStatusTypesStatus === "PENDING") {
     return <Loading />;
   }
 
+  // console.log(initialValues, "initialState");
   return (
     <ReactFlowProvider>
       <GridParent>
