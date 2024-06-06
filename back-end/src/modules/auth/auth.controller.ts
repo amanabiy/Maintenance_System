@@ -1,5 +1,5 @@
 
-import { Controller, Post, Body, HttpStatus, BadRequestException, Param, Get, UseGuards } from '@nestjs/common';
+import { Controller, Post, Body, HttpStatus, BadRequestException, Param, Get, UseGuards, Patch } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
@@ -13,6 +13,8 @@ import { ResetPasswordWithOtpDto } from './dto/reset-with-otp.dto';
 import { AuthRefreshTokenDto } from './dto/auth-refresh_token.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UpdateUserMeDto } from '../user/dto/update-user-me.dto';
+import { CurrentUser } from './decorators/current-user.decorator';
 
 @Controller('auth')
 @ApiTags('Auth')
@@ -31,6 +33,23 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   createUser(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.authService.adminCreate(createUserDto);
+  }
+
+  @Patch('logged-in-user')
+  @ApiOperation({ summary: 'Update current logged in user' })
+  @ApiBody({ type: UpdateUserMeDto })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'User updated successfully',
+    type: User,
+  })
+  @ApiBearerAuth('bearerAuth')
+  @UseGuards(JwtAuthGuard)
+  async updateMe(
+    @Body() updateUserDto: UpdateUserMeDto,
+    @CurrentUser() currentUser: User,
+  ): Promise<User> {
+    return this.authService.updateLoggedInUser(currentUser.id, updateUserDto, currentUser);
   }
 
   @Post('register')
