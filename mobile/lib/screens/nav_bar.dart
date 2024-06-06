@@ -3,6 +3,7 @@ import 'package:mobile/screens/add_request_page.dart';
 import 'package:mobile/screens/authentication/check_email.dart';
 import 'package:mobile/screens/authentication/login_page.dart';
 import 'package:mobile/screens/authentication/reset_password.dart';
+import 'package:mobile/screens/profile_page.dart';
 import 'package:mobile/screens/requests_list_page.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
 
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
     const RequestsPage(),
     const AddRequestPage(),
     const CheckEmailPage(description: 'Nothing here',),
-    const ResetPasswordPage(),
+    UserPage(),
   ];
 
   int selected = 0;
