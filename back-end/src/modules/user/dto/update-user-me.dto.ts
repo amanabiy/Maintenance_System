@@ -19,7 +19,7 @@ export class UpdateUserMeDto {
   @IsNotEmpty()
   fullName: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @MinLength(6)
   @ApiProperty({
     description: 'Password for the user account',
