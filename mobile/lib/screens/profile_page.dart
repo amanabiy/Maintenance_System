@@ -1,8 +1,9 @@
-// lib/screens/user_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/models/UserModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
+import 'package:mobile/screens/authentication/login_page.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -15,6 +16,7 @@ class _UserPageState extends State<UserPage> {
   late TextEditingController nameController;
   late TextEditingController emailController;
   late TextEditingController phoneController;
+  FlutterSecureStorage _storage = FlutterSecureStorage();
   bool isLoading = true;
   final Api api = Api();
 
@@ -48,56 +50,57 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
-void saveChanges() async {
-  if (nameController.text.isEmpty || emailController.text.isEmpty || phoneController.text.isEmpty) {
-    // Show an error message or handle the empty fields appropriately
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('All fields must be filled out')),
-    );
-    return;
-  }
-
-  setState(() {
-    isLoading = true;
-  });
-
-  try {
-    final updatedUser = {
-      'fullName': nameController.text,
-      'email': emailController.text,
-      'phoneNumber': phoneController.text,
-    };
-    print(updatedUser);
-    await api.patch(Endpoints.updateMyProfile, updatedUser);
-
-    setState(() {
-      user = User(
-        id: user.id,
-        createdAt: user.createdAt,
-        updatedAt: DateTime.now(),
-        email: emailController.text,
-        fullName: nameController.text,
-        phoneNumber: phoneController.text,
-        isVerified: user.isVerified,
-        lastPasswordUpdatedAt: user.lastPasswordUpdatedAt,
-        role: user.role,
-        department: user.department,
+  void saveChanges() async {
+    if (nameController.text.isEmpty ||
+        emailController.text.isEmpty ||
+        phoneController.text.isEmpty) {
+      // Show an error message or handle the empty fields appropriately
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('All fields must be filled out')),
       );
-      isEditMode = false;
-      isLoading = false;
-    });
-  } catch (e) {
-    setState(() {
-      isLoading = false;
-    });
-    print(e.toString());
-    // Handle the error, show a message, etc.
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Failed to update profile: $e')),
-    );
-  }
-}
+      return;
+    }
 
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final updatedUser = {
+        'fullName': nameController.text,
+        'email': emailController.text,
+        'phoneNumber': phoneController.text,
+      };
+      print(updatedUser);
+      await api.patch(Endpoints.updateMyProfile, updatedUser);
+
+      setState(() {
+        user = User(
+          id: user.id,
+          createdAt: user.createdAt,
+          updatedAt: DateTime.now(),
+          email: emailController.text,
+          fullName: nameController.text,
+          phoneNumber: phoneController.text,
+          isVerified: user.isVerified,
+          lastPasswordUpdatedAt: user.lastPasswordUpdatedAt,
+          role: user.role,
+          department: user.department,
+        );
+        isEditMode = false;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+      print(e.toString());
+      // Handle the error, show a message, etc.
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update profile: $e')),
+      );
+    }
+  }
 
   void cancelChanges() {
     setState(() {
@@ -106,6 +109,21 @@ void saveChanges() async {
       phoneController.text = user.phoneNumber ?? "+251XXXXXXXXX";
       isEditMode = false;
     });
+  }
+
+  void logout() async {
+    // clear all login information from the secure storage
+    // and go to login screen
+    await _storage.delete(
+      key: 'accessToken',
+    );
+    await _storage.delete(
+      key: 'refreshToken',
+    );
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false);
   }
 
   @override
@@ -122,16 +140,10 @@ void saveChanges() async {
       appBar: AppBar(
         title: Text('User Page'),
         actions: [
-          if (!isLoading)
-            IconButton(
-              icon: Icon(isEditMode ? Icons.check : Icons.edit),
-              onPressed: isEditMode ? saveChanges : toggleEditMode,
-            ),
-          if (isEditMode)
-            IconButton(
-              icon: Icon(Icons.close),
-              onPressed: cancelChanges,
-            ),
+          IconButton(
+            icon: Icon(Icons.logout),
+            onPressed: logout,
+          ),
         ],
       ),
       body: isLoading
@@ -145,7 +157,8 @@ void saveChanges() async {
                     child: Stack(
                       children: [
                         CircleAvatar(
-                          backgroundImage: AssetImage('assets/image/profile_placeholder.jpg'),
+                          backgroundImage: AssetImage(
+                              'assets/image/profile_placeholder.png'),
                           radius: 65,
                         ),
                         Positioned(
@@ -179,26 +192,23 @@ void saveChanges() async {
                             fillColor: Colors.white,
                           ),
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
                             color: Colors.black,
                           ),
-                          textAlign: TextAlign.center,
                         )
                       : Column(
                           children: [
                             Text(
                               user.fullName!,
                               style: TextStyle(
-                                fontSize: 20,
+                                fontSize: 25,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                  SizedBox(height: 24),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 20.0),
                     child: isEditMode
                         ? TextField(
                             controller: emailController,
@@ -217,7 +227,7 @@ void saveChanges() async {
                             title: Text(
                               user.email!,
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 20,
                               ),
                             ),
                             subtitle: Text(
@@ -247,9 +257,9 @@ void saveChanges() async {
                           )
                         : ListTile(
                             title: Text(
-                              user.phoneNumber ?? '',
+                              user.phoneNumber ?? 'No phone number',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 20,
                               ),
                             ),
                             subtitle: Text(
@@ -261,6 +271,53 @@ void saveChanges() async {
                             ),
                           ),
                   ),
+                  // Spacer(),
+                  SizedBox(height: 30),
+                  if (!isLoading)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: isEditMode
+                          ? Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: saveChanges,
+                                    child: Text('Save'),
+                                    style: ElevatedButton.styleFrom(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 15),
+                                      textStyle: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: ElevatedButton(
+                                    onPressed: cancelChanges,
+                                    child: Text('Cancel'),
+                                    style: ElevatedButton.styleFrom(
+                                      padding:
+                                          EdgeInsets.symmetric(vertical: 15),
+                                      textStyle: TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          : Align(
+                              alignment: Alignment.bottomCenter,
+                              child: ElevatedButton(
+                                onPressed: toggleEditMode,
+                                child: Text('Edit Profile'),
+                                style: ElevatedButton.styleFrom(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical: 15, horizontal: 30),
+                                  textStyle: TextStyle(fontSize: 16),
+                                ),
+                              ),
+                            ),
+                    ),
                 ],
               ),
             ),
