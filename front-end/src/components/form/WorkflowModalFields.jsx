@@ -26,7 +26,7 @@ const WorkflowModalFields = ({
   const fields = [];
   //   console.log(values);
 
-  if (type === "fields") {
+  if (type === "fields" || type === "new") {
     fields.push(
       <>
         <TextField
@@ -75,7 +75,7 @@ const WorkflowModalFields = ({
     );
   }
 
-  if (type === "roles") {
+  if (type === "roles" || type === "new") {
     const [selectedRoles, setSelectedRoles] = useState(
       transitionState?.allowedRoles || []
     );
@@ -138,7 +138,7 @@ const WorkflowModalFields = ({
     );
   }
 
-  if (type === "transitions") {
+  if (type === "transitions" || type === "new") {
     const [selectedTransitions, setSelectedTransitions] = useState(
       transitionState?.allowedTransitions || []
     );

@@ -39,17 +39,23 @@ import ManageRequestStatusTypes from "../../components/modals/ManageRequestStatu
 
 // redux
 import {
+  useCreateRequestStatusTypeMutation,
+  useDeleteRequestStatusTypeMutation,
   useGetRequestStatusTypesQuery,
   useUpdateRequestStatusTypeByIdMutation,
 } from "../../redux/features/requestStatusType";
 
 import { useDispatch } from "react-redux";
+import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 
 const ManageWorkFlow = () => {
   const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const [type, setType] = useState("fields");
   const [transitionState, setTransitionState] = useState(null);
+  const [isNew, setIsNew] = useState(false);
 
+  // redux
   const dispatch = useDispatch();
 
   const {
@@ -58,10 +64,15 @@ const ManageWorkFlow = () => {
     status: getRequestStatusTypesStatus,
   } = useGetRequestStatusTypesQuery();
 
-  const [updateRequestStatusTypeById, data] =
+  const [updateRequestStatusTypeById, updateData] =
     useUpdateRequestStatusTypeByIdMutation();
 
-  useEffect(() => {}, [requestStatusTypes]);
+  const [addRequestStatusType, newData] = useCreateRequestStatusTypeMutation();
+
+  const [deleteRequestStatusType, deleteData] =
+    useDeleteRequestStatusTypeMutation();
+
+  //  views
 
   const [nodes, setNodes] = useState(
     initialState.map((state) => ({
@@ -130,19 +141,47 @@ const ManageWorkFlow = () => {
     setType(modalType);
     setOpen(true);
   };
+  const handleOpenDelete = () => {
+    setOpenDelete(true);
+  };
 
   const handleClose = () => {
     setOpen(false);
+    setOpenDelete(false);
   };
 
   const handleSubmit = async (updatedValues) => {
-    console.log(updatedValues, "updatedValues");
+    console.log(
+      updatedValues,
+      "updatedValues----------------------------------"
+    );
     try {
       const response = await updateRequestStatusTypeById({
         id: transitionState.id,
         body: updatedValues,
       });
       console.log(response, "response");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const addNewRequestStatus = async (newValues) => {
+    console.log(newValues, "newValues");
+
+    try {
+      const response = await addRequestStatusType(newValues);
+      console.log(response, "response");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteRequestStatus = async (id) => {
+    try {
+      const response = await deleteRequestStatusType(id);
+      console.log(response, "response");
+      handleClose();
     } catch (error) {
       console.error(error);
     }
@@ -182,6 +221,7 @@ const ManageWorkFlow = () => {
   }
 
   // console.log(initialValues, "initialState");
+  console.log(transitionState, "transitionState");
   return (
     <ReactFlowProvider>
       <GridParent>
@@ -197,6 +237,7 @@ const ManageWorkFlow = () => {
             variant="outlined"
             style={{ width: "150px", fontSize: "10px" }}
             size="small"
+            onClick={() => handleOpen("new", {})}
           >
             Add Status Type
           </Button>
@@ -254,7 +295,12 @@ const ManageWorkFlow = () => {
                           color: "red",
                         }}
                       >
-                        <DeleteIcon />
+                        <DeleteIcon
+                          onClick={() => {
+                            setTransitionState(state);
+                            handleOpenDelete();
+                          }}
+                        />
                       </IconButton>
                     )}
                     <Typography variant="body1">{state.name}</Typography>
@@ -414,14 +460,23 @@ const ManageWorkFlow = () => {
           </div>
         </GridItem> */}
       </GridParent>
+
+      {/* MODALS */}
       <ManageRequestStatusTypes
         open={open}
         onClose={handleClose}
         type={type}
         transitionState={transitionState}
         initialValues={initialValues}
-        onConfirm={handleSubmit}
-        data={data}
+        onConfirm={type === "new" ? addNewRequestStatus : handleSubmit}
+        data={type === "new" ? newData : updateData}
+      />
+      <DeleteConfirmation
+        open={openDelete}
+        onClose={handleClose}
+        onConfirm={() => deleteRequestStatus(transitionState?.id)}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete ${transitionState?.name} state?`}
       />
     </ReactFlowProvider>
   );

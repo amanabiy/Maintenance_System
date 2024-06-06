@@ -71,7 +71,7 @@ const requestStatusTypeSlice = createSlice({
         requestStatusTypeApi.endpoints.createRequestStatusType.matchFulfilled,
         (state, action) => {
           state.status = "succeeded";
-          state.statusTypes.push(action.payload);
+          state.statusTypes = action.payload;
         }
       )
       .addMatcher(
@@ -90,10 +90,9 @@ const requestStatusTypeSlice = createSlice({
       .addMatcher(
         requestStatusTypeApi.endpoints.deleteRequestStatusType.matchFulfilled,
         (state, action) => {
+          console.log(state, action, "deleteRequestStatusType");
           state.status = "succeeded";
-          state.statusTypes = state.statusTypes.filter(
-            (type) => type.id !== action.payload
-          );
+          state.statusTypes = action.payload;
         }
       )
       .addMatcher(
@@ -128,31 +127,31 @@ const requestStatusTypeSlice = createSlice({
           state.status = "failed";
           state.error = action.error.message;
         }
+      )
+      .addMatcher(
+        requestStatusTypeApi.endpoints.updateRequestStatusTypeById.matchPending,
+        (state) => {
+          state.status = "loading";
+        }
+      )
+      .addMatcher(
+        requestStatusTypeApi.endpoints.updateRequestStatusTypeById
+          .matchFulfilled,
+        (state, action) => {
+          state.status = "succeeded";
+          const updatedStatusType = action.payload;
+          console.log(state, action, "updateRequestStatusTypeById");
+          state.statusTypes = state?.statusTypes || [];
+        }
+      )
+      .addMatcher(
+        requestStatusTypeApi.endpoints.updateRequestStatusTypeById
+          .matchRejected,
+        (state, action) => {
+          state.status = "failed";
+          state.error = action.error.message;
+        }
       );
-    // .addMatcher(
-    //   requestStatusTypeApi.endpoints.updateRequestStatusTypeById.matchPending,
-    //   (state) => {
-    //     state.status = "loading";
-    //   }
-    // )
-    // .addMatcher(
-    //   requestStatusTypeApi.endpoints.updateRequestStatusTypeById
-    //     .matchFulfilled,
-    //   (state, action) => {
-    //     state.status = "succeeded";
-    //     const updatedStatusType = action.payload;
-    //     console.log(state, action, "updateRequestStatusTypeById");
-    //     state.statusTypes = state?.statusTypes || [];
-    //   }
-    // )
-    // .addMatcher(
-    //   requestStatusTypeApi.endpoints.updateRequestStatusTypeById
-    //     .matchRejected,
-    //   (state, action) => {
-    //     state.status = "failed";
-    //     state.error = action.error.message;
-    //   }
-    // );
   },
 });
 
