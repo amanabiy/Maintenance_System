@@ -8,6 +8,7 @@ import 'package:mobile/screens/authentication/register_page.dart';
 import 'package:mobile/screens/authentication/reset_password.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/screens/nav_bar.dart';
+import 'package:mobile/screens/util/custom_scaffold.dart';
 // Import for navigation (replace with your implementation)
 
 class LoginPage extends StatefulWidget {
@@ -65,26 +66,17 @@ class _LoginPageState extends State<LoginPage> {
             (route) => false);
       } else if (response.statusCode == 400) {
         if (decResponse['message'].runtimeType == String) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(decResponse['message'])),
-          );
+          showFailureSnackBar(context, decResponse['message']);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(decResponse['message'][0])),
-          );
+          showFailureSnackBar(context, decResponse['message'][0]);
         }
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
-        );
+        showFailureSnackBar(context, 'Invalid email or password');
       }
     } catch (e) {
       // Handle other exceptions
       print('Error during login: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('An error occurred. Please try again later.')),
-      );
+      showFailureSnackBar(context, 'An error occurred. Please try again later.');
     }
   }
 

@@ -101,7 +101,9 @@ class Api {
   Future<Response> get(String url) async {
     try {
       print(url);
-      return await dio.get(url);
+      final x = await dio.get(url);
+      print(x);
+      return x;
     } on DioError catch (e) {
       // Empty body
       print(e.response);

@@ -9,6 +9,7 @@ class Endpoints {
 
   // Users
   static String request = "$baseUrl/maintenance-request";
+  static String myRequests = "$baseUrl/maintenance-request/my-requests";
   static String createRequest = "$baseUrl/maintenance-request";
 
   // Media
@@ -17,5 +18,8 @@ class Endpoints {
 
   // Profile
   static String getMyProfile = "$baseUrl/users/me";
-  static String updateMyProfile = "$baseUrl/users/me";
+  static String updateMyProfile = "$baseUrl/auth/logged-in-user";
+
+  // Media
+  static String mediaServe = "$baseUrl/media/server";
 }

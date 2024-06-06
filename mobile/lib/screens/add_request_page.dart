@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -8,6 +10,7 @@ import 'package:mobile/screens/nav_bar.dart';
 import 'package:mobile/screens/requests_list_page.dart';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:mobile/screens/util/custom_scaffold.dart';
 
 class AddRequestPage extends StatefulWidget {
   const AddRequestPage({super.key});
@@ -99,20 +102,13 @@ class _AddRequestPageState extends State<AddRequestPage> {
           _uploadedFiles.add(
               {'id': response.data['id'], 'name': file.name, 'path': fileUrl});
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('File uploaded successfully')),
-        );
+        showSuccessSnackBar(context, 'File uploaded successfully');
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text('Error uploading file: ${response.statusMessage}')),
-        );
+        showFailureSnackBar(context, 'Error uploading file: ${response.statusMessage}');
       }
     } catch (e) {
       print('Error uploading file: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error uploading file: $e')),
-      );
+      showFailureSnackBar(context, 'Error uploading file: ${e}');
     }
   }
 
@@ -147,9 +143,7 @@ class _AddRequestPageState extends State<AddRequestPage> {
 
       final response = await Api().post(Endpoints.createRequest, body);
       if (response.statusCode == 201 || response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Request submitted successfully')),
-        );
+        showSuccessSnackBar(context, 'Request submitted successfully');
         Future.delayed(const Duration(seconds: 1), () {
           Navigator.pushReplacement(
             context,
@@ -159,14 +153,11 @@ class _AddRequestPageState extends State<AddRequestPage> {
       } else {
         final errorMessage = response.data['message'] ??
             'Error submitting request. Please try again.';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(errorMessage)),
-        );
+        showFailureSnackBar(context, 'Failed to add request: $errorMessage');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      print(e);
+      showFailureSnackBar(context, 'Failed to add request: $e');
     }
   }
 

@@ -4,6 +4,7 @@ import 'package:mobile/models/UserModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
 import 'package:mobile/screens/authentication/login_page.dart';
+import 'package:mobile/screens/util/custom_scaffold.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -54,10 +55,7 @@ class _UserPageState extends State<UserPage> {
     if (nameController.text.isEmpty ||
         emailController.text.isEmpty ||
         phoneController.text.isEmpty) {
-      // Show an error message or handle the empty fields appropriately
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('All fields must be filled out')),
-      );
+      showFailureSnackBar(context, 'All fields must be filled out');
       return;
     }
 
@@ -90,15 +88,13 @@ class _UserPageState extends State<UserPage> {
         isEditMode = false;
         isLoading = false;
       });
+      showSuccessSnackBar(context, 'Profile updated successfully!');
     } catch (e) {
       setState(() {
         isLoading = false;
       });
       print(e.toString());
-      // Handle the error, show a message, etc.
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to update profile: $e')),
-      );
+      showFailureSnackBar(context, 'Failed to update profile: $e');
     }
   }
 
@@ -148,72 +144,46 @@ class _UserPageState extends State<UserPage> {
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          backgroundImage: AssetImage(
-                              'assets/image/profile_placeholder.png'),
-                          radius: 65,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            backgroundColor: Colors.grey,
-                            radius: 20,
-                            child: IconButton(
-                              onPressed: () {
-                                print("open image picker");
-                              },
-                              icon: const Icon(
-                                Icons.edit_rounded,
-                                color: Colors.white,
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            backgroundImage: AssetImage(
+                                'assets/image/profile_placeholder.png'),
+                            radius: 65,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              backgroundColor: Colors.grey,
+                              radius: 20,
+                              child: IconButton(
+                                onPressed: () {
+                                  print("open image picker");
+                                },
+                                icon: const Icon(
+                                  Icons.edit_rounded,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  isEditMode
-                      ? TextField(
-                          controller: nameController,
-                          decoration: InputDecoration(
-                            labelText: 'Name',
-                            border: OutlineInputBorder(),
-                            filled: true,
-                            fillColor: Colors.white,
-                          ),
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.black,
-                          ),
-                        )
-                      : Column(
-                          children: [
-                            Text(
-                              user.fullName!,
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: isEditMode
+                    SizedBox(height: 16),
+                    isEditMode
                         ? TextField(
-                            controller: emailController,
+                            controller: nameController,
                             decoration: InputDecoration(
-                              labelText: 'Email',
+                              labelText: 'Name',
                               border: OutlineInputBorder(),
                               filled: true,
                               fillColor: Colors.white,
@@ -223,102 +193,129 @@ class _UserPageState extends State<UserPage> {
                               color: Colors.black,
                             ),
                           )
-                        : ListTile(
-                            title: Text(
-                              user.email!,
-                              style: TextStyle(
-                                fontSize: 20,
+                        : Column(
+                            children: [
+                              Text(
+                                user.fullName!,
+                                style: TextStyle(
+                                  fontSize: 25,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            subtitle: Text(
-                              'Email',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                              ),
-                            ),
+                            ],
                           ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: isEditMode
-                        ? TextField(
-                            controller: phoneController,
-                            decoration: InputDecoration(
-                              labelText: 'Phone Number',
-                              border: OutlineInputBorder(),
-                              filled: true,
-                              fillColor: Colors.white,
-                            ),
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                            ),
-                          )
-                        : ListTile(
-                            title: Text(
-                              user.phoneNumber ?? 'No phone number',
-                              style: TextStyle(
-                                fontSize: 20,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'Phone Number (Format +251XXXXXXXXX)',
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ),
-                  ),
-                  // Spacer(),
-                  SizedBox(height: 30),
-                  if (!isLoading)
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding: const EdgeInsets.symmetric(vertical: 20.0),
                       child: isEditMode
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: saveChanges,
-                                    child: Text('Save'),
-                                    style: ElevatedButton.styleFrom(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 15),
-                                      textStyle: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(width: 16),
-                                Expanded(
-                                  child: ElevatedButton(
-                                    onPressed: cancelChanges,
-                                    child: Text('Cancel'),
-                                    style: ElevatedButton.styleFrom(
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 15),
-                                      textStyle: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                          ? TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                labelText: 'Email',
+                                border: OutlineInputBorder(),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
                             )
-                          : Align(
-                              alignment: Alignment.bottomCenter,
-                              child: ElevatedButton(
-                                onPressed: toggleEditMode,
-                                child: Text('Edit Profile'),
-                                style: ElevatedButton.styleFrom(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 15, horizontal: 30),
-                                  textStyle: TextStyle(fontSize: 16),
+                          : ListTile(
+                              title: Text(
+                                user.email!,
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Email',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
                                 ),
                               ),
                             ),
                     ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: isEditMode
+                          ? TextField(
+                              controller: phoneController,
+                              decoration: InputDecoration(
+                                labelText: 'Phone Number',
+                                border: OutlineInputBorder(),
+                                filled: true,
+                                fillColor: Colors.white,
+                              ),
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black,
+                              ),
+                            )
+                          : ListTile(
+                              title: Text(
+                                user.phoneNumber ?? 'No phone number',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Phone Number (Format +251XXXXXXXXX)',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey[600],
+                                ),
+                              ),
+                            ),
+                    ),
+                    SizedBox(height: 30),
+                    if (!isLoading)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: isEditMode
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: saveChanges,
+                                      child: Text('Save'),
+                                      style: ElevatedButton.styleFrom(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 15),
+                                        textStyle: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: ElevatedButton(
+                                      onPressed: cancelChanges,
+                                      child: Text('Cancel'),
+                                      style: ElevatedButton.styleFrom(
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 15),
+                                        textStyle: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Align(
+                                alignment: Alignment.bottomCenter,
+                                child: ElevatedButton(
+                                  onPressed: toggleEditMode,
+                                  child: Text('Edit Profile'),
+                                  style: ElevatedButton.styleFrom(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 30),
+                                    textStyle: TextStyle(fontSize: 16),
+                                  ),
+                                ),
+                              ),
+                      ),
+                  ],
+                ),
               ),
             ),
     );

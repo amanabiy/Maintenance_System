@@ -4,6 +4,8 @@ import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/screens/authentication/check_email.dart';
 import 'dart:convert';
 
+import 'package:mobile/screens/util/custom_scaffold.dart';
+
 class CreateAccountPage extends StatefulWidget {
   const CreateAccountPage({super.key});
 
@@ -55,23 +57,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         )),
       );
     } else if (response.statusCode == 409 ) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email already exists')),
-      );
+      showFailureSnackBar(context, 'Email already exists');
     } else if ( response.statusCode == 400) {
       var errorMessage = responseData['message'][0];
       if (responseData['message'].runtimeType == String) {
         errorMessage = responseData['message'];
       }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(errorMessage)),
-      );
+      showFailureSnackBar(context, errorMessage);
 
     }
     else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration failed')),
-      );
+      showFailureSnackBar(context, 'Registration failed');
     }
   }
 

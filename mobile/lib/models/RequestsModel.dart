@@ -27,6 +27,7 @@ class RequestsModel {
 
 class Item {
     Item({
+        required this.id,
         required this.createdAt,
         required this.updatedAt,
         required this.subject,
@@ -48,6 +49,7 @@ class Item {
         required this.equipments,
     });
 
+    final int? id;
     final DateTime? createdAt;
     final DateTime? updatedAt;
     final String? subject;
@@ -70,6 +72,7 @@ class Item {
 
     factory Item.fromJson(Map<String, dynamic> json){ 
         return Item(
+            id: json["id"],
             createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
             updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
             subject: json["subject"],
@@ -84,7 +87,6 @@ class Item {
             feedback: json["feedback"],
             requester: json["requester"] == null ? null : Requester.fromJson(json["requester"]),
             assignedPersons: json["assignedPersons"] == null ? [] : List<Requester>.from(json["assignedPersons"]!.map((x) => Requester.fromJson(x))),
-            // maintenanceRequestTypes: json["maintenanceRequestTypes"] == null ? [] : List<dynamic>.from(json["maintenanceRequestTypes"]!.map((x) => x)),
             maintenanceRequestTypes: json["maintenanceRequestTypes"] == null ? [] : List<MaintenanceRequestType>.from(json["maintenanceRequestTypes"]!.map((x) => MaintenanceRequestType.fromJson(x))),
             handlingDepartment: json["handlingDepartment"] == null ? null : Department.fromJson(json["handlingDepartment"]),
             mediaFiles: json["mediaFiles"] == null ? [] : List<MediaFile>.from(json["mediaFiles"]!.map((x) => MediaFile.fromJson(x))),
@@ -193,7 +195,7 @@ class Equipment {
     final String? model;
     final String? category;
     final int? amount;
-    final int? price;
+    final String? price;
     final String? clarification;
     final int? priority;
     final String? status;
@@ -253,6 +255,7 @@ class Location {
 
 class MediaFile {
     MediaFile({
+        required this.id,
         required this.createdAt,
         required this.updatedAt,
         required this.filename,
@@ -261,6 +264,7 @@ class MediaFile {
         required this.uploadedBy,
     });
 
+    final int? id;
     final DateTime? createdAt;
     final DateTime? updatedAt;
     final String? filename;
@@ -270,6 +274,7 @@ class MediaFile {
 
     factory MediaFile.fromJson(Map<String, dynamic> json){ 
         return MediaFile(
+            id: json["id"],
             createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
             updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
             filename: json["filename"],

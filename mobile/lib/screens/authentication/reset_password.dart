@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/screens/authentication/check_email.dart';
+import 'package:mobile/screens/util/custom_scaffold.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -42,9 +43,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
         ),
       );
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error sending reset link')),
-      );
+      showFailureSnackBar(context, 'Error sending reset link');
     }
   }
 
