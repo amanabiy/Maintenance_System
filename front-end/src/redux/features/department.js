@@ -1,5 +1,9 @@
 import departmentApi from "../services/departmentApi";
 
 export const {
-    useGetAllDepartmentsQuery,
+  useCreateDepartmentMutation,
+  useGetAllDepartmentsQuery,
+  useGetDepartmentByIdQuery,
+  useUpdateDepartmentByIdMutation,
+  useDeleteDepartmentByIdMutation,
 } = departmentApi;

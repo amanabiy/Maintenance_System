@@ -30,9 +30,6 @@ const Requests = () => {
   const { data: requests, error, status } = useGetMaintenanceRequestsQuery();
 
   console.log(requests, error, status);
-  // const requests = [];
-  // const error = null;
-  // const status = "succeeded";
 
   const columns = [
     { field: "id", headerName: "ID" },
@@ -42,7 +39,7 @@ const Requests = () => {
       field: "verificationStatus",
       headerName: "Verification Status",
       renderCell: (params) =>
-        params.value ? (
+        params.value === "PASSED" ? (
           <div
             style={{
               width: "100%",
@@ -67,7 +64,37 @@ const Requests = () => {
             </div>
           </div>
         ) : (
-          <div style={{ color: colors.redAccent[500] }}>Not Verified</div>
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "10px",
+            }}
+          >
+            <div
+              style={{
+                width: "60px",
+                height: "20px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-around",
+                borderRadius: "5px",
+                backgroundColor:
+                  params.value === "FAILED"
+                    ? colors.redAccent[700]
+                    : params.value === "PENDING"
+                    ? colors.blueAccent[600]
+                    : colors.secondary[400],
+
+                color: "white",
+              }}
+            >
+              {params.value}
+            </div>
+          </div>
         ),
     },
     {

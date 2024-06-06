@@ -1,18 +1,29 @@
-import HexagonIcon from "@mui/icons-material/Hexagon";
-import DashboardIcon from "@mui/icons-material/Dashboard";
-import ReportIcon from "@mui/icons-material/Report";
-import SummarizeIcon from "@mui/icons-material/Summarize";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import SettingsIcon from "@mui/icons-material/Settings";
-import LogoutIcon from "@mui/icons-material/Logout";
-
-import PeopleIcon from "@mui/icons-material/People";
-import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
-import StoreIcon from "@mui/icons-material/Store";
-import BarChartIcon from "@mui/icons-material/BarChart";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import React, { Suspense } from "react";
 import logoutFunction from "../../functions/logoutFunction";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+
+const HexagonIcon = React.lazy(() => import("@mui/icons-material/Hexagon"));
+const DashboardIcon = React.lazy(() => import("@mui/icons-material/Dashboard"));
+const ReportIcon = React.lazy(() => import("@mui/icons-material/Report"));
+const SummarizeIcon = React.lazy(() => import("@mui/icons-material/Summarize"));
+const NotificationsIcon = React.lazy(() =>
+  import("@mui/icons-material/Notifications")
+);
+const AccountCircleIcon = React.lazy(() =>
+  import("@mui/icons-material/AccountCircle")
+);
+const SettingsIcon = React.lazy(() => import("@mui/icons-material/Settings"));
+const LogoutIcon = React.lazy(() => import("@mui/icons-material/Logout"));
+
+const PeopleIcon = React.lazy(() => import("@mui/icons-material/People"));
+const ReceiptLongIcon = React.lazy(() =>
+  import("@mui/icons-material/ReceiptLong")
+);
+const StoreIcon = React.lazy(() => import("@mui/icons-material/Store"));
+const BarChartIcon = React.lazy(() => import("@mui/icons-material/BarChart"));
+const AccountTreeIcon = React.lazy(() =>
+  import("@mui/icons-material/AccountTree")
+);
 
 import { adminPaths, generalPaths, issuerPaths } from "../../routing/paths";
 
@@ -94,6 +105,11 @@ const SidebarData = {
       },
     ],
     usefull: [
+      {
+        text: "Manage Workflows",
+        icon: AccountTreeIcon,
+        path: adminPaths.MANAGE_WORKFLOWS,
+      },
       {
         text: "Generate Report",
         icon: BarChartIcon,

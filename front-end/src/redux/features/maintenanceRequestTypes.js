@@ -1,5 +1,11 @@
 import maintenanceRequestTypesApi from "../services/maintenanceRequestTypesApi";
 
 export const {
-    useFuzzySearchMutation,
+  useCreateMaintenanceRequestTypeMutation,
+  useGetAllMaintenanceRequestTypesQuery,
+  useGetMaintenanceRequestTypeByIdQuery,
+  useUpdateMaintenanceRequestTypeByIdMutation,
+  useDeleteMaintenanceRequestTypeByIdMutation,
+  useFuzzySearchMaintenanceRequestTypesQuery,
+  useFuzzySearchMutation,
 } = maintenanceRequestTypesApi;
