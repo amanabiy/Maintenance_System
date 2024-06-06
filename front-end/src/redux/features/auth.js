@@ -1,6 +1,7 @@
 import authApi from "../services/authApi";
 
 export const {
+    useCreateUserMutation,
     useRegisterMutation,
     useLoginMutation,
     useVerifyOtpMutation,

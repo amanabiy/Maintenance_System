@@ -1,4 +1,6 @@
 import React, { Suspense } from "react";
+import logoutFunction from "../../functions/logoutFunction";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 const HexagonIcon = React.lazy(() => import("@mui/icons-material/Hexagon"));
 const DashboardIcon = React.lazy(() => import("@mui/icons-material/Dashboard"));

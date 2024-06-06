@@ -87,7 +87,6 @@ const Roles = () => {
     try {
       const res = await createRole({ roleName: roleName }).unwrap();
       const roleId = Number(res.id);
-      console.log("the create", roleId);
       return roleId;
     } catch (err) {
       console.error("Failed to create role:", err);
@@ -100,7 +99,6 @@ const Roles = () => {
     permissionId = Number(permissionId);
     try {
       const res = await addPermission({ roleId, permissionId }).unwrap();
-      console.log("the add", res);
     } catch (error) {
       console.error("Failed to add permission:", error);
     }
@@ -108,14 +106,12 @@ const Roles = () => {
 
   const handleRemovePermission = async (roleId, permissionId) => {
     const res = await removePermission({ roleId, permissionId });
-    console.log("the remove", res);
   };
 
   const handleUpdateRole = async (id, roleName) => {
     try {
       console.log("Role ID:", id, "Role Name:", roleName);
       const res = await updateRole({ id, roleName }).unwrap();
-      console.log("the update", res);
     } catch (error) {
       console.error("Failed to update role:", error);
     }
@@ -131,7 +127,6 @@ const Roles = () => {
     if (title === "Create Role") {
       const newRoleId = await handleCreateRole(roleName);
       changedPermissions.forEach((permission) => {
-        console.log("Permission:", permission.name, permission.id);
         if (permission.value) {
           handleAddPermission(newRoleId, permission.id);
         } else {
@@ -149,18 +144,15 @@ const Roles = () => {
         }
       });
     }
-    console.log("Changed Permissions:", changedPermissions);
     setOpenCreate(false);
   };
 
   const handleDelete = async (id) => {
     const res = await deleteRole(id).unwrap();
-    console.log("the delete", res);
     setOpenDelete(false);
   };
 
   const handleEditRole = (params) => {
-    console.log(params);
     setTitle("Edit Role");
     setOpenCreate(true);
     setRoleId(params.row.id);
@@ -169,8 +161,6 @@ const Roles = () => {
       setExistingRolePermissions((prev) => [...prev, permission.name]);
     });
   };
-
-  console.log("existingRolePermissions", existingRolePermissions);
 
   const columns = [
     { field: "id", headerName: "ID", flex: 0.5 },

@@ -43,6 +43,8 @@ const RequestStatusDetails = lazy(
   () => "../components/commonScenes/RequestStatusDetails.jsx"
 );
 const Roles = lazy(() => import("../pages/Admin/Roles"));
+const EditUser = lazy(() => import("../pages/Admin/EditUser"));
+const CreateUser = lazy(() => import("../pages/Admin/CreateUser"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
@@ -191,6 +193,34 @@ const router = createBrowserRouter(
           }
         >
           <Route index element={<Roles />} />
+        </Route>
+
+        {/* Edit Users */}
+        <Route
+          path="all-users"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<Requests />} />
+          <Route path="edit/:userId" element={<EditUser />} />
+          {/* <Route path="view/:requestId" element={<RequestDetails />} />
+          <Route path="edit/:requestId" element={<RequestDetails />} /> */}
+        </Route>
+
+        {/* Create Users */}
+        <Route
+          path="all-users"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<Requests />} />
+          <Route path="create" element={<CreateUser />} />
         </Route>
 
         {/* Issuer Routes */}
