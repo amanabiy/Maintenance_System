@@ -2,6 +2,17 @@ import baseApi from "./baseApi";
 
 const authApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
+        createUser: builder.mutation({
+            query: (body) => {
+                const isFormData = body instanceof FormData;
+                return {
+                    url: 'auth/create-user',
+                    method: 'POST',
+                    body: isFormData ? body : JSON.stringify(body),
+                    headers: isFormData ? {} : { 'Content-Type': 'application/json' },
+                };
+            },
+        }),
         register: builder.mutation({
             query: (body) => ({
                 url: 'auth/register',
