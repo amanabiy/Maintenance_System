@@ -29,7 +29,7 @@ export class Media extends BaseModelEntity {
   @JoinColumn({ name: 'maintenance_request' })
   maintenanceRequests: MaintenanceRequest[];
 
-  @OneToOne(() => User, user => user.avatar, { cascade: true, nullable: true })
+  @OneToOne(() => User, user => user.avatar, { nullable: true })
   @JoinColumn({ name: 'avatar_of_user' })
   userAvatar: User;
 }
