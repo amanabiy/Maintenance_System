@@ -1,6 +1,8 @@
 // lib/screens/user_page.dart
 import 'package:flutter/material.dart';
 import 'package:mobile/models/UserModel.dart';
+import 'package:mobile/network/endpoints.dart';
+import 'package:mobile/providers/api_provider.dart';
 
 class UserPage extends StatefulWidget {
   @override
@@ -13,41 +15,31 @@ class _UserPageState extends State<UserPage> {
   late TextEditingController nameController;
   late TextEditingController emailController;
   late TextEditingController phoneController;
+  bool isLoading = true;
+  final Api api = Api();
 
   @override
   void initState() {
     super.initState();
-    // Initializing user with dummy data
-    user = User(
-      id: 4,
-      createdAt: DateTime.parse("2024-06-05T16:20:49.954Z"),
-      updatedAt: DateTime.parse("2024-06-06T04:59:18.000Z"),
-      email: "user@example.com",
-      fullName: "stringgg",
-      phoneNumber: "+251988135784",
-      isVerified: true,
-      lastPasswordUpdatedAt: DateTime.parse("2024-06-05T16:20:49.000Z"),
-      role: Role(
-        id: 31,
-        createdAt: DateTime.parse("2024-06-05T14:19:26.793Z"),
-        updatedAt: DateTime.parse("2024-06-05T14:19:26.793Z"),
-        roleName: "STUDENT", permissions: [],
-      ),
-      department: null,
-    );
-
-    // Initialize controllers
-    nameController = TextEditingController(text: user.fullName);
-    emailController = TextEditingController(text: user.email);
-    phoneController = TextEditingController(text: user.phoneNumber);
+    fetchUserData();
   }
 
-  @override
-  void dispose() {
-    nameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    super.dispose();
+  Future<void> fetchUserData() async {
+    try {
+      final response = await api.get(Endpoints.getMyProfile);
+      user = User.fromJson(response.data);
+      print(response.data);
+      nameController = TextEditingController(text: user.fullName);
+      emailController = TextEditingController(text: user.email);
+      phoneController = TextEditingController(text: user.phoneNumber);
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void toggleEditMode() {
@@ -56,7 +48,28 @@ class _UserPageState extends State<UserPage> {
     });
   }
 
-  void saveChanges() {
+void saveChanges() async {
+  if (nameController.text.isEmpty || emailController.text.isEmpty || phoneController.text.isEmpty) {
+    // Show an error message or handle the empty fields appropriately
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('All fields must be filled out')),
+    );
+    return;
+  }
+
+  setState(() {
+    isLoading = true;
+  });
+
+  try {
+    final updatedUser = {
+      'fullName': nameController.text,
+      'email': emailController.text,
+      'phoneNumber': phoneController.text,
+    };
+    print(updatedUser);
+    await api.patch(Endpoints.updateMyProfile, updatedUser);
+
     setState(() {
       user = User(
         id: user.id,
@@ -71,16 +84,36 @@ class _UserPageState extends State<UserPage> {
         department: user.department,
       );
       isEditMode = false;
+      isLoading = false;
     });
+  } catch (e) {
+    setState(() {
+      isLoading = false;
+    });
+    print(e.toString());
+    // Handle the error, show a message, etc.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Failed to update profile: $e')),
+    );
   }
+}
+
 
   void cancelChanges() {
     setState(() {
       nameController.text = user.fullName!;
       emailController.text = user.email!;
-      phoneController.text = user.phoneNumber!;
+      phoneController.text = user.phoneNumber ?? "+251XXXXXXXXX";
       isEditMode = false;
     });
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    phoneController.dispose();
+    super.dispose();
   }
 
   @override
@@ -89,10 +122,11 @@ class _UserPageState extends State<UserPage> {
       appBar: AppBar(
         title: Text('User Page'),
         actions: [
-          IconButton(
-            icon: Icon(isEditMode ? Icons.check : Icons.edit),
-            onPressed: isEditMode ? saveChanges : toggleEditMode,
-          ),
+          if (!isLoading)
+            IconButton(
+              icon: Icon(isEditMode ? Icons.check : Icons.edit),
+              onPressed: isEditMode ? saveChanges : toggleEditMode,
+            ),
           if (isEditMode)
             IconButton(
               icon: Icon(Icons.close),
@@ -100,64 +134,136 @@ class _UserPageState extends State<UserPage> {
             ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            CircleAvatar(
-              radius: 50,
-              backgroundImage: AssetImage('assets/image/profile_placeholder.jpg'), // Make sure you have a dummy profile picture in your assets
+      body: isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Center(
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: AssetImage('assets/image/profile_placeholder.jpg'),
+                          radius: 65,
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: CircleAvatar(
+                            backgroundColor: Colors.grey,
+                            radius: 20,
+                            child: IconButton(
+                              onPressed: () {
+                                print("open image picker");
+                              },
+                              icon: const Icon(
+                                Icons.edit_rounded,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  isEditMode
+                      ? TextField(
+                          controller: nameController,
+                          decoration: InputDecoration(
+                            labelText: 'Name',
+                            border: OutlineInputBorder(),
+                            filled: true,
+                            fillColor: Colors.white,
+                          ),
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                          ),
+                          textAlign: TextAlign.center,
+                        )
+                      : Column(
+                          children: [
+                            Text(
+                              user.fullName!,
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                  SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: isEditMode
+                        ? TextField(
+                            controller: emailController,
+                            decoration: InputDecoration(
+                              labelText: 'Email',
+                              border: OutlineInputBorder(),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          )
+                        : ListTile(
+                            title: Text(
+                              user.email!,
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Email',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                    child: isEditMode
+                        ? TextField(
+                            controller: phoneController,
+                            decoration: InputDecoration(
+                              labelText: 'Phone Number',
+                              border: OutlineInputBorder(),
+                              filled: true,
+                              fillColor: Colors.white,
+                            ),
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.black,
+                            ),
+                          )
+                        : ListTile(
+                            title: Text(
+                              user.phoneNumber ?? '',
+                              style: TextStyle(
+                                fontSize: 16,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'Phone Number (Format +251XXXXXXXXX)',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey[600],
+                              ),
+                            ),
+                          ),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(height: 16),
-            TextField(
-              controller: nameController,
-              enabled: isEditMode,
-              decoration: InputDecoration(
-                labelText: 'Name',
-                border: OutlineInputBorder(),
-                filled: !isEditMode,
-                fillColor: !isEditMode ? Colors.grey[200] : null,
-              ),
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: isEditMode ? Colors.black : Colors.grey[700],
-              ),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              controller: emailController,
-              enabled: isEditMode,
-              decoration: InputDecoration(
-                labelText: 'Email',
-                border: OutlineInputBorder(),
-                filled: !isEditMode,
-                fillColor: !isEditMode ? Colors.grey[200] : null,
-              ),
-              style: TextStyle(
-                fontSize: 16,
-                color: isEditMode ? Colors.black : Colors.grey[700],
-              ),
-            ),
-            SizedBox(height: 8),
-            TextField(
-              controller: phoneController,
-              enabled: isEditMode,
-              decoration: InputDecoration(
-                labelText: 'Phone Number',
-                border: OutlineInputBorder(),
-                filled: !isEditMode,
-                fillColor: !isEditMode ? Colors.grey[200] : null,
-              ),
-              style: TextStyle(
-                fontSize: 16,
-                color: isEditMode ? Colors.black : Colors.grey[700],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

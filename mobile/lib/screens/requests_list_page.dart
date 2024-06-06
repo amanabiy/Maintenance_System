@@ -21,13 +21,15 @@ class _RequestsPageState extends State<RequestsPage> {
   RequestsModel? requests; // Store the entire response data
 
   Future<void> fetchRequests() async {
-    final response = await Api().get(Endpoints.request);
-    if (response.statusCode == 200) {
-      requests = RequestsModel.fromJson(response.data);
-      setState(() {}); // Update UI after fetching data
-    } else {
+    try {
+      final response = await Api().get(Endpoints.request);
+      if (response.statusCode == 200) {
+        requests = RequestsModel.fromJson(response.data);
+        setState(() {}); // Update UI after fetching data
+      }
+    } catch(e) {
       // Handle API request errors here
-      print('Error fetching requests: ${response.statusCode}');
+      print('Error fetching requests: ${e.toString()}');
     }
   }
 

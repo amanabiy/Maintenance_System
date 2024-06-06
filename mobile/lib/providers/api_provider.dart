@@ -100,9 +100,11 @@ class Api {
   // get method
   Future<Response> get(String url) async {
     try {
+      print(url);
       return await dio.get(url);
     } on DioError catch (e) {
       // Empty body
+      print(e.response);
       print(e.response?.data);
       throw Exception(e.response?.data['message']);
     }
@@ -112,6 +114,15 @@ class Api {
   Future<Response> put(String url, Map data) async {
     try {
       return await dio.put(url, data: data);
+    } on DioError catch (e) {
+      // Empty body
+      throw Exception(e.response?.data['message']);
+    }
+  }
+
+    Future<Response> patch(String url, Map data) async {
+    try {
+      return await dio.patch(url, data: data);
     } on DioError catch (e) {
       // Empty body
       throw Exception(e.response?.data['message']);
