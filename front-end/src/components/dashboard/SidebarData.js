@@ -22,7 +22,10 @@ const BarChartIcon = React.lazy(() => import("@mui/icons-material/BarChart"));
 const AccountTreeIcon = React.lazy(() =>
   import("@mui/icons-material/AccountTree")
 );
-
+const ManageAccountsIcon = React.lazy(() =>
+  import("@mui/icons-material/ManageAccounts")
+);
+import logoutFunction from "../../functions/logoutFunction";
 import { adminPaths, generalPaths, issuerPaths } from "../../routing/paths";
 
 const SidebarData = {

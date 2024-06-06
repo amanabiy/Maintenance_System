@@ -134,21 +134,40 @@ const ManageWorkFlow = () => {
   };
 
   const handleSubmit = async (updatedValues) => {
-    try {
-      const response = await updateRequestStatusTypeById({
-        id: transitionState.id,
-        body: updatedValues,
-      });
-      console.log(response, "response");
-      setTimeout(() => {
-        console.log("Request status type updated successfully");
-      }),
-        400;
-      setOpen(false);
-    } catch (error) {
-      console.error(error);
-      setOpen(false);
-    }
+    //   try {
+    //     const response = await updateRequestStatusTypeById({
+    //       id: transitionState.id,
+    //       body: updatedValues,
+    //     });
+    //     console.log(response, "response");
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+  };
+
+  const initialValues = {
+    name: transitionState?.name || "",
+    description: transitionState?.description || "",
+    isInitialStatus: transitionState?.isInitialStatus || false,
+    hasSchedule: transitionState?.hasSchedule || false,
+    needsFile: transitionState?.needsFile || false,
+    needsSignatures: transitionState?.needsSignatures || false,
+    isInternal: transitionState?.isInternal || false,
+    allowChangePriority: transitionState?.allowChangePriority || false,
+    allowChangeconfirmationStatus:
+      transitionState?.allowChangeconfirmationStatus || false,
+    allowChangeverificationStatus:
+      transitionState?.allowChangeverificationStatus || false,
+    allowsChangeRequestTypes:
+      transitionState?.allowsChangeRequestTypes || false,
+    allowsForwardToDepartment:
+      transitionState?.allowsForwardToDepartment || false,
+    allowsForwardToPerson: transitionState?.allowsForwardToPerson || false,
+    allowsChangeLocation: transitionState?.allowsChangeLocation || false,
+    allowsChangeTitleAndDescription:
+      transitionState?.allowsChangeTitleAndDescription || false,
+    allowsChangeMedia: transitionState?.allowsChangeMedia || false,
+    allowsAddMoreMedia: transitionState?.allowsAddMoreMedia || false,
   };
 
   if (getRequestStatusTypesStatus === "PENDING") {
@@ -392,6 +411,7 @@ const ManageWorkFlow = () => {
         onClose={handleClose}
         type={type}
         transitionState={transitionState}
+        initialValues={initialValues}
         onConfirm={handleSubmit}
         data={data}
       />

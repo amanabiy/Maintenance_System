@@ -142,9 +142,7 @@ const requestStatusTypeSlice = createSlice({
           state.status = "succeeded";
           const updatedStatusType = action.payload;
           console.log(state, action, "updateRequestStatusTypeById");
-          state.statusTypes = state.statusTypes.map((type) =>
-            type.id === updatedStatusType.id ? updatedStatusType : type
-          );
+          state.statusTypes = state?.statusTypes || [];
         }
       )
       .addMatcher(

@@ -9,10 +9,12 @@ import {
   Autocomplete,
   Chip,
   Alert,
+  Typography,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { useGetRequestStatusTypesQuery } from "../../redux/features/requestStatusType";
+import { useGetAllRolesQuery } from "../../redux/features/role";
 
 const ManageRequestStatusTypes = ({
   open,
@@ -20,30 +22,50 @@ const ManageRequestStatusTypes = ({
   type,
   transitionState,
   onConfirm,
+  initialValues,
   data,
 }) => {
   const [selectedRoles, setSelectedRoles] = useState([]);
   const [selectedTransitions, setSelectedTransitions] = useState([]);
-  const roles = ["role1", "role2", "role3"];
+  const {
+    data: roles,
+    status: fetchAllRolesStatus,
+    error: fetchAllRolesError,
+  } = useGetAllRolesQuery();
   const { data: transitions, status, error } = useGetRequestStatusTypesQuery();
-  console.log(transitions);
 
   useEffect(() => {
     if (transitionState) {
-      setSelectedRoles(transitionState?.allowedRoles || []);
-      setSelectedTransitions(transitionState?.allowedTransitions || []);
+      setSelectedRoles(
+        transitionState &&
+          transitionState.allowedRoles &&
+          transitionState.allowedRoles.length > 0
+          ? transitionState.allowedRoles.map((state) => state.id)
+          : []
+      );
+      setSelectedTransitions(
+        transitionState &&
+          transitionState.allowedTransitions &&
+          transitionState.allowedTransitions.length > 0
+          ? transitionState.allowedTransitions.map((state) => state.id)
+          : []
+      );
     }
-  }, [transitionState]);
-
-  //   console.log(updateRequestStatusTypeById, data);
+  }, [open, transitionState]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     description: Yup.string().required("Description is required"),
   });
 
-  const handleRoleChange = (event, value) => {
-    setSelectedRoles(value);
+  const handleRoleInputChange = (event, newInputValue) => {
+    handleRoleChange(event, [
+      ...selectedRoles,
+      roles.items.find((role) => role.roleName === newInputValue),
+    ]);
+  };
+  const handleRoleChange = (event, newValue) => {
+    setSelectedRoles([...selectedRoles, newValue]);
   };
 
   const handleTransitionChange = (event, value) => {
@@ -53,9 +75,8 @@ const ManageRequestStatusTypes = ({
   const handleSubmit = (values) => {
     const updatedValues = {
       ...values,
-      allowedRoles: selectedRoles?.map((role) => role.id) || [],
-      allowedTransitions:
-        selectedTransitions?.map((transition) => transition.id) || [],
+      allowedRolesIds: selectedRoles || [],
+      allowedTransitions: selectedTransitions || [],
     };
 
     console.log(updatedValues);
@@ -63,30 +84,9 @@ const ManageRequestStatusTypes = ({
     onConfirm(updatedValues);
   };
 
-  const initialValues = {
-    name: transitionState?.name || "",
-    description: transitionState?.description || "",
-    isInitialStatus: transitionState?.isInitialStatus || false,
-    hasSchedule: transitionState?.hasSchedule || false,
-    needsFile: transitionState?.needsFile || false,
-    needsSignatures: transitionState?.needsSignatures || false,
-    isInternal: transitionState?.isInternal || false,
-    allowChangePriority: transitionState?.allowChangePriority || false,
-    allowChangeconfirmationStatus:
-      transitionState?.allowChangeconfirmationStatus || false,
-    allowChangeverificationStatus:
-      transitionState?.allowChangeverificationStatus || false,
-    allowsChangeRequestTypes:
-      transitionState?.allowsChangeRequestTypes || false,
-    allowsForwardToDepartment:
-      transitionState?.allowsForwardToDepartment || false,
-    allowsForwardToPerson: transitionState?.allowsForwardToPerson || false,
-    allowsChangeLocation: transitionState?.allowsChangeLocation || false,
-    allowsChangeTitleAndDescription:
-      transitionState?.allowsChangeTitleAndDescription || false,
-    allowsChangeMedia: transitionState?.allowsChangeMedia || false,
-    allowsAddMoreMedia: transitionState?.allowsAddMoreMedia || false,
-  };
+  // console.log(transitionState);
+  // console.log(selectedRoles);
+  // console.log(selectedTransitions);
 
   return (
     <Modal
@@ -173,31 +173,57 @@ const ManageRequestStatusTypes = ({
 
               {type === "roles" && (
                 <Box>
+                  {selectedRoles.length > 0 ? (
+                    <div
+                      style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}
+                    >
+                      {roles?.items &&
+                      roles.items.length > 0 &&
+                      selectedRoles.length > 0
+                        ? roles.items.map(
+                            (role) =>
+                              selectedRoles.includes(role.id) && (
+                                <Chip
+                                  key={role.id}
+                                  label={role.roleName}
+                                  onDelete={() => {
+                                    setSelectedRoles((prev) =>
+                                      prev.filter(
+                                        (roleId) => roleId !== role.id
+                                      )
+                                    );
+                                  }}
+                                />
+                              )
+                          )
+                        : null}
+                    </div>
+                  ) : (
+                    <Typography>No Request Types added yet</Typography>
+                  )}
                   <Autocomplete
-                    multiple
-                    options={roles}
-                    value={selectedRoles}
-                    onChange={handleRoleChange}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          key={option}
-                          label={option}
-                          {...getTagProps({ index })}
-                          onDelete={() => {
-                            setSelectedRoles((prev) =>
-                              prev.filter((role) => role !== option)
-                            );
-                          }}
-                        />
-                      ))
+                    // multiple
+                    options={(roles?.items || []).filter(
+                      (role) => !selectedRoles.includes(role.id)
+                    )}
+                    getOptionLabel={(option) => option.roleName}
+                    // value={selectedRoles}
+                    isOptionEqualToValue={(option, value) =>
+                      option.id === value.id
                     }
+                    onChange={handleRoleChange}
+                    // onInputChange={handleRoleInputChange}
                     renderInput={(params) => (
                       <TextField
                         {...params}
                         label="Roles"
                         placeholder="Select roles"
                       />
+                    )}
+                    renderOption={(props, option) => (
+                      <li {...props} key={option.id}>
+                        <strong>{option.roleName}</strong>
+                      </li>
                     )}
                   />
                 </Box>
@@ -208,25 +234,27 @@ const ManageRequestStatusTypes = ({
                   <Autocomplete
                     multiple
                     options={(transitions?.items || []).filter(
-                      (option) => option.id !== transitionState.id
+                      (option) =>
+                        option.id !== transitionState.id &&
+                        !selectedTransitions.includes(option.id)
                     )}
                     getOptionLabel={(option) => option.name}
-                    value={selectedTransitions}
+                    // value={selectedTransitions}
                     onChange={handleTransitionChange}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          key={option.id}
-                          label={option.name}
-                          {...getTagProps({ index })}
-                          onDelete={() => {
-                            setSelectedTransitions((prev) =>
-                              prev.filter((transition) => transition !== option)
-                            );
-                          }}
-                        />
-                      ))
-                    }
+                    // renderTags={(value, getTagProps) =>
+                    //   value.map((option, index) => (
+                    //     <Chip
+                    //       key={option.id}
+                    //       label={option.name}
+                    //       {...getTagProps({ index })}
+                    //       onDelete={() => {
+                    //         setSelectedTransitions((prev) =>
+                    //           prev.filter((transition) => transition !== option)
+                    //         );
+                    //       }}
+                    //     />
+                    //   ))
+                    // }
                     renderInput={(params) => (
                       <TextField
                         {...params}
