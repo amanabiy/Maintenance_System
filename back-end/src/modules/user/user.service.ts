@@ -148,12 +148,12 @@ export class UserService extends GenericDAL<
     if (roleId) {
       role = await this.roleService.findOne(roleId);
     }
-    if (avatarId) {
-      const avatar = await this.mediaRepository.findOne({where: {id: avatarId}});
-      if (avatar) {
-        toUpdateUser.avatar = avatar;
-      }
-    }
+    // if (avatarId) {
+    //   const avatar = await this.mediaRepository.findOne({where: {id: avatarId}});
+    //   if (avatar) {
+    //     toUpdateUser.avatar = avatar;
+    //   }
+    // }
 
     const userToUpdate: Partial<User> = {};
     // if (email) userToUpdate.email = email;

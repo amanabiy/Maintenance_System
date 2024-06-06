@@ -25,11 +25,11 @@ export class Media extends BaseModelEntity {
   @Exclude()
   uploadedBy: Promise<User>;
 
-  @ManyToOne(() => MaintenanceRequest, request => request.mediaFiles, {cascade: true})
+  @ManyToOne(() => MaintenanceRequest, request => request.mediaFiles, {cascade: false})
   @JoinColumn({ name: 'maintenance_request' })
-  maintenanceRequests: MaintenanceRequest[];
+  maintenanceRequests: Promise<MaintenanceRequest[]>;
 
-  @OneToOne(() => User, user => user.avatar, { nullable: true })
-  @JoinColumn({ name: 'avatar_of_user' })
-  userAvatar: User;
+  // @OneToOne(() => User, user => user.avatar, { nullable: true })
+  // @JoinColumn({ name: 'avatar_id'})
+  // userAvatar: Promise<User>;
 }

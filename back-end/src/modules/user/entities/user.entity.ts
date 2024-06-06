@@ -38,13 +38,13 @@ export class User extends BaseModelEntity {
   fullName: string;
 
 
-  @OneToOne(() => Media, { eager: true, cascade: true, nullable: true })
-  @JoinColumn({ name: 'avatar_id' })
-  @ApiProperty({
-    description: 'Media entity representing the user avatar',
-    nullable: true,
-  })
-  avatar: Media;
+  // @OneToOne(() => Media, { eager: true, cascade: true, nullable: true })
+  // @JoinColumn({ name: 'avatar_id' })
+  // @ApiProperty({
+  //   description: 'Media entity representing the user avatar',
+  //   nullable: true,
+  // })
+  // avatar: Media;
 
   @Column()
   @Exclude()
