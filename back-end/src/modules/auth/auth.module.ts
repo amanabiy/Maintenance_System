@@ -15,6 +15,7 @@ import { Department } from '../department/entities/department.entity';
 import { MailService } from '../mail/mailer.service';
 import { Permission } from '../permission/entities/permission.entity';
 import { PermissionService } from '../permission/permission.service';
+import { Media } from '../media/entities/media.entity';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { PermissionService } from '../permission/permission.service';
       secret: process.env.JWT_SECRET_KEY,
       signOptions: { expiresIn: '48h' },
     }),
-    TypeOrmModule.forFeature([User, Department, Role, Permission]),
+    TypeOrmModule.forFeature([User, Department, Role, Permission, Media]),
   ],
   providers: [AuthService, UserService, JwtStrategy, DepartmentService, RoleService, MailService, PermissionService],
   controllers: [AuthController],
