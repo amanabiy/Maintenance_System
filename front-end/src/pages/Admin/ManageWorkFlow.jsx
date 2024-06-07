@@ -84,7 +84,7 @@ const ManageWorkFlow = () => {
     requestStatusTypes?.items?.map((state, index) => ({
       id: state.id.toString(),
       data: { label: state.name, isFirst: state.isInitialStatus },
-      position: { x: firstX + 250 * index, y: firstY + 10 * index },
+      position: { x: firstX + 350 * index, y: firstY + 100 * index },
       type: "customNode",
     }))
   );
@@ -119,7 +119,7 @@ const ManageWorkFlow = () => {
       requestStatusTypes?.items?.map((state, index) => ({
         id: state.id.toString(),
         data: { label: state.name, isFirst: state.isInitialStatus },
-        position: { x: firstX + 250 * index, y: firstY + 10 * index },
+        position: { x: firstX + 350 * index, y: firstY + 100 * index },
         type: "customNode",
       }))
     );
