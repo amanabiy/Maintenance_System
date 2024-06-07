@@ -4,16 +4,16 @@ import * as path from 'path';
 
 export const mailConfig: MailerOptions = {
   transport: {
-    host: 'live.smtp.mailtrap.io',
-    port:  587,
+    host: process.env.MAIL_HOST  || 'live.smtp.mailtrap.io',
+    port:  process.env.MAIL_PORT || 587,
     secure: true, // TLS is optional and can be used if secure: true
     auth: {
       user: process.env.MAIL_USERNAME || 'api',
-      pass: process.env.MAIL_PASSWORD || 'cda687a3f54b95cc27315d2f29a4a580', // replace with the actual password
+      pass: process.env.MAIL_PASSWORD || 'xs', // replace with the actual password
     },
   },
   defaults: {
-    from: '"amanuelabiy.as@gmail.com',
+    from: 'admin@maintains.live',
   },
   template: {
     dir: path.join(__dirname, 'templates'),
