@@ -16,12 +16,12 @@ const roleApi = baseApi.injectEndpoints({
         method: "GET",
       }),
     }),
-    getAllRoles: builder.query({
-      query: () => ({
-        url: "role",
-        method: "GET",
-      }),
-    }),
+    // getAllRoles: builder.query({
+    //   query: () => ({
+    //     url: "role",
+    //     method: "GET",
+    //   }),
+    // }),
     getRoleById: builder.mutation({
       query: (id) => ({
         url: `role/${id}`,
