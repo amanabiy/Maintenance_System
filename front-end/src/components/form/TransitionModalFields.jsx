@@ -219,12 +219,12 @@ const TransitionModalFields = (
                     secondary={"Click to view"}
                   />
                   <Button
-                    onClick={() =>
+                    onClick={() => {
                       setFieldValue(
                         "mediaFiles",
                         values.mediaFiles.filter((_, i) => i !== index)
-                      )
-                    }
+                      );
+                    }}
                   >
                     Delete
                   </Button>

@@ -5,6 +5,7 @@ const CustomNode = ({ data }) => {
   return (
     <div
       style={{
+        width: "300px",
         padding: "10px",
         borderRadius: "8px",
         backgroundColor: data.isFirst ? "green" : "blue",
@@ -14,7 +15,7 @@ const CustomNode = ({ data }) => {
     >
       {data.label}
       <Handle type="target" position={Position.Top} />
-      <Handle type="source" position={Position.Bottom} />
+      <Handle type="source" position={Position.Right} />
     </div>
   );
 };
