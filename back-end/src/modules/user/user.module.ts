@@ -15,10 +15,11 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { SharedModule } from '../shared/shared.module';
 import { Permission } from '../permission/entities/permission.entity';
 import { PermissionService } from '../permission/permission.service';
+import { Media } from '../media/entities/media.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Permission]),
+    TypeOrmModule.forFeature([User, Permission, Media]),
     TypeOrmModule.forFeature([Role]),
     TypeOrmModule.forFeature([Department]),
     PassportModule.register({ defaultStrategy: 'jwt' }),

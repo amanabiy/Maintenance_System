@@ -1,16 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactFlow, {
-  addEdge,
   MiniMap,
   Controls,
   Background,
-  Handle,
-  Position,
-  useReactFlow,
   ReactFlowProvider,
-  NodeResizer,
-  NodeResizeControl,
-  NodeToolbar,
+  MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import {
@@ -20,6 +14,11 @@ import {
   Typography,
   Card,
   CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  DialogActions,
 } from "@mui/material";
 // icons
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
@@ -29,6 +28,9 @@ import FlagIcon from "@mui/icons-material/Flag";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import SettingsSuggestIcon from "@mui/icons-material/SettingsSuggest";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+import SchemaIcon from "@mui/icons-material/Schema";
 // data
 import { initialState } from "../../data/mockStateData";
 // components
@@ -36,20 +38,30 @@ import AboveTableHeader from "../../components/headers/AboveTableHeader";
 import GridParent from "../../components/layout/GridParent";
 import GridItem from "../../components/layout/GridItem";
 import ManageRequestStatusTypes from "../../components/modals/ManageRequestStatusTypes";
+import CustomNode from "../../components/react-flow-custom/CustomNode";
 
 // redux
 import {
+  useCreateRequestStatusTypeMutation,
+  useDeleteRequestStatusTypeMutation,
   useGetRequestStatusTypesQuery,
   useUpdateRequestStatusTypeByIdMutation,
 } from "../../redux/features/requestStatusType";
 
 import { useDispatch } from "react-redux";
+import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 
 const ManageWorkFlow = () => {
   const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [workflowOpen, setWorkflowOpen] = useState(false);
   const [type, setType] = useState("fields");
   const [transitionState, setTransitionState] = useState(null);
+  const firstX = 0;
+  const firstY = 0;
+  const nodeTypes = useMemo(() => ({ customNode: CustomNode }), []);
 
+  // redux
   const dispatch = useDispatch();
 
   const {
@@ -58,69 +70,116 @@ const ManageWorkFlow = () => {
     status: getRequestStatusTypesStatus,
   } = useGetRequestStatusTypesQuery();
 
-  const [updateRequestStatusTypeById, data] =
+  const [updateRequestStatusTypeById, updateData] =
     useUpdateRequestStatusTypeByIdMutation();
 
+  const [addRequestStatusType, newData] = useCreateRequestStatusTypeMutation();
+
+  const [deleteRequestStatusType, deleteData] =
+    useDeleteRequestStatusTypeMutation();
+
+  //  views
+
   const [nodes, setNodes] = useState(
-    initialState.map((state) => ({
-      id: state.id,
-      data: { label: state.label, isFirst: state.isFirst },
-      position: { x: Math.random() * 250, y: Math.random() * 250 },
-      type: "default",
+    requestStatusTypes?.items?.map((state, index) => ({
+      id: state.id.toString(),
+      data: { label: state.name, isFirst: state.isInitialStatus },
+      position: { x: firstX + 250 * index, y: firstY + 10 * index },
+      type: "customNode",
     }))
   );
 
   const [edges, setEdges] = useState(
-    initialState.flatMap((state) =>
-      state.transitionTo.map((targetId) => ({
-        id: `${state.id}-${targetId}`,
-        source: state.id,
-        target: targetId,
-        animated: true,
-        arrowHeadType: "arrowclosed",
-        type: "smoothstep",
-      }))
+    requestStatusTypes?.items?.flatMap((state) =>
+      state.allowedTransitions.map((target) => {
+        const sourceId = state.id;
+        const targetId = target.id;
+        const direction = sourceId < targetId ? "forward" : "backward";
+
+        return {
+          id: `${state.id}-${target.id}`,
+          source: sourceId.toString(),
+          target: targetId.toString(),
+          animated: true,
+          markerEnd: {
+            type: MarkerType.ArrowClosed,
+          },
+          type: "default",
+          style: {
+            strokeWidth: 2,
+            stroke: { backward: "#FF0072", forward: "#00FF72" }[direction],
+          },
+        };
+      })
     )
   );
 
-  //   const [open, setOpen] = useState(false);
-  const [newStateLabel, setNewStateLabel] = useState("");
-  //   const { project } = useReactFlow();
-
-  const onConnect = (params) => setEdges((eds) => addEdge(params, eds));
-
-  const onNodesChange = (changes) =>
-    setNodes((nds) =>
-      nds.map((node) => {
-        const change = changes.find((change) => change.id === node.id);
-        return change ? { ...node, ...change } : node;
-      })
+  useEffect(() => {
+    setNodes(
+      requestStatusTypes?.items?.map((state, index) => ({
+        id: state.id.toString(),
+        data: { label: state.name, isFirst: state.isInitialStatus },
+        position: { x: firstX + 250 * index, y: firstY + 10 * index },
+        type: "customNode",
+      }))
     );
+    setEdges(
+      requestStatusTypes?.items?.flatMap((state) =>
+        state.allowedTransitions.map((target) => {
+          const sourceId = state.id;
+          const targetId = target.id;
+          const direction = sourceId < targetId ? "forward" : "backward";
 
-  const onEdgesChange = (changes) =>
-    setEdges((eds) =>
-      eds.map((edge) => {
-        const change = changes.find((change) => change.id === edge.id);
-        return change ? { ...edge, ...change } : edge;
-      })
+          return {
+            id: `${state.id}-${target.id}`,
+            source: sourceId.toString(),
+            target: targetId.toString(),
+            animated: true,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+            },
+            type: "default",
+            style: {
+              strokeWidth: 2,
+              stroke: { backward: "#FF0072", forward: "#00FF72" }[direction],
+            },
+          };
+        })
+      )
     );
+  }, [requestStatusTypes]);
 
-  const addState = () => {
-    const newNode = {
-      id: (nodes.length + 1).toString(),
-      data: { label: newStateLabel, isFirst: false },
-      //   position: project({ x: 250, y: 250 }),
-    };
-    setNodes((nds) => [...nds, newNode]);
-    setOpen(false);
-    setNewStateLabel("");
-  };
+  console.log(requestStatusTypes, "requestStatusTypes");
+  console.log(nodes, "nodes");
+  console.log(edges, "edges");
 
-  const deleteState = (id) => {
-    setNodes((nds) => nds.filter((node) => node.id !== id));
-    setEdges((eds) =>
-      eds.filter((edge) => edge.source !== id && edge.target !== id)
-    );
+  const initialValues = {
+    name: transitionState?.name || "",
+    description: transitionState?.description || "",
+    isInitialStatus: transitionState?.isInitialStatus || false,
+    hasSchedule: transitionState?.hasSchedule || false,
+    needsFile: transitionState?.needsFile || false,
+    needsSignatures: transitionState?.needsSignatures || false,
+    isInternal: transitionState?.isInternal || false,
+    allowChangePriority: transitionState?.allowChangePriority || false,
+    allowChangeconfirmationStatus:
+      transitionState?.allowChangeconfirmationStatus || false,
+    allowChangeverificationStatus:
+      transitionState?.allowChangeverificationStatus || false,
+    allowsChangeRequestTypes:
+      transitionState?.allowsChangeRequestTypes || false,
+    allowsForwardToDepartment:
+      transitionState?.allowsForwardToDepartment || false,
+    allowsForwardToPerson: transitionState?.allowsForwardToPerson || false,
+    allowsChangeLocation: transitionState?.allowsChangeLocation || false,
+    allowsChangeTitleAndDescription:
+      transitionState?.allowsChangeTitleAndDescription || false,
+    allowsChangeMedia: transitionState?.allowsChangeMedia || false,
+    allowsAddMoreMedia: transitionState?.allowsAddMoreMedia || false,
+    allowedRolesIds:
+      transitionState?.allowedRoles?.map((role) => role.id) || [],
+    allowedTransitions:
+      transitionState?.allowedTransitions?.map((state) => state.id) || [],
   };
 
   const handleOpen = (modalType, state) => {
@@ -128,26 +187,49 @@ const ManageWorkFlow = () => {
     setType(modalType);
     setOpen(true);
   };
+  const handleOpenDelete = () => {
+    setOpenDelete(true);
+  };
 
   const handleClose = () => {
     setOpen(false);
+    setOpenDelete(false);
   };
 
   const handleSubmit = async (updatedValues) => {
+    console.log(
+      updatedValues,
+      "updatedValues--------------------------------------------------"
+    );
     try {
       const response = await updateRequestStatusTypeById({
         id: transitionState.id,
         body: updatedValues,
       });
       console.log(response, "response");
-      setTimeout(() => {
-        console.log("Request status type updated successfully");
-      }),
-        400;
-      setOpen(false);
     } catch (error) {
       console.error(error);
-      setOpen(false);
+    }
+  };
+
+  const addNewRequestStatus = async (newValues) => {
+    console.log(newValues, "newValues");
+
+    try {
+      const response = await addRequestStatusType(newValues);
+      console.log(response, "response");
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const deleteRequestStatus = async (id) => {
+    try {
+      const response = await deleteRequestStatusType(id);
+      console.log(response, "response");
+      handleClose();
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -155,6 +237,8 @@ const ManageWorkFlow = () => {
     return <Loading />;
   }
 
+  // console.log(initialValues, "initialState");
+  console.log(transitionState, "transitionState");
   return (
     <ReactFlowProvider>
       <GridParent>
@@ -164,14 +248,36 @@ const ManageWorkFlow = () => {
             subTitle={"Manage all states and Workflow here"}
           />
         </GridItem>
-        <GridItem xs={12} md={4} sx={{ paddingLeft: "4px" }}>
+        <GridItem xs={12} sx={{ paddingLeft: "4px", position: "relative" }}>
           <Button
             endIcon={<AddIcon />}
             variant="outlined"
-            style={{ width: "150px", fontSize: "10px" }}
+            style={{ position: "absolute", top: 8, left: 16, zIndex: 2 }}
             size="small"
+            onClick={() => handleOpen("new", {})}
           >
             Add Status Type
+          </Button>
+
+          <Button
+            startIcon={
+              workflowOpen ? <VisibilityOffIcon /> : <VisibilityIcon />
+            }
+            variant="text"
+            style={{
+              position: "absolute",
+              top: 8,
+              right: 16,
+              display: "flex",
+              alignItems: "center",
+              height: "fit-content",
+              fontSize: "10px",
+              zIndex: 2,
+            }}
+            size="small"
+            onClick={() => setWorkflowOpen(!workflowOpen)}
+          >
+            {workflowOpen ? "Hide Workflow" : "Show Workflow"}
           </Button>
           <div
             style={{
@@ -191,7 +297,7 @@ const ManageWorkFlow = () => {
             <div
               style={{
                 display: "flex",
-                flexDirection: "column",
+                flexWrap: "wrap",
                 gap: "8px",
                 padding: "8px",
                 width: "100%",
@@ -205,6 +311,8 @@ const ManageWorkFlow = () => {
                   <Card
                     key={state.id}
                     sx={{
+                      minWidth: "300px",
+                      flex: 1,
                       padding: "8px",
                       position: "relative",
                     }}
@@ -227,7 +335,12 @@ const ManageWorkFlow = () => {
                           color: "red",
                         }}
                       >
-                        <DeleteIcon />
+                        <DeleteIcon
+                          onClick={() => {
+                            setTransitionState(state);
+                            handleOpenDelete();
+                          }}
+                        />
                       </IconButton>
                     )}
                     <Typography variant="body1">{state.name}</Typography>
@@ -301,99 +414,69 @@ const ManageWorkFlow = () => {
             </div>
           </div>
         </GridItem>
-        {/* <GridItem
-          xs={12}
-          md={8}
-          style={{
-            padding: "16px",
-            height: "100vh",
-            display: "flex",
-            flexDirection: "column",
-            gap: "16px",
-          }}
-        >
-          <div
+
+        {/* WorkFlow Display */}
+        {workflowOpen && (
+          <GridItem
+            xs={12}
             style={{
-              height: "90%",
-              border: "1px dashed lightgrey",
-              borderRadius: "8px",
-              position: "relative",
+              padding: "16px",
+              height: "100vh",
+              display: "flex",
+              flexDirection: "column",
+              gap: "16px",
             }}
           >
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              onConnect={onConnect}
-              // onNodesChange={onNodesChange}
-              // onEdgesChange={onEdgesChange}
-              fitView
+            <div
+              style={{
+                height: "90%",
+                border: "1px dashed lightgrey",
+                borderRadius: "8px",
+                position: "relative",
+              }}
             >
-              <MiniMap />
-              <Controls />
-              <Background />
+              <ReactFlow
+                nodes={nodes}
+                edges={edges}
+                nodeTypes={nodeTypes}
+                fitView
+              >
+                <MiniMap />
+                <Controls />
+                <Background />
+              </ReactFlow>
 
-              {nodes.map(
-                (node) =>
-                  !node.data.isFirst && (
-                    <Tooltip title="Delete State" key={`delete-${node.id}`}>
-                      <IconButton
-                        onClick={() => deleteState(node.id)}
-                        style={{
-                          position: "absolute",
-                          left: node.position.x + 145,
-                          top: node.position.y + 165,
-                          zIndex: 10,
-                          borderRadius: "50%",
-                        }}
-                      >
-                        <DeleteIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  )
-              )}
-            </ReactFlow>
-
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={() => setOpen(true)}
-              style={{ position: "absolute", top: 10, left: 10, zIndex: 2 }}
-            >
-              Add New State
-            </Button>
-
-            <Dialog open={open} onClose={() => setOpen(false)}>
-              <DialogTitle>Add New State</DialogTitle>
-              <DialogContent>
-                <TextField
-                  autoFocus
-                  margin="dense"
-                  label="State Label"
-                  fullWidth
-                  value={newStateLabel}
-                  onChange={(e) => setNewStateLabel(e.target.value)}
-                />
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={() => setOpen(false)} color="primary">
-                  Cancel
-                </Button>
-                <Button onClick={addState} color="primary">
-                  Add
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </div>
-        </GridItem> */}
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<AddIcon />}
+                endIcon={<SchemaIcon />}
+                onClick={() => handleOpen("new", {})}
+                style={{ position: "absolute", top: 10, left: 10, zIndex: 2 }}
+              >
+                Add New Status Type
+              </Button>
+            </div>
+          </GridItem>
+        )}
       </GridParent>
+
+      {/* MODALS */}
       <ManageRequestStatusTypes
         open={open}
         onClose={handleClose}
         type={type}
         transitionState={transitionState}
-        onConfirm={handleSubmit}
-        data={data}
+        initialValues={initialValues}
+        onConfirm={type === "new" ? addNewRequestStatus : handleSubmit}
+        data={type === "new" ? newData : updateData}
+      />
+      <DeleteConfirmation
+        open={openDelete}
+        onClose={handleClose}
+        onConfirm={() => deleteRequestStatus(transitionState?.id)}
+        title="Confirm Deletion"
+        message={`Are you sure you want to delete ${transitionState?.name} state?`}
       />
     </ReactFlowProvider>
   );

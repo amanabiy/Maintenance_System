@@ -71,7 +71,7 @@ const requestStatusTypeSlice = createSlice({
         requestStatusTypeApi.endpoints.createRequestStatusType.matchFulfilled,
         (state, action) => {
           state.status = "succeeded";
-          state.statusTypes.push(action.payload);
+          state.statusTypes = action.payload;
         }
       )
       .addMatcher(
@@ -90,10 +90,9 @@ const requestStatusTypeSlice = createSlice({
       .addMatcher(
         requestStatusTypeApi.endpoints.deleteRequestStatusType.matchFulfilled,
         (state, action) => {
+          console.log(state, action, "deleteRequestStatusType");
           state.status = "succeeded";
-          state.statusTypes = state.statusTypes.filter(
-            (type) => type.id !== action.payload
-          );
+          state.statusTypes = action.payload;
         }
       )
       .addMatcher(
@@ -142,9 +141,7 @@ const requestStatusTypeSlice = createSlice({
           state.status = "succeeded";
           const updatedStatusType = action.payload;
           console.log(state, action, "updateRequestStatusTypeById");
-          state.statusTypes = state.statusTypes.map((type) =>
-            type.id === updatedStatusType.id ? updatedStatusType : type
-          );
+          state.statusTypes = state?.statusTypes || [];
         }
       )
       .addMatcher(

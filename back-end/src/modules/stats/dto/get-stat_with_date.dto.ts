@@ -19,7 +19,7 @@ export class GetStatsDto {
   @IsDateString()
   endDate?: string;
 
-  @ApiProperty({ description: 'Group by period (DAY, WEEK, MONTH, YEAR)', example: 'MONTH', enum: GroupByEnum })
+  @ApiProperty({ description: 'Group by period (DAY, WEEK, MONTH, YEAR)', example: 'MONTH', enum: GroupByEnum, required: false})
   @IsOptional()
   @IsEnum(GroupByEnum)
   groupBy?: GroupByEnum;

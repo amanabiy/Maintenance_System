@@ -1,11 +1,12 @@
 import roleApi from "../services/roleApi";
 
 export const {
-    useCreateRoleMutation,
-    useGetAllRolesMutation,
-    useGetRoleByIdMutation,
-    useUpdateRoleMutation,
-    useDeleteRoleMutation,
-    useAddPermissionToRoleMutation,
-    useRemovePermissionFromRoleMutation,
+  useCreateRoleMutation,
+  useGetAllRolesMutation,
+  useGetAllRolesQuery,
+  useGetRoleByIdMutation,
+  useUpdateRoleMutation,
+  useDeleteRoleMutation,
+  useAddPermissionToRoleMutation,
+  useRemovePermissionFromRoleMutation,
 } = roleApi;

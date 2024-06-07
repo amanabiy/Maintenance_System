@@ -35,6 +35,7 @@ import { PermissionsGuard } from '../permission/guard/permissions.guard';
 import { UserRoutePermissionEnum } from './entities/user-route-permission.enum';
 import { Permissions } from '../permission/decorator/permissions.decorator';
 import { plainToClass, plainToInstance } from 'class-transformer';
+import { UpdateUserMeDto } from './dto/update-user-me.dto';
 
 @Controller('users')
 @ApiTags('User')
@@ -43,18 +44,18 @@ import { plainToClass, plainToInstance } from 'class-transformer';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  @ApiOperation({ summary: 'Create a new user admin' })
-  @ApiBody({ type: CreateUserDto })
-  @ApiResponse({
-    status: HttpStatus.CREATED,
-    description: 'User created successfully',
-    type: User,
-  })
-  @Permissions(UserRoutePermissionEnum.CAN_CREATE_USER)
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.userService.adminCreate(createUserDto);
-  }
+  // @Post()
+  // @ApiOperation({ summary: 'Create a new user admin' })
+  // @ApiBody({ type: CreateUserDto })
+  // @ApiResponse({
+  //   status: HttpStatus.CREATED,
+  //   description: 'User created successfully',
+  //   type: User,
+  // })
+  // @Permissions(UserRoutePermissionEnum.CAN_CREATE_USER)
+  // create(@Body() createUserDto: CreateUserDto): Promise<User> {
+  //   return this.userService.adminCreate(createUserDto);
+  // }
 
   @Get()
   @ApiOperation({ summary: 'Get all users' })
@@ -115,22 +116,20 @@ export class UserController {
   //   return this.userService.searchUsers(updateUserDto, +page, +limit);
   // }
 
-  @Patch('me')
-  @ApiOperation({ summary: 'Update current logged in user' })
-  @ApiBody({ type: UpdateUserDto })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'User updated successfully',
-    type: User,
-  })
-  async updateMe(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-    @CurrentUser() currentUser: User,
-  ): Promise<User> {
-    const { email, fullName, password } = updateUserDto;
-    return this.userService.updateUser(currentUser.id, { email, fullName, password }, currentUser);
-  }
+  // @Patch('me')
+  // @ApiOperation({ summary: 'Update current logged in user' })
+  // @ApiBody({ type: UpdateUserMeDto })
+  // @ApiResponse({
+  //   status: HttpStatus.OK,
+  //   description: 'User updated successfully',
+  //   type: User,
+  // })
+  // async updateMe(
+  //   @Body() updateUserDto: UpdateUserMeDto,
+  //   @CurrentUser() currentUser: User,
+  // ): Promise<User> {
+  //   return this.userService.updateUser(currentUser.id, updateUserDto, currentUser);
+  // }
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update user by ID' })
