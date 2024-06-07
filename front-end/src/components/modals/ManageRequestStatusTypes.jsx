@@ -9,10 +9,13 @@ import {
   Autocomplete,
   Chip,
   Alert,
+  Typography,
 } from "@mui/material";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { useGetRequestStatusTypesQuery } from "../../redux/features/requestStatusType";
+import { useGetAllRolesQuery } from "../../redux/features/role";
+import WorkflowModalFields from "../form/WorkflowModalFields";
 
 const ManageRequestStatusTypes = ({
   open,
@@ -20,73 +23,35 @@ const ManageRequestStatusTypes = ({
   type,
   transitionState,
   onConfirm,
+  initialValues,
   data,
 }) => {
-  const [selectedRoles, setSelectedRoles] = useState([]);
-  const [selectedTransitions, setSelectedTransitions] = useState([]);
-  const roles = ["role1", "role2", "role3"];
-  const { data: transitions, status, error } = useGetRequestStatusTypesQuery();
-  console.log(transitions);
-
-  useEffect(() => {
-    if (transitionState) {
-      setSelectedRoles(transitionState?.allowedRoles || []);
-      setSelectedTransitions(transitionState?.allowedTransitions || []);
-    }
-  }, [transitionState]);
-
-  //   console.log(updateRequestStatusTypeById, data);
+  useEffect(() => {}, [open, transitionState]);
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Name is required"),
     description: Yup.string().required("Description is required"),
   });
 
-  const handleRoleChange = (event, value) => {
-    setSelectedRoles(value);
-  };
-
   const handleTransitionChange = (event, value) => {
     setSelectedTransitions(value);
   };
 
   const handleSubmit = (values) => {
+    const uniqueAllowedRoles = Array.from(new Set(values.allowedRolesIds));
+    const uniqueAllowedTransitions = Array.from(
+      new Set(values.allowedTransitions)
+    );
     const updatedValues = {
       ...values,
-      allowedRoles: selectedRoles?.map((role) => role.id) || [],
-      allowedTransitions:
-        selectedTransitions?.map((transition) => transition.id) || [],
+      allowedRolesIds: uniqueAllowedRoles,
+      allowedTransitions: uniqueAllowedTransitions,
     };
-
-    console.log(updatedValues);
 
     onConfirm(updatedValues);
   };
 
-  const initialValues = {
-    name: transitionState?.name || "",
-    description: transitionState?.description || "",
-    isInitialStatus: transitionState?.isInitialStatus || false,
-    hasSchedule: transitionState?.hasSchedule || false,
-    needsFile: transitionState?.needsFile || false,
-    needsSignatures: transitionState?.needsSignatures || false,
-    isInternal: transitionState?.isInternal || false,
-    allowChangePriority: transitionState?.allowChangePriority || false,
-    allowChangeconfirmationStatus:
-      transitionState?.allowChangeconfirmationStatus || false,
-    allowChangeverificationStatus:
-      transitionState?.allowChangeverificationStatus || false,
-    allowsChangeRequestTypes:
-      transitionState?.allowsChangeRequestTypes || false,
-    allowsForwardToDepartment:
-      transitionState?.allowsForwardToDepartment || false,
-    allowsForwardToPerson: transitionState?.allowsForwardToPerson || false,
-    allowsChangeLocation: transitionState?.allowsChangeLocation || false,
-    allowsChangeTitleAndDescription:
-      transitionState?.allowsChangeTitleAndDescription || false,
-    allowsChangeMedia: transitionState?.allowsChangeMedia || false,
-    allowsAddMoreMedia: transitionState?.allowsAddMoreMedia || false,
-  };
+  console.log(transitionState);
 
   return (
     <Modal
@@ -101,7 +66,10 @@ const ManageRequestStatusTypes = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 600,
+          maxWidth: "80%",
+          width: "50%",
+          maxHeight: "80%",
+          overflowY: "auto",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
@@ -123,120 +91,17 @@ const ManageRequestStatusTypes = ({
         >
           {({ values, errors, touched, setFieldValue }) => (
             <Form>
-              {type === "fields" && (
-                <>
-                  <Field
-                    name="name"
-                    as={TextField}
-                    label="Name"
-                    error={touched.name && Boolean(errors.name)}
-                    helperText={touched.name && errors.name}
-                    fullWidth
-                    margin="normal"
-                    onChange={(e) => setFieldValue("name", e.target.value)}
-                  />
-                  <Field
-                    name="description"
-                    as={TextField}
-                    label="Description"
-                    error={touched.description && Boolean(errors.description)}
-                    helperText={touched.description && errors.description}
-                    fullWidth
-                    margin="normal"
-                    onChange={(e) =>
-                      setFieldValue("description", e.target.value)
-                    }
-                  />
-                  {/* Render checkboxes for all boolean values */}
-                  {Object.keys(initialValues).map((key) => {
-                    if (typeof initialValues[key] === "boolean") {
-                      return (
-                        <FormControlLabel
-                          key={key}
-                          control={
-                            <Field
-                              name={key}
-                              type="checkbox"
-                              as={Checkbox}
-                              checked={values[key]}
-                              onChange={() => setFieldValue(key, !values[key])}
-                            />
-                          }
-                          label={key}
-                        />
-                      );
-                    }
-                    return null;
-                  })}
-                </>
-              )}
-
-              {type === "roles" && (
-                <Box>
-                  <Autocomplete
-                    multiple
-                    options={roles}
-                    value={selectedRoles}
-                    onChange={handleRoleChange}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          key={option}
-                          label={option}
-                          {...getTagProps({ index })}
-                          onDelete={() => {
-                            setSelectedRoles((prev) =>
-                              prev.filter((role) => role !== option)
-                            );
-                          }}
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Roles"
-                        placeholder="Select roles"
-                      />
-                    )}
-                  />
-                </Box>
-              )}
-
-              {type === "transitions" && (
-                <Box>
-                  <Autocomplete
-                    multiple
-                    options={(transitions?.items || []).filter(
-                      (option) => option.id !== transitionState.id
-                    )}
-                    getOptionLabel={(option) => option.name}
-                    value={selectedTransitions}
-                    onChange={handleTransitionChange}
-                    renderTags={(value, getTagProps) =>
-                      value.map((option, index) => (
-                        <Chip
-                          key={option.id}
-                          label={option.name}
-                          {...getTagProps({ index })}
-                          onDelete={() => {
-                            setSelectedTransitions((prev) =>
-                              prev.filter((transition) => transition !== option)
-                            );
-                          }}
-                        />
-                      ))
-                    }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Transitions"
-                        placeholder="Select transitions"
-                      />
-                    )}
-                  />
-                </Box>
-              )}
+              {
+                <WorkflowModalFields
+                  transitionState={transitionState}
+                  values={values}
+                  errors={errors}
+                  touched={touched}
+                  setFieldValue={setFieldValue}
+                  type={type}
+                  initialValues={initialValues}
+                />
+              }
 
               <Button
                 type="submit"

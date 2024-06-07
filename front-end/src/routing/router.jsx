@@ -35,12 +35,12 @@ const FinancialTransactions = lazy(() =>
 const Users = lazy(() => import("../pages/Admin/Users"));
 const Requests = lazy(() => import("../pages/Admin/Requests"));
 const ManageWorkFlow = lazy(() => import("../pages/Admin/ManageWorkFlow"));
-const RequestDetails = lazy(
-  () => "../components/commonScenes/RequestDetails.jsx"
+const RequestDetails = lazy(() =>
+  import("../components/commonScenes/RequestDetails.jsx")
 );
 const MyProfile = lazy(() => import("../pages/Admin/MyProfile"));
-const RequestStatusDetails = lazy(
-  () => "../components/commonScenes/RequestStatusDetails.jsx"
+const RequestStatusDetails = lazy(() =>
+  import("../components/commonScenes/RequestStatusDetails.jsx")
 );
 const Roles = lazy(() => import("../pages/Admin/Roles"));
 const EditUser = lazy(() => import("../pages/Admin/EditUser"));

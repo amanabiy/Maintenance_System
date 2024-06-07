@@ -2,16 +2,23 @@
 export const initialState = [
   {
     id: "1",
-    label: "State 1",
-    isFirst: true,
+    name: "State 1",
+    isInitialStatus: true,
     deletable: false,
     transitionTo: ["2"],
   },
   {
     id: "2",
-    label: "State 2",
-    isFirst: false,
+    name: "State 2",
+    isInitialStatus: false,
     deletable: true,
-    transitionTo: [],
+    transitionTo: ["1"],
+  },
+  {
+    id: "3",
+    name: "State 3",
+    isInitialStatus: false,
+    deletable: true,
+    transitionTo: ["1"],
   },
 ];
