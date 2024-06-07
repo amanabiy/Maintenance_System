@@ -134,7 +134,7 @@ class _UserPageState extends State<UserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('User Page'),
+        title: Text('Profile'),
         actions: [
           IconButton(
             icon: Icon(Icons.logout),

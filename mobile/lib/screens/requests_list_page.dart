@@ -54,7 +54,7 @@ class _RequestsPageState extends State<RequestsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Requests Page'), // Set application title here
+          title: const Text('Requests'), // Set application title here
         ),
         body: Padding(
           padding: const EdgeInsets.all(8.0),
