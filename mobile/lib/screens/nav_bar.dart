@@ -3,6 +3,7 @@ import 'package:mobile/screens/add_request_page.dart';
 import 'package:mobile/screens/authentication/check_email.dart';
 import 'package:mobile/screens/authentication/login_page.dart';
 import 'package:mobile/screens/authentication/reset_password.dart';
+import 'package:mobile/screens/notification.dart';
 import 'package:mobile/screens/profile_page.dart';
 import 'package:mobile/screens/requests_list_page.dart';
 import 'package:stylish_bottom_bar/stylish_bottom_bar.dart';
@@ -23,7 +24,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> bottomBarPages = [
     const RequestsPage(),
     const AddRequestPage(),
-    const CheckEmailPage(description: 'Nothing here',),
+    const NotificationsPage(),
     UserPage(),
   ];
 
@@ -53,11 +54,11 @@ class _HomePageState extends State<HomePage> {
           BottomBarItem(
             icon: Icon(
               Icons.home,
-              color: Colors.blue,
+              color: Color.fromARGB(255, 64, 35, 92),
             ),
             selectedIcon: Icon(
-              Icons.home_filled,
-              color: Colors.blue,
+              Icons.home_outlined,
+              color: Color.fromARGB(255, 76, 14, 142),
             ),
             selectedColor: Colors.white,
             unSelectedColor: const Color(0xffd4d4d8),
@@ -66,11 +67,11 @@ class _HomePageState extends State<HomePage> {
           BottomBarItem(
               icon: Icon(
                 Icons.work,
-                color: Colors.blue,
+                color: Color.fromARGB(255, 64, 35, 92),
               ),
               selectedIcon: Icon(
                 Icons.work_outline,
-                color: Colors.blue,
+                color: Color.fromARGB(255, 76, 14, 142),
               ),
               selectedColor: Colors.white,
               unSelectedColor: const Color(0xffd4d4d8),
@@ -78,11 +79,11 @@ class _HomePageState extends State<HomePage> {
           BottomBarItem(
               icon: Icon(
                 Icons.notifications,
-                color: Colors.blue,
+                color: Color.fromARGB(255, 64, 35, 92),
               ),
               selectedIcon: Icon(
                 Icons.notifications_outlined,
-                color: Colors.blue,
+                color: Color.fromARGB(255, 76, 14, 142),
               ),
               selectedColor: Colors.white,
               unSelectedColor: const Color(0xffd4d4d8),
@@ -90,11 +91,11 @@ class _HomePageState extends State<HomePage> {
           BottomBarItem(
             icon: Icon(
               Icons.person,
-              color: Colors.blue,
+              color: Color.fromARGB(255, 64, 35, 92),
             ),
             selectedIcon: Icon(
               Icons.person_outline,
-              color: Colors.blue,
+              color: Color.fromARGB(255, 76, 14, 142),
             ),
             selectedColor: Colors.white,
             unSelectedColor: const Color(0xffd4d4d8),

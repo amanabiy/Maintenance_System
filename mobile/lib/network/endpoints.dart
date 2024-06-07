@@ -22,4 +22,7 @@ class Endpoints {
 
   // Media
   static String mediaServe = "$baseUrl/media/server";
+
+  // Notifications
+  static String getMyNotification = '${Endpoints.baseUrl}/notifications/logged-in-user';
 }
