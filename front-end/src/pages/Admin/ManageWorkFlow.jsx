@@ -1,16 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactFlow, {
-  addEdge,
   MiniMap,
   Controls,
   Background,
-  Handle,
-  Position,
-  useReactFlow,
   ReactFlowProvider,
-  NodeResizer,
-  NodeResizeControl,
-  NodeToolbar,
   MarkerType,
 } from "reactflow";
 import "reactflow/dist/style.css";
@@ -45,6 +38,7 @@ import AboveTableHeader from "../../components/headers/AboveTableHeader";
 import GridParent from "../../components/layout/GridParent";
 import GridItem from "../../components/layout/GridItem";
 import ManageRequestStatusTypes from "../../components/modals/ManageRequestStatusTypes";
+import CustomNode from "../../components/react-flow-custom/CustomNode";
 
 // redux
 import {
@@ -65,6 +59,7 @@ const ManageWorkFlow = () => {
   const [transitionState, setTransitionState] = useState(null);
   const firstX = 0;
   const firstY = 0;
+  const nodeTypes = useMemo(() => ({ customNode: CustomNode }), []);
 
   // redux
   const dispatch = useDispatch();
@@ -90,7 +85,7 @@ const ManageWorkFlow = () => {
       id: state.id.toString(),
       data: { label: state.name, isFirst: state.isInitialStatus },
       position: { x: firstX + 250 * index, y: firstY + 10 * index },
-      type: "default",
+      type: "customNode",
     }))
   );
 
@@ -125,7 +120,7 @@ const ManageWorkFlow = () => {
         id: state.id.toString(),
         data: { label: state.name, isFirst: state.isInitialStatus },
         position: { x: firstX + 250 * index, y: firstY + 10 * index },
-        type: "default",
+        type: "customNode",
       }))
     );
     setEdges(
@@ -204,7 +199,7 @@ const ManageWorkFlow = () => {
   const handleSubmit = async (updatedValues) => {
     console.log(
       updatedValues,
-      "updatedValues----------------------------------"
+      "updatedValues--------------------------------------------------"
     );
     try {
       const response = await updateRequestStatusTypeById({
@@ -443,9 +438,7 @@ const ManageWorkFlow = () => {
               <ReactFlow
                 nodes={nodes}
                 edges={edges}
-                // onConnect={onConnect}
-                // onNodesChange={onNodesChange}
-                // onEdgesChange={onEdgesChange}
+                nodeTypes={nodeTypes}
                 fitView
               >
                 <MiniMap />

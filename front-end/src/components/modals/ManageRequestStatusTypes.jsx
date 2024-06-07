@@ -66,7 +66,10 @@ const ManageRequestStatusTypes = ({
           top: "50%",
           left: "50%",
           transform: "translate(-50%, -50%)",
-          width: 600,
+          maxWidth: "80%",
+          width: "50%",
+          maxHeight: "80%",
+          overflowY: "auto",
           bgcolor: "background.paper",
           boxShadow: 24,
           p: 4,
@@ -99,43 +102,6 @@ const ManageRequestStatusTypes = ({
                   initialValues={initialValues}
                 />
               }
-
-              {/*} {type === "transitions" && (
-                <Box>
-                  <Autocomplete
-                    multiple
-                    options={(transitions?.items || []).filter(
-                      (option) =>
-                        option.id !== transitionState.id &&
-                        !selectedTransitions.includes(option.id)
-                    )}
-                    getOptionLabel={(option) => option.name}
-                    // value={selectedTransitions}
-                    onChange={handleTransitionChange}
-                    // renderTags={(value, getTagProps) =>
-                    //   value.map((option, index) => (
-                    //     <Chip
-                    //       key={option.id}
-                    //       label={option.name}
-                    //       {...getTagProps({ index })}
-                    //       onDelete={() => {
-                    //         setSelectedTransitions((prev) =>
-                    //           prev.filter((transition) => transition !== option)
-                    //         );
-                    //       }}
-                    //     />
-                    //   ))
-                    // }
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Transitions"
-                        placeholder="Select transitions"
-                      />
-                    )}
-                  />
-                </Box>
-              )} */}
 
               <Button
                 type="submit"

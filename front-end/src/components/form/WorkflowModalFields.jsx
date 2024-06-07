@@ -94,6 +94,12 @@ const WorkflowModalFields = ({
       }
     };
 
+    const handleRemoveRole = (index, id) => {
+      const updatedRoles = values.allowedRolesIds.filter((_, i) => i !== index);
+      setFieldValue("allowedRolesIds", updatedRoles);
+      setSelectedRoles((prev) => prev.filter((prevRole) => prevRole.id !== id));
+    };
+
     console.log(values);
     console.log(transitionState.allowedRoles);
     console.log(selectedRoles);
@@ -103,14 +109,12 @@ const WorkflowModalFields = ({
         {selectedRoles.length > 0 ? (
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {selectedRoles.length > 0
-              ? selectedRoles.map((role) => (
+              ? selectedRoles.map((role, index) => (
                   <Chip
                     key={role.id}
                     label={role.roleName}
                     onDelete={() => {
-                      setSelectedRoles((prev) =>
-                        prev.filter((prevRole) => prevRole.id !== role.id)
-                      );
+                      handleRemoveRole(index, role.id);
                     }}
                     // deleteIcon={<CloseIcon />}
                   />
@@ -159,6 +163,15 @@ const WorkflowModalFields = ({
         ]);
       }
     };
+    const handleRemoveTransition = (index, id) => {
+      const updatedTransitions = values.allowedTransitions.filter(
+        (_, i) => i !== index
+      );
+      setFieldValue("allowedTransitions", updatedTransitions);
+      setSelectedTransitions((prev) =>
+        prev.filter((prevState) => prevState.id !== id)
+      );
+    };
 
     console.log(values);
     console.log(transitionState.allowedTransitions);
@@ -169,14 +182,12 @@ const WorkflowModalFields = ({
         {selectedTransitions.length > 0 ? (
           <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
             {selectedTransitions.length > 0
-              ? selectedTransitions.map((state) => (
+              ? selectedTransitions.map((state, index) => (
                   <Chip
                     key={state.id}
                     label={state.name}
                     onDelete={() => {
-                      setSelectedTransitions((prev) =>
-                        prev.filter((prevState) => prevState.id !== state.id)
-                      );
+                      handleRemoveTransition(index, state.id);
                     }}
                   />
                 ))
