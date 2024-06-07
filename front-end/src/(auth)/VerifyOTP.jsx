@@ -25,6 +25,7 @@ const VerifyOTP = () => {
   const [values, setValues] = useState(Array(6).fill(""));
   const [verifyOtp, { isLoading, err }] = useVerifyOtpMutation();
   const [requestOtp] = useRequestOtpMutation();
+  console.log(email);
 
   const handleVerifyOTP = async () => {
     try {

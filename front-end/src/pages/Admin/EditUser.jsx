@@ -71,7 +71,17 @@ const EditUser = () => {
   const handleSave = async () => {
     try {
       const id = userId;
+      Object.keys(userData).forEach((key) => {
+        if (
+          (key === "roleId" && userData[key] === 0) ||
+          (key === "departmentId" && userData[key] === 0) ||
+          (key == "phoneNumber" && userData[key] === "")
+        ) {
+          delete userData[key];
+        }
+      });
       const res = await updateUser({ id, user: userData }).unwrap();
+      console.log("User updated successfully:", res);
     } catch (error) {
       console.error("Error updating user:", error);
     }

@@ -66,6 +66,17 @@ const authApi = baseApi.injectEndpoints({
                 method: "POST",
             })
         }),
+        updateMe: builder.mutation({
+            query: (body) => {
+                const isFormData = body instanceof FormData;
+                return {
+                    url: 'auth/logged-in-user',
+                    method: 'PATCH',
+                    body: isFormData ? body : JSON.stringify(body),
+                    headers: isFormData ? {} : { 'Content-Type': 'application/json' },
+                };
+            },
+        }),
     }),
 });
 

@@ -1,43 +1,29 @@
 import { Avatar, Typography } from "@mui/material";
 import Person from "../../assets/images/person1.jpg";
 
-const Updates = () => {
+const Updates = ({ names, subject }) => {
   return (
     <div className="updates">
       <div className="title">
         <span>UPDATES</span>
       </div>
       <div className="internal">
-        <div className="update">
-          <div className="left">
-            <Avatar className="avatar" src={Person} />
-          </div>
-          <div className="right">
-            <div className="msg">
-              Abebe just reported a broken door at Block 43
+        {names && subject && names.length === subject.length ? (
+          names.map((name, index) => (
+            <div className="update" key={index}>
+              <div className="left">
+                <Avatar className="avatar" style={{ color: "#4e24e1" }} />
+              </div>
+              <div className="right">
+                <div className="msg">
+                  {name} just reported {subject[index]}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="update">
-          <div className="left">
-            <Avatar className="avatar" />
-          </div>
-          <div className="right">
-            <div className="msg">
-              Abebe just reported a broken door at Block 43
-            </div>
-          </div>
-        </div>
-        <div className="update">
-          <div className="left">
-            <Avatar className="avatar" />
-          </div>
-          <div className="right">
-            <div className="msg">
-              Abebe just reported a broken door at Block 43
-            </div>
-          </div>
-        </div>
+          ))
+        ) : (
+          <div>No updates available</div>
+        )}
       </div>
     </div>
   );

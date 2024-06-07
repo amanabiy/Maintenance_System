@@ -10,4 +10,5 @@ export const {
     useVerifyEmailMutation,
     useRequestVerificationEmailMutation,
     useRequestOtpMutation,
+    useUpdateMeMutation,
 } = authApi;
