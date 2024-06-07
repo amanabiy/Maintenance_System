@@ -4,6 +4,8 @@ export const {
   useCreateUserMutation,
   useGetAllUsersQuery,
   useGetUsersFuzzyQuery,
+  useGetMeQuery,
+  useUpdateMeMutation,
   useGetUserByIdQuery,
   useUpdateUserByIdMutation,
   useDeleteUserByIdMutation,

@@ -61,6 +61,7 @@ const CreateUser = () => {
           formData.append(key, userData[key]);
         }
       }
+      console.log("User data:", userData);
       const res = await createUser(userData).unwrap();
       console.log("User created successfully:", res);
     } catch (error) {
