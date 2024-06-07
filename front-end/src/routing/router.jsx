@@ -45,6 +45,7 @@ const RequestStatusDetails = lazy(() =>
 const Roles = lazy(() => import("../pages/Admin/Roles"));
 const EditUser = lazy(() => import("../pages/Admin/EditUser"));
 const CreateUser = lazy(() => import("../pages/Admin/CreateUser"));
+const Departments = lazy(() => import("../pages/Admin/Departments"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
@@ -221,6 +222,16 @@ const router = createBrowserRouter(
         >
           <Route index element={<Requests />} />
           <Route path="create" element={<CreateUser />} />
+        </Route>
+        <Route
+          path="departments"
+          element={
+            <Suspense fallback={<Loading />}>
+              <ProtectedRoute requiredRoles={["ADMIN"]} />
+            </Suspense>
+          }
+        >
+          <Route index element={<Departments />} />
         </Route>
 
         {/* Issuer Routes */}

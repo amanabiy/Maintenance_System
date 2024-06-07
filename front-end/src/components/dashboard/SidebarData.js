@@ -1,6 +1,4 @@
 import React, { Suspense } from "react";
-import logoutFunction from "../../functions/logoutFunction";
-import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 
 const HexagonIcon = React.lazy(() => import("@mui/icons-material/Hexagon"));
 const DashboardIcon = React.lazy(() => import("@mui/icons-material/Dashboard"));
@@ -27,6 +25,7 @@ const AccountTreeIcon = React.lazy(() =>
 const ManageAccountsIcon = React.lazy(() =>
   import("@mui/icons-material/ManageAccounts")
 );
+const DomainIcon = React.lazy(() => import("@mui/icons-material/Domain"));
 import logoutFunction from "../../functions/logoutFunction";
 import { adminPaths, generalPaths, issuerPaths } from "../../routing/paths";
 
@@ -122,6 +121,11 @@ const SidebarData = {
         text: "Manage Roles",
         icon: ManageAccountsIcon,
         path: adminPaths.ROLES,
+      },
+      {
+        text: "Manage Departments",
+        icon: DomainIcon,
+        path: adminPaths.DEPARTMENTS,
       },
     ],
     user: [
