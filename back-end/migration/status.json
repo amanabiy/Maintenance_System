@@ -1,0 +1,174 @@
+{
+    "id": 1,
+    "createdAt": "2024-05-23T10:33:41.470Z",
+    "updatedAt": "2024-05-23T10:33:41.470Z",
+    "name": "SUBMITTED",
+    "description": null,
+    "isInitialStatus": true,
+    "hasSchedule": false,
+    "needsFile": false,
+    "needsSignatures": false,
+    "isInternal": false,
+    "allowChangePriority": false,
+    "allowChangeconfirmationStatus": false,
+    "allowChangeverificationStatus": false,
+    "allowsChangeRequestTypes": false,
+    "allowsForwardToDepartment": false,
+    "allowsForwardToPerson": false,
+    "allowsChangeLocation": false,
+    "allowsChangeTitleAndDescription": false,
+    "allowsChangeMedia": false,
+    "allowsAddMoreMedia": false,
+    "allowedRoles": []
+}
+
+{
+    "id": 2,
+    "createdAt": "2024-05-23T10:33:41.470Z",
+    "updatedAt": "2024-05-23T10:33:41.470Z",
+    "name": "Verified",
+    "description": null,
+    "isInitialStatus": true,
+    "hasSchedule": false,
+    "needsFile": true,
+    "needsSignatures": true,
+    "isInternal": false,
+    "allowChangePriority": true,
+    "allowChangeconfirmationStatus": false,
+    "allowChangeverificationStatus": true,
+    "allowsChangeRequestTypes": true,
+    "allowsForwardToDepartment": true,
+    "allowsForwardToPerson": true,
+    "allowsChangeLocation": false,
+    "allowsChangeTitleAndDescription": false,
+    "allowsChangeMedia": false,
+    "allowsAddMoreMedia": false,
+    "allowedRoles": []
+}
+
+{
+    "id": 3,
+    "createdAt": "2024-05-23T10:33:41.470Z",
+    "updatedAt": "2024-05-23T10:33:41.470Z",
+    "name": "MaintenancePersonal",
+    "description": "Maintenance personal they can assigne the request, forward to department or person, schedule it or change it done",
+    "isInitialStatus": false,
+    "hasSchedule": false,
+    "needsFile": true,
+    "needsSignatures": false,
+    "isInternal": false,
+    "allowChangePriority": false,
+    "allowChangeconfirmationStatus": false,
+    "allowChangeverificationStatus": false,
+    "allowsChangeRequestTypes": false,
+    "allowsForwardToDepartment": true,
+    "allowsForwardToPerson": true,
+    "allowsChangeLocation": false,
+    "allowsChangeTitleAndDescription": false,
+    "allowsChangeMedia": false,
+    "allowsAddMoreMedia": false,
+    "allowedRoles": []
+}
+
+
+{
+    "id": 3,
+    "createdAt": "2024-05-23T10:33:41.470Z",
+    "updatedAt": "2024-05-23T10:33:41.470Z",
+    "name": "Scheduled for Maintenance",
+    "description": null,
+    "isInitialStatus": false,
+    "hasSchedule": true,
+    "needsFile": true,
+    "needsSignatures": false,
+    "isInternal": false,
+    "allowChangePriority": false,
+    "allowChangeconfirmationStatus": false,
+    "allowChangeverificationStatus": false,
+    "allowsChangeRequestTypes": false,
+    "allowsForwardToDepartment": false,
+    "allowsForwardToPerson": false,
+    "allowsChangeLocation": false,
+    "allowsChangeTitleAndDescription": false,
+    "allowsChangeMedia": false,
+    "allowsAddMoreMedia": false,
+    "allowedRoles": []
+}
+
+{
+    "id": 1,
+    "createdAt": "2024-05-23T10:33:41.470Z",
+    "updatedAt": "2024-05-23T10:33:41.470Z",
+    "name": "Done",
+    "description": "When the request is fullfilled",
+    "isInitialStatus": false,
+    "hasSchedule": false,
+    "needsFile": true,
+    "needsSignatures": true,
+    "isInternal": false,
+    "allowChangePriority": false,
+    "allowChangeconfirmationStatus": false,
+    "allowChangeverificationStatus": false,
+    "allowsChangeRequestTypes": false,
+    "allowsForwardToDepartment": false,
+    "allowsForwardToPerson": false,
+    "allowsChangeLocation": false,
+    "allowsChangeTitleAndDescription": false,
+    "allowsChangeMedia": false,
+    "allowsAddMoreMedia": false,
+    "allowedRoles": []
+}
+
+{
+    "id": 1,
+    "createdAt": "2024-05-23T10:33:41.470Z",
+    "updatedAt": "2024-05-23T10:33:41.470Z",
+    "name": "Confirmed By the requester",
+    "description": "When the request is fullfilled",
+    "isInitialStatus": false,
+    "hasSchedule": false,
+    "needsFile": false,
+    "needsSignatures": false,
+    "isInternal": false,
+    "allowChangePriority": false,
+    "allowChangeconfirmationStatus": true,
+    "allowChangeverificationStatus": false,
+    "allowsChangeRequestTypes": false,
+    "allowsForwardToDepartment": false,
+    "allowsForwardToPerson": false,
+    "allowsChangeLocation": false,
+    "allowsChangeTitleAndDescription": false,
+    "allowsChangeMedia": false,
+    "allowsAddMoreMedia": false,
+}
+
+{
+    "id": 1,
+    "createdAt": "2024-05-23T10:33:41.470Z",
+    "updatedAt": "2024-05-23T10:33:41.470Z",
+    "name": "Returned To Requester",
+    "description": "When their is a need to ask for more information, and the user needs to fill the request again will lead back to Submitted. Assign it to the requester",
+    "isInitialStatus": false,
+    "hasSchedule": false,
+    "needsFile": false,
+    "needsSignatures": false,
+    "isInternal": false,
+    "allowChangePriority": false,
+    "allowChangeconfirmationStatus": true,
+    "allowChangeverificationStatus": false,
+    "allowsChangeRequestTypes": false,
+    "allowsForwardToDepartment": false,
+    "allowsForwardToPerson": false,
+    "allowsChangeLocation": false,
+    "allowsChangeTitleAndDescription": false,
+    "allowsChangeMedia": false,
+    "allowsAddMoreMedia": false,
+}
+
+
+
+
+
+  
+  
+  

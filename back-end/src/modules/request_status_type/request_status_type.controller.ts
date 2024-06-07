@@ -39,13 +39,13 @@ export class RequestStatusTypeController {
     return await this.requestStatusTypeService.findOne(+id);
   }
 
-  // @Patch(':id')
-  // @ApiOperation({ summary: 'Update a request status type by ID' })
-  // @ApiResponse({ status: HttpStatus.OK, description: 'Request status type has been successfully updated', type: RequestStatusType })
-  // @ApiNotFoundResponse({ description: 'Request status type with the specified ID not found' })
-  // async update(@Param('id') id: string, @Body() updateRequestStatusTypeDto: UpdateRequestStatusTypeDto): Promise<RequestStatusType> {
-  //   return await this.requestStatusTypeService.update(+id, updateRequestStatusTypeDto);
-  // }
+  @Patch(':id')
+  @ApiOperation({ summary: 'Update a request status type by ID' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Request status type has been successfully updated', type: RequestStatusType })
+  @ApiNotFoundResponse({ description: 'Request status type with the specified ID not found' })
+  async update(@Param('id') id: string, @Body() updateRequestStatusTypeDto: UpdateRequestStatusTypeDto): Promise<RequestStatusType> {
+    return await this.requestStatusTypeService.updateRequestStatusType(+id, updateRequestStatusTypeDto);
+  }
 
   @Delete(':id')
   @HttpCode(HttpStatus.OK)

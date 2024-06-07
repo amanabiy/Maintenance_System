@@ -28,82 +28,85 @@ docker exec -i "$CONTAINER_NAME" mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MY
 # Insert a default admin user into the database
 docker exec -i "$CONTAINER_NAME" mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "
 INSERT INTO users (email, fullName, password, role_id, isVerified) 
-VALUES ('admin@example.com', 'Admin User', 'admin1234!', 
+VALUES ('admin@example.com', 'Admin User', 'string!', 
+(SELECT id FROM roles WHERE roleName = 'ADMIN'), 1);
+
+INSERT INTO users (email, fullName, password, role_id, isVerified) 
+VALUES ('admin@aastu.adminstrator.com', 'Admin User', 'string!', 
 (SELECT id FROM roles WHERE roleName = 'ADMIN'), 1);
 "
 
-# docker exec -i "$CONTAINER_NAME" mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" -e "INSERT INTO request_status_type (name, isInitialStatus, hasSchedule, needsFile, needsSignatures, isInternal, allowsForwardToDepartment, allowsForwardToPerson, allowChangePriority, allowChangeconfirmationStatus, allowChangeverificationStatus, allowsChangeRequestTypes) VALUES \
-#   ('SUBMITTED', true, false, false, false, false, false, false, false, false, false, false), \
-#   ('VERIFIED', false, false, false, false, false, false, false, false, false, false, false), \
-#   ('REVIEWED', false, false, false, false, false, false, false, false, false, false, false), \
-#   ('MOVED_TO_DEPARTMENT', false, false, false, false, false, true, false, false, false, false, false), \
-#   ('ASSIGNED_TO_PERSON', false, false, false, false, false, false, true, false, false, false, false), \
-#   ('SCHEDULED_FOR_MAINTENANCE', false, true, false, false, false, false, false, false, false, false, false), \
-#   ('DONE', false, false, false, false, false, false, false, false, false, false, false);"
 # Insert initial RequestStatusType records
 docker exec -i "$CONTAINER_NAME" mysql -h "$MYSQL_HOST" -P "$MYSQL_PORT" -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" "$MYSQL_DATABASE" <<EOF
--- Inserting values into request_status_type table
-INSERT INTO request_status_type (
-  name, 
-  description,
-  isInitialStatus, 
-  hasSchedule, 
-  needsFile, 
-  needsSignatures, 
-  isInternal, 
-  allowsForwardToDepartment, 
-  allowsForwardToPerson, 
-  allowChangePriority, 
-  allowChangeconfirmationStatus, 
-  allowChangeverificationStatus, 
-  allowsChangeRequestTypes,
-  allowsChangeLocation,
-  allowsChangeTitleAndDescription,
-  allowsChangeMedia,
-  allowsAddMoreMedia
-) VALUES 
-('SUBMITTED', 'The request has been submitted and is awaiting verification.', true, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
-('VERIFIED', 'The request has been verified and is ready for review.', false, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
-('REVIEWED', 'The request has been reviewed and further action is needed.', false, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
-('MOVED_TO_DEPARTMENT', 'The request has been moved to the relevant department.', false, false, false, false, false, true, false, false, false, false, false, false, false, false, false),
-('ASSIGNED_TO_PERSON', 'The request has been assigned to a specific person for handling.', false, false, false, false, false, false, true, false, false, false, false, false, false, false, false),
-('SCHEDULED_FOR_MAINTENANCE', 'The request has been scheduled for maintenance.', false, true, false, false, false, false, false, false, false, false, false, false, false, false, false),
-('DONE', 'The maintenance request has been completed.', false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+-- Insert status types
+INSERT INTO request_status_type (name, createdAt, updatedAt, description, isInitialStatus, hasSchedule, needsFile, needsSignatures, isInternal, allowChangePriority, allowChangeconfirmationStatus, allowChangeverificationStatus, allowsChangeRequestTypes, allowsForwardToDepartment, allowsForwardToPerson, allowsChangeLocation, allowsChangeTitleAndDescription, allowsChangeMedia, allowsAddMoreMedia)
+VALUES 
+('SUBMITTED', NOW(), NOW(), NULL, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
+('Verified', NOW(), NOW(), NULL, true, false, true, true, false, true, false, true, true, true, true, false, false, false, false),
+('MaintenancePersonal', NOW(), NOW(), 'Maintenance personal they can assigne the request, forward to department or person, schedule it or change it done', false, false, true, false, false, false, false, false, false, true, true, false, false, false, false),
+('Scheduled for Maintenance', NOW(), NOW(), NULL, false, true, true, false, false, false, false, false, false, false, false, false, false, false, false),
+('Done', NOW(), NOW(), 'When the request is fullfilled', false, false, true, true, false, false, false, false, false, false, false, false, false, false, false),
+('Confirmed By the requester', NOW(), NOW(), 'When the request is fullfilled', false, false, false, false, false, false, true, false, false, false, false, false, false, false, false),
+('Returned To Requester', NOW(), NOW(), 'When their is a need to ask for more information, and the user needs to fill the request again will lead back to Submitted. Assign it to the requester', false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false),
+('Rejected', NOW(), NOW(), NULL, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false),
+('Feedback Given', NOW(), NOW(), 'Feedback given by the user after the request is returned to them.', false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+
 
 -- Example IDs, replace these with actual IDs from your database after initial insertions
 SET @submitted_id = (SELECT id FROM request_status_type WHERE name = 'SUBMITTED');
-SET @verified_id = (SELECT id FROM request_status_type WHERE name = 'VERIFIED');
-SET @reviewed_id = (SELECT id FROM request_status_type WHERE name = 'REVIEWED');
-SET @moved_to_department_id = (SELECT id FROM request_status_type WHERE name = 'MOVED_TO_DEPARTMENT');
-SET @assigned_to_person_id = (SELECT id FROM request_status_type WHERE name = 'ASSIGNED_TO_PERSON');
-SET @scheduled_for_maintenance_id = (SELECT id FROM request_status_type WHERE name = 'SCHEDULED_FOR_MAINTENANCE');
-SET @done_id = (SELECT id FROM request_status_type WHERE name = 'DONE');
+SET @verified_id = (SELECT id FROM request_status_type WHERE name = 'Verified');
+SET @maintenance_personal_id = (SELECT id FROM request_status_type WHERE name = 'MaintenancePersonal');
+SET @scheduled_for_maintenance_id = (SELECT id FROM request_status_type WHERE name = 'Scheduled for Maintenance');
+SET @done_id = (SELECT id FROM request_status_type WHERE name = 'Done');
+SET @confirmed_by_requester_id = (SELECT id FROM request_status_type WHERE name = 'Confirmed By the requester');
+SET @returned_to_requester_id = (SELECT id FROM request_status_type WHERE name = 'Returned To Requester');
+SET @rejected_id = (SELECT id FROM request_status_type WHERE name = 'Rejected');
+SET @feedback_given_id = (SELECT id FROM request_status_type WHERE name = 'Feedback Given');
 
--- SUBMITTED can transition to VERIFIED
-INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id) VALUES 
-(@submitted_id, @verified_id);
+-- Establish relations
+INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id)
+VALUES 
+(@submitted_id, @verified_id),
+(@submitted_id, @returned_to_requester_id),
+(@verified_id, @scheduled_for_maintenance_id),
+(@verified_id, @done_id),
+(@verified_id, @confirmed_by_requester_id),
+(@maintenance_personal_id, @submitted_id),
+(@maintenance_personal_id, @scheduled_for_maintenance_id),
+(@maintenance_personal_id, @done_id),
+(@scheduled_for_maintenance_id, @done_id),
+(@done_id, @confirmed_by_requester_id),
+(@confirmed_by_requester_id, @returned_to_requester_id),
+(@returned_to_requester_id, @submitted_id),
+(@returned_to_requester_id, @feedback_given_id); -- Assuming Feedback Given status can transition from Returned To Requester status
 
--- VERIFIED can transition to REVIEWED or MOVED_TO_DEPARTMENT
-INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id) VALUES 
-(@verified_id, @reviewed_id), 
-(@verified_id, @moved_to_department_id);
+INSERT INTO permissions (name, description, createdAt, updatedAt)
+VALUES 
+('CAN_CREATE_USER', 'Permission to create new users', NOW(), NOW()),
+('CAN_VIEW_USERS', 'Permission to view list of users', NOW(), NOW()),
+('CAN_VIEW_USER', 'Permission to view a specific user', NOW(), NOW()),
+('CAN_UPDATE_USER', 'Permission to update user details', NOW(), NOW()),
+('CAN_DELETE_USER', 'Permission to delete a user', NOW(), NOW());
 
--- REVIEWED can transition to ASSIGNED_TO_PERSON or SCHEDULED_FOR_MAINTENANCE
-INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id) VALUES 
-(@reviewed_id, @assigned_to_person_id), 
-(@reviewed_id, @scheduled_for_maintenance_id);
+INSERT INTO permissions (name, description) VALUES
+('CAN_CREATE_MAINTENANCE_REQUEST', 'Permission to create a new maintenance request'),
+('CAN_VIEW_ALL_MAINTENANCE_REQUESTS', 'Permission to view all maintenance requests'),
+('CAN_VIEW_ASSIGNED_TO_ME_MAINTENANCE_REQUESTS', 'Permission to view maintenance requests assigned to the current user'),
+('CAN_VIEW_MY_MAINTENANCE_REQUESTS', 'Permission to view maintenance requests created by the current user'),
+('CAN_VIEW_MY_DEPARTMENT_MAINTENANCE_REQUESTS', 'Permission to view maintenance requests assigned to the current user\'s department'),
+('CAN_VIEW_MAINTENANCE_REQUEST_BY_ID', 'Permission to view a maintenance request by its ID'),
+('CAN_UPDATE_MAINTENANCE_REQUEST', 'Permission to update a maintenance request by its ID'),
+('CAN_DELETE_MAINTENANCE_REQUEST', 'Permission to delete a maintenance request by its ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS', 'Permission to search maintenance requests'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_ASSIGNED_PERSON_IDS', 'Permission to search maintenance requests by assigned person IDs'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUEST_TYPE_IDS', 'Permission to search maintenance requests by request type IDs'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_HANDLING_DEPARTMENT_ID', 'Permission to search maintenance requests by handling department ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUESTER_ID', 'Permission to search maintenance requests by requester ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_CONFIRMATION_STATUS', 'Permission to search maintenance requests by confirmation status'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFICATION_STATUS', 'Permission to search maintenance requests by verification status'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFIED_BY_ID', 'Permission to search maintenance requests by verified by ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_PRIORITY', 'Permission to search maintenance requests by priority');
 
--- MOVED_TO_DEPARTMENT can transition to ASSIGNED_TO_PERSON
-INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id) VALUES 
-(@moved_to_department_id, @assigned_to_person_id);
-
--- ASSIGNED_TO_PERSON can transition to SCHEDULED_FOR_MAINTENANCE
-INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id) VALUES 
-(@assigned_to_person_id, @scheduled_for_maintenance_id);
-
--- SCHEDULED_FOR_MAINTENANCE can transition to DONE
-INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id) VALUES 
-(@scheduled_for_maintenance_id, @done_id);
 EOF
 
 echo "Database populated with default roles and departments."

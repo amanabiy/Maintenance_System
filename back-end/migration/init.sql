@@ -54,3 +54,40 @@ INSERT INTO request_status_type_next_options (request_status_type_id, next_statu
 -- SCHEDULED_FOR_MAINTENANCE can transition to DONE
 INSERT INTO request_status_type_next_options (request_status_type_id, next_status_type_id) VALUES 
 (@scheduled_for_maintenance_id, @done_id);
+
+
+
+
+
+INSERT INTO permissions (name, description) VALUES 
+('CAN_CREATE_USER', 'Allows roles with this permission to create users'),
+('CAN_VIEW_USERS', 'Allows roles with this permission to view a list of users'),
+('CAN_VIEW_USER', 'Allows roles with this permission to view a single user'),
+('CAN_UPDATE_USER', 'Allows roles with this permission to update user details'),
+('CAN_DELETE_USER', 'Allows roles with this permission to delete a user');
+
+INSERT INTO permissions (name, description) VALUES 
+('CAN_CREATE_ROLE', 'Allows roles with this permission to create roles'),
+('CAN_VIEW_ROLES', 'Allows roles with this permission to view a list of roles'),
+('CAN_VIEW_ROLE', 'Allows roles with this permission to view a single role'),
+('CAN_UPDATE_ROLE', 'Allows roles with this permission to update role details'),
+('CAN_DELETE_ROLE', 'Allows roles with this permission to delete a role');
+
+INSERT INTO permissions (name, description) VALUES
+('CAN_CREATE_MAINTENANCE_REQUEST', 'Permission to create a new maintenance request'),
+('CAN_VIEW_ALL_MAINTENANCE_REQUESTS', 'Permission to view all maintenance requests'),
+('CAN_VIEW_ASSIGNED_TO_ME_MAINTENANCE_REQUESTS', 'Permission to view maintenance requests assigned to the current user'),
+('CAN_VIEW_MY_MAINTENANCE_REQUESTS', 'Permission to view maintenance requests created by the current user'),
+('CAN_VIEW_MY_DEPARTMENT_MAINTENANCE_REQUESTS', 'Permission to view maintenance requests assigned to the current user department'),
+('CAN_VIEW_MAINTENANCE_REQUEST_BY_ID', 'Permission to view a maintenance request by its ID'),
+('CAN_UPDATE_MAINTENANCE_REQUEST', 'Permission to update a maintenance request by its ID'),
+('CAN_DELETE_MAINTENANCE_REQUEST', 'Permission to delete a maintenance request by its ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS', 'Permission to search maintenance requests'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_ASSIGNED_PERSON_IDS', 'Permission to search maintenance requests by assigned person IDs'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUEST_TYPE_IDS', 'Permission to search maintenance requests by request type IDs'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_HANDLING_DEPARTMENT_ID', 'Permission to search maintenance requests by handling department ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUESTER_ID', 'Permission to search maintenance requests by requester ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_CONFIRMATION_STATUS', 'Permission to search maintenance requests by confirmation status'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFICATION_STATUS', 'Permission to search maintenance requests by verification status'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFIED_BY_ID', 'Permission to search maintenance requests by verified by ID'),
+('CAN_SEARCH_MAINTENANCE_REQUESTS_BY_PRIORITY', 'Permission to search maintenance requests by priority');
