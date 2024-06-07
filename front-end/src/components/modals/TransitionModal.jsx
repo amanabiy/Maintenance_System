@@ -1,4 +1,4 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import { Modal, Box, Typography, Button } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as yup from "yup";
@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import TransitionModalFields from "../form/TransitionModalFields";
 import { useUploadMediaMutation } from "../../redux/features/media";
 import { useUpdateStatusByIdMutation } from "../../redux/features/requestStatus";
+import { useGetMaintenanceRequestByIdQuery } from "../../redux/features/maintenanceRequest";
+import { useParams } from "react-router-dom";
 
 const TransitionModal = ({
   open,
@@ -15,8 +17,26 @@ const TransitionModal = ({
   currentRequestStatusType,
   currentRequest,
 }) => {
+  // const { requestId } = useParams();
+  // const {
+  //   data: currentRequest,
+  //   error,
+  //   status,
+  // } = useGetMaintenanceRequestByIdQuery(requestId);
+  console.log(currentRequest, "currentRequest in TransitionModal");
+  // const [filesState, setFilesState] = useState([]);
+  // const [base64FilesState, setBase64FilesStates] = useState([]);
   const [uploadMedia] = useUploadMediaMutation();
   const [updateStatus] = useUpdateStatusByIdMutation();
+
+  // useEffect(() => {
+  //   if (open) {
+  //     setFilesState([]);
+  //     setBase64FilesStates([]);
+  //   }
+  // }),
+  //   [];
+
   // const transitionState = {
   //   allowChangePriority: true,
   //   allowChangeconfirmationStatus: true,
@@ -42,7 +62,7 @@ const TransitionModal = ({
   // };
   const initialValues = {
     priority:
-      currentRequest.priority && currentRequest.priority > 0
+      currentRequest && currentRequest.priority && currentRequest.priority > 0
         ? currentRequest.priority
         : 5,
     confirmationStatus: currentRequest.confirmationStatus || "",
@@ -68,6 +88,7 @@ const TransitionModal = ({
     internalNote: currentRequestStatus.internalNote || "",
     externalNote: currentRequestStatus.externalNote || "",
     requiredFiles: [],
+    requiredFilesIds: [],
     signature: currentRequestStatus.signatureByName || "",
     // condtional values
     allowChangePriority: transitionState.allowChangePriority || false,
@@ -170,22 +191,59 @@ const TransitionModal = ({
     //   otherwise: () => yup.string().notRequired(),
     // }),
   });
+
+  const handleFileChange = async (filesList) => {
+    // const files = Array.from(filesList);
+    // const readerPromises = files.map((file) => {
+    //   return new Promise((resolve, reject) => {
+    //     const reader = new FileReader();
+    //     reader.readAsDataURL(file);
+    //     reader.onload = () => resolve(reader.result);
+    //     reader.onerror = reject;
+    //   });
+    // });
+    // Promise.all(readerPromises)
+    //   .then((newBase64Files) => {
+    //     setFilesState([...filesState, ...files]);
+    //     setBase64FilesStates([...base64FilesState, ...newBase64Files]);
+    //   })
+    //   .catch((error) => console.error("Error reading files:", error));
+  };
+
+  const handleRemoveFile = (index) => {
+    const updatedFiles = filesState.filter((_, i) => i !== index);
+    const updatedBase64Files = base64FilesState.filter((_, i) => i !== index);
+    setFileS(updatedFiles);
+    setBase64Images(updatedBase64Files);
+  };
+
+  const handleUploadFile = async (formData, values) => {
+    // console.log("the data", formData);
+    try {
+      const res = await uploadMedia(formData);
+      // console.log(res);
+      values.requiredFilesIds.push(res.data.id);
+    } catch (err) {
+      console.log("error", err);
+    }
+  };
+
   const handleSubmit = async (values) => {
     console.log(values, "values in handleSubmit");
 
+    // await handleFileChange(values.requiredFiles);
+
+    // console.log(filesState, "filesState in handleSubmit");
+    // console.log(base64FilesState, "base64FilesState in handleSubmit");
+
     try {
-      const nextRequestTypeId = transitionState.id;
-      const requestId = currentRequest.id;
-      const requiredFilesArray = [...(values?.requiredFiles || [])];
-      const uploadRequiredFilesPromises = requiredFilesArray.map(
-        async (file) => {
-          const media = await uploadMedia(file);
-          return media.id;
-        }
-      );
-      const uploadedRequiredFilesIds = await Promise.all(
-        uploadRequiredFilesPromises
-      );
+      Array.from(values.requiredFiles).map((file) => {
+        console.log(file, "file in handleSubmit");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        handleUploadFile(formData, values);
+      });
 
       const formData = {
         updateMaintenance: {
@@ -236,34 +294,32 @@ const TransitionModal = ({
             scheduleMaintenanceEndDateTime:
               values?.scheduleMaintenanceEndDateTime.toDate() || "",
           }),
-          ...(transitionState.needsFile && {
-            requiredFiles: uploadedRequiredFilesIds,
-          }),
+          // ...(transitionState.needsFile && {
+          //   requiredFiles: values.requiredFilesIds,
+          // }),
           ...(transitionState.isInternal && {
             internalNote: values.internalNote,
           }),
           externalNote: values.externalNote,
           ...(transitionState.needsFile && {
-            mediaFiles: values.requiredFiles,
+            mediaFiles: values.requiredFilesIds,
           }),
           ...(transitionState.needsSignatures && {
             signatureByName: values.signature,
           }),
         },
       };
-      // const len = await console.log(
-      //   currentRequestId,
-      //   transitionStateId,
-      //   formData
-      // );
+
+      console.log(formData, "formData in handleSubmit");
+      console.log(values, "values in handleSubmit after submit");
       const response = await updateStatus({
-        requestId: requestId,
-        nextRequestTypeId: nextRequestTypeId,
+        requestId: currentRequest.id,
+        nextRequestTypeId: transitionState.id,
         body: formData,
       });
-      // console.log(len);
+      // // console.log(len);
       console.log(response, "response in handleSubmit");
-      console.log(formData, "formData in handleSubmit");
+      //   console.log(formData, "formData in handleSubmit");
     } catch (error) {
       console.log(error);
     }
@@ -272,13 +328,15 @@ const TransitionModal = ({
     // console.log("formData", formData);
   };
 
-  console.log(currentRequestStatus, "currentRequestStatus in TransitionModal");
-  console.log(dayjs(new Date()).toDate());
+  // console.log(currentRequestStatus, "currentRequestStatus in TransitionModal");
+  // console.log(dayjs(new Date()).toDate());
+  console.log(transitionState, "transitionState in TransitionModal");
 
   return (
     <Modal open={open} onClose={onClose}>
       <Box
         sx={{
+          // position: "absolute",
           maxWidth: "90%",
           maxHeight: "90%",
           overflowY: "auto",
@@ -312,6 +370,7 @@ const TransitionModal = ({
                 type="submit"
                 variant="contained"
                 style={{ marginTop: "16px" }}
+                // onClick={() => handleSubmit(values)}
               >
                 Transition
               </Button>

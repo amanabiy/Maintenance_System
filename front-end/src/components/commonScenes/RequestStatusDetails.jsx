@@ -11,6 +11,7 @@ import {
   Typography,
   Alert,
   Button,
+  Hidden,
 } from "@mui/material";
 
 // styles and themes
@@ -77,13 +78,14 @@ const RequestStatusDetails = () => {
     );
   }
 
-  if (!requestStatuses || requestStatus === "pending" || status === "pending") {
+  if (!requestStatuses || status === "PENDING") {
     return <Loading />;
   }
 
   console.log("Requests", request);
   console.log("current Request Status TYpe", currentRequestStatusType);
-  // console.log("Request Statuses", requestStatuses, currentRequestStatusId);
+  console.log("Request Statuses", requestStatuses);
+  console.log("Current Request Status", currentRequestStatus);
   // console.log("Current Request Status", currentRequestStatusType);
   // console.log("current Reaest status and error", requestStatus, requestError);
   // console.log("current transition state", currentTransitionState);
@@ -105,12 +107,14 @@ const RequestStatusDetails = () => {
           className="stepper"
         >
           {requestStatuses
-            .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+            .slice()
+            .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt))
             .map((status, index) => (
               <Step
                 key={index}
                 className="step"
                 onClick={() => handleStepClick(index)}
+                style={{ position: "relative" }}
               >
                 <StepLabel
                   className="step-label"
@@ -133,141 +137,166 @@ const RequestStatusDetails = () => {
                     },
                   }}
                 >
-                  {requestStatuses.length - index}
+                  <div style={{ position: "absolute", top: 4, left: 4 }}>
+                    {index + 1}
+                  </div>
+                  <Hidden only={["xs", "sm"]}>
+                    <Typography variant="overline">
+                      {requestStatuses[index].statusType.name}
+                    </Typography>
+                  </Hidden>
                 </StepLabel>
               </Step>
             ))}
         </Stepper>
       </GridItem>
-      <GridItem xs={10} className="details-section">
-        {currentRequestStatusType && (
-          <Box
-            style={{ display: "flex", flexDirection: "column", gap: "10px" }}
-          >
-            <Typography variant="h5">
-              {currentRequestStatusType.name}
-            </Typography>
-            <Typography variant="caption">
-              {new Date(currentRequestStatusType.updatedAt).toDateString()}
-            </Typography>
-            <Box>
-              <Typography
-                variant="body1"
+      <GridItem
+        xs={10}
+        className="details-section"
+        style={{ position: "relative" }}
+      >
+        {requestStatus === "PENDING" || !currentRequestStatus ? (
+          <Loading />
+        ) : (
+          currentRequestStatusType && (
+            <div>
+              <Box
                 style={{
-                  width: "50%",
-                  position: "relative",
-                  backgroundColor: colors.secondary[600],
-                  border: "dashed lightgrey 0.5px",
-                  padding: "8px",
-                  margin: "4px 0",
-                  borderRadius: "8px",
-                  fontFamily: "Arial, sans-serif",
-                  lineHeight: "1.5",
+                  display: "flex",
+                  flexDirection: "row",
+                  gap: "10px",
+                  // height: "100%",
                 }}
               >
-                <EditNoteOutlinedIcon
-                  style={{ position: "absolute", top: "0", right: "0" }}
-                />
-                {currentRequestStatusType.externalNote}
-              </Typography>
-              <Typography
-                variant="body1"
-                style={{
-                  width: "50%",
-                  position: "relative",
-                  backgroundColor: colors.secondary[600],
-                  border: "dashed lightgrey 0.5px",
-                  padding: "8px",
-                  margin: "4px 0",
-                  borderRadius: "8px",
-                  fontFamily: "Arial, sans-serif",
-                  lineHeight: "1.5",
-                }}
-              >
-                <EditNoteOutlinedIcon
+                <Box>
+                  <Typography variant="h5">
+                    {currentRequestStatusType.name}
+                  </Typography>
+                  <Typography variant="caption">
+                    {new Date(
+                      currentRequestStatusType.createdAt
+                    ).toDateString()}
+                  </Typography>
+                </Box>
+
+                <Box>
+                  <Typography variant="h6">Scheduling</Typography>
+                  <Typography variant="body1">
+                    <strong>Start Date:</strong>{" "}
+                    {currentRequestStatus.scheduleMaintenanceStartDateTime
+                      ? new Date(
+                          currentRequestStatus.scheduleMaintenanceStartDateTime
+                        ).toDateString()
+                      : "Not Scheduled"}
+                  </Typography>
+                  <Typography variant="body1">
+                    <strong>End Date:</strong>{" "}
+                    {currentRequestStatus.scheduleMaintenanceEndDateTime
+                      ? new Date(
+                          currentRequestStatus.scheduleMaintenanceEndDateTime
+                        ).toDateString()
+                      : "Not Scheduled"}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="h6">Signed By</Typography>
+                  <Typography variant="body1">
+                    {currentRequestStatus.signatureByName || "Not Signed"}
+                  </Typography>
+                </Box>
+
+                <Box>
+                  <Typography variant="h6">Transition To:</Typography>
+                  {currentRequestStatusType.allowedTransitions.length > 0 ? (
+                    currentRequestStatusType.allowedTransitions.map(
+                      (transitionState) => {
+                        return (
+                          <Button
+                            key={transitionState.id}
+                            variant="contained"
+                            onClick={() => {
+                              console.log(
+                                "Transitioning State to",
+                                transitionState.id
+                              );
+                              setCurrentTransitionState(transitionState);
+                              setTransitionModalOpen(true);
+                            }}
+                            size="small"
+                          >
+                            {transitionState.name}
+                          </Button>
+                        );
+                      }
+                    )
+                  ) : (
+                    <div>This is a Final State.</div>
+                  )}
+                </Box>
+              </Box>
+              <Box>
+                <Typography
+                  variant="body1"
                   style={{
-                    position: "absolute",
-                    top: "0",
-                    right: "0",
+                    width: "50%",
+                    position: "relative",
+                    backgroundColor: colors.secondary[600],
+                    border: "dashed lightgrey 0.5px",
+                    padding: "8px",
+                    margin: "4px 0",
+                    borderRadius: "8px",
+                    fontFamily: "Arial, sans-serif",
+                    lineHeight: "1.5",
                   }}
-                />
-                {currentRequestStatusType.internalNote}
-              </Typography>
-            </Box>
-
-            <Box>
-              <Button
-                variant="contained"
-                startIcon={<GetAppIcon />}
-                onClick={() => {}}
-                size="small"
+                >
+                  <EditNoteOutlinedIcon
+                    style={{ position: "absolute", top: "0", right: "0" }}
+                  />
+                  {currentRequestStatus.externalNote}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  style={{
+                    width: "50%",
+                    position: "relative",
+                    backgroundColor: colors.secondary[600],
+                    border: "dashed lightgrey 0.5px",
+                    padding: "8px",
+                    margin: "4px 0",
+                    borderRadius: "8px",
+                    fontFamily: "Arial, sans-serif",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  <EditNoteOutlinedIcon
+                    style={{
+                      position: "absolute",
+                      top: "0",
+                      right: "0",
+                    }}
+                  />
+                  {currentRequestStatus.internalNote}
+                </Typography>
+                <Box>
+                  <Button
+                    variant="contained"
+                    startIcon={<GetAppIcon />}
+                    onClick={() => {}}
+                    size="small"
+                  >
+                    Download Files
+                  </Button>
+                </Box>
+              </Box>
+              <Typography
+                variant="caption"
+                style={{ position: "absolute", bottom: 8, right: 8 }}
               >
-                Download Files
-              </Button>
-            </Box>
-
-            <Box>
-              <Typography variant="h6">Scheduling</Typography>
-              <Typography variant="body1">
-                <strong>Start Date:</strong>{" "}
-                {currentRequestStatusType.scheduleMaintenanceStartDateTime
-                  ? new Date(
-                      requestStatuses[
-                        activeStep
-                      ].scheduleMaintenanceStartDateTime
-                    ).toDateString()
-                  : "Not Scheduled"}
+                Most Recent Update:{" "}
+                {new Date(currentRequestStatusType.updatedAt).toDateString()}
               </Typography>
-              <Typography variant="body1">
-                <strong>End Date:</strong>{" "}
-                {currentRequestStatusType.scheduleMaintenanceEndDateTime
-                  ? new Date(
-                      currentRequestStatusType.scheduleMaintenanceEndDateTime
-                    ).toDateString()
-                  : "Not Scheduled"}
-              </Typography>
-            </Box>
-            <Box>
-              <Typography variant="h6">Signed By</Typography>
-              <Typography variant="body1">
-                {currentRequestStatusType.signatureByName || "Not Signed"}
-              </Typography>
-            </Box>
-
-            <Box>
-              <Typography variant="h6">Transition To:</Typography>
-              {currentRequestStatusType.allowedTransitions.length > 0 ? (
-                currentRequestStatusType.allowedTransitions.map(
-                  (transitionState) => {
-                    return (
-                      <Button
-                        key={transitionState.id}
-                        variant="contained"
-                        onClick={() => {
-                          console.log(
-                            "Transitioning State to",
-                            transitionState.id
-                          );
-                          setCurrentTransitionState(transitionState);
-                          setTransitionModalOpen(true);
-                        }}
-                        size="small"
-                      >
-                        {transitionState.name}
-                      </Button>
-                    );
-                  }
-                )
-              ) : (
-                <div>This is a Final State.</div>
-              )}
-            </Box>
-
-            <Typography variant="caption">
-              Most Recent Update:{" "}
-              {new Date(currentRequestStatusType.updatedAt).toDateString()}
-            </Typography>
-          </Box>
+            </div>
+          )
         )}
       </GridItem>
       <TransitionModal
