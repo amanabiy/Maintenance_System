@@ -1,10 +1,14 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http; // Import for making API requests
 import 'dart:convert';
 
 import 'package:mobile/models/RequestsModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
+import 'package:mobile/screens/authentication/login_page.dart';
 import 'package:mobile/screens/request_page.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart'; // Import for JSON decoding
 
@@ -21,7 +25,24 @@ class RequestsPage extends StatefulWidget {
 
 class _RequestsPageState extends State<RequestsPage> {
   RequestsModel? requests; // Store the entire response data
+  FlutterSecureStorage _storage = FlutterSecureStorage();
 
+
+  void logout() async {
+    // clear all login information from the secure storage
+    // and go to login screen
+    await _storage.delete(
+      key: 'accessToken',
+    );
+    await _storage.delete(
+      key: 'refreshToken',
+    );
+    Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginPage()),
+        (route) => false);
+  }
+  
   Future<void> fetchRequests() async {
     try {
       final response = await Api().get(Endpoints.myRequests);
@@ -35,7 +56,12 @@ class _RequestsPageState extends State<RequestsPage> {
         }
         print("set fine");
         setState(() {}); // Update UI after fetching data
-      }
+      } else if (response.statusCode == 401) {
+        // Handle unauthorized requests here
+        print("Unauthorized request");
+        showFailureSnackBar(context, 'Unauthorized request');
+        logout();
+      } 
     } catch (e) {
       // Handle API request errors here
       print('Error fetching requests: ${e}');
