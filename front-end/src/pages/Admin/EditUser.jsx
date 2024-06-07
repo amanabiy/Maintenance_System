@@ -16,14 +16,13 @@ import {
   useGetUserByIdQuery,
   useUpdateUserByIdMutation,
 } from "../../redux/features/user";
-import { useGetAllRolesMutation } from "../../redux/features/role";
+import { useGetAllRolesQuery } from "../../redux/features/role";
 import { useGetAllDepartmentsQuery } from "../../redux/features/department";
 
 const EditUser = () => {
   const { userId } = useParams();
   const [updateUser] = useUpdateUserByIdMutation();
-  const [getRoles] = useGetAllRolesMutation();
-  const [roles, setRoles] = useState([]);
+
   const {
     data: departments,
     isLoading: departmentLoading,
@@ -38,18 +37,23 @@ const EditUser = () => {
     departmentId: 0,
   });
 
-  useEffect(() => {
-    const handleGetAllRoles = async () => {
-      try {
-        const res = await getRoles().unwrap();
-        setRoles(res.items);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-    handleGetAllRoles();
-  }, [getRoles]);
+  // useEffect(() => {
+  //   const handleGetAllRoles = async () => {
+  //     try {
+  //       const res = await getRoles().unwrap();
+  //       setRoles(res.items);
+  //     } catch (error) {
+  //       console.error("Error fetching roles:", error);
+  //     }
+  //   };
+  //   handleGetAllRoles();
+  // }, [getRoles]);
 
+  const {
+    data: roles,
+    error: roleErr,
+    isLoading: roleLoading,
+  } = useGetAllRolesQuery();
   const { data, error, isLoading } = useGetUserByIdQuery(userId);
 
   useEffect(() => {

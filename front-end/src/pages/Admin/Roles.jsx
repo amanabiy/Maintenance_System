@@ -23,7 +23,7 @@ import DataTable from "../../components/tables/DataTable";
 import Loading from "../../components/loading/Loading";
 import { tokens } from "../../theme";
 import {
-  useGetAllRolesMutation,
+  useGetAllRolesQuery,
   useCreateRoleMutation,
   useDeleteRoleMutation,
   useUpdateRoleMutation,
@@ -43,9 +43,8 @@ const Roles = () => {
   const [openCreate, setOpenCreate] = useState(false);
   const [roleId, setRoleId] = useState("");
   const [deleteRole] = useDeleteRoleMutation();
-  const [requests, setRequests] = useState(null);
+  // const [requests, setRequests] = useState(null);
   const [changedNewPermissions, setChangedNewPermissions] = useState([]);
-  const [getAllRole, { error, status }] = useGetAllRolesMutation();
   const [createRole] = useCreateRoleMutation();
   const [addPermission] = useAddPermissionToRoleMutation();
   const [removePermission] = useRemovePermissionFromRoleMutation();
@@ -53,19 +52,24 @@ const Roles = () => {
   const [roleName, setRoleName] = useState("");
   const [updateRole] = useUpdateRoleMutation();
 
-  const handleGetAllRole = async () => {
-    try {
-      const res = await getAllRole().unwrap();
-      setRequests(res);
-    } catch (error) {
-      console.error("There was an error:", error);
-    }
-  };
+  // const handleGetAllRole = async () => {
+  //   try {
+  //     const res = await getAllRole().unwrap();
+  //     setRequests(res);
+  //   } catch (error) {
+  //     console.error("There was an error:", error);
+  //   }
+  // };
 
-  useEffect(() => {
-    handleGetAllRole();
-  }, []);
-
+  // useEffect(() => {
+  //   handleGetAllRole();
+  // }, []);
+  const {
+    data: requests,
+    error: reqErr,
+    status: reqStat,
+  } = useGetAllRolesQuery();
+  console.log(requests);
   const { data: permissions } = useGetAllPermissionsQuery();
   const [selectedPermissions, setSelectedPermissions] = useState({});
   const [existingRolePermissions, setExistingRolePermissions] = useState([]);
@@ -222,8 +226,8 @@ const Roles = () => {
   return (
     <GridParent>
       <GridItem xs={12} style={{ position: "relative" }}>
-        {status === "pending" && <Loading />}
-        {status === "failed" && (
+        {reqStat === "pending" && <Loading />}
+        {reqStat === "failed" && (
           <Alert severity="error">
             Can't seem to load the data at the moment.
           </Alert>
@@ -258,7 +262,7 @@ const Roles = () => {
             roleId={roleId}
           />
         </Box>
-        {status === "fulfilled" && requests && requests.items && (
+        {reqStat === "fulfilled" && requests && requests.items && (
           <DataTable
             rows={requests.items}
             columns={columns}

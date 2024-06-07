@@ -10,18 +10,18 @@ const roleApi = baseApi.injectEndpoints({
       }),
       providesTags: ["Role"],
     }),
-    getAllRoles: builder.mutation({
-      query: () => ({
-        url: "role",
-        method: "GET",
-      }),
-    }),
-    // getAllRoles: builder.query({
+    // getAllRoles: builder.mutation({
     //   query: () => ({
     //     url: "role",
     //     method: "GET",
     //   }),
     // }),
+    getAllRoles: builder.query({
+      query: () => ({
+        url: "role",
+        method: "GET",
+      }),
+    }),
     getRoleById: builder.mutation({
       query: (id) => ({
         url: `role/${id}`,

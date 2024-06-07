@@ -13,15 +13,18 @@ import {
   MenuItem,
 } from "@mui/material";
 import { useCreateUserMutation } from "../../redux/features/auth";
-import { useGetAllRolesMutation } from "../../redux/features/role";
+import { useGetAllRolesQuery } from "../../redux/features/role";
 import { useGetAllDepartmentsQuery } from "../../redux/features/department";
 
 const CreateUser = () => {
   const [createUser] = useCreateUserMutation();
-  const [roles, setRoles] = useState([]);
-  const [getRoles] = useGetAllRolesMutation();
 
   const { data, error, isLoading } = useGetAllDepartmentsQuery();
+  const {
+    data: roles,
+    error: roleErr,
+    isLoading: roleLoading,
+  } = useGetAllRolesQuery();
 
   const [userData, setUserData] = useState({
     fullName: "",
@@ -32,17 +35,17 @@ const CreateUser = () => {
     departmentId: 0,
   });
 
-  useEffect(() => {
-    const handleGetAllRoles = async () => {
-      try {
-        const res = await getRoles().unwrap();
-        setRoles(res.items);
-      } catch (error) {
-        console.error("Error fetching roles:", error);
-      }
-    };
-    handleGetAllRoles();
-  }, [getRoles]);
+  // useEffect(() => {
+  //   const handleGetAllRoles = async () => {
+  //     try {
+  //       const res = await getRoles().unwrap();
+  //       setRoles(res.items);
+  //     } catch (error) {
+  //       console.error("Error fetching roles:", error);
+  //     }
+  //   };
+  //   handleGetAllRoles();
+  // }, [getRoles]);
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
