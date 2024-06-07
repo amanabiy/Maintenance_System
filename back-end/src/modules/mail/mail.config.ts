@@ -6,7 +6,7 @@ export const mailConfig: MailerOptions = {
   transport: {
     host: process.env.MAIL_HOST  || 'live.smtp.mailtrap.io',
     port:  process.env.MAIL_PORT || 587,
-    secure: true, // TLS is optional and can be used if secure: true
+    secure: false, // TLS is optional and can be used if secure: true
     auth: {
       user: process.env.MAIL_USERNAME || 'api',
       pass: process.env.MAIL_PASSWORD || 'xs', // replace with the actual password
