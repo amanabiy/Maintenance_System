@@ -22,10 +22,13 @@ const departmentApi = baseApi.injectEndpoints({
       }),
     }),
     updateDepartmentById: builder.mutation({
-      query: ({ id, body }) => ({
+      query: ({ id, name }) => ({
         url: `department/${id}`,
         method: "PATCH",
-        body,
+        body: JSON.stringify({ name }),
+        headers: {
+          "Content-Type": "application/json",
+        },
       }),
     }),
     deleteDepartmentById: builder.mutation({

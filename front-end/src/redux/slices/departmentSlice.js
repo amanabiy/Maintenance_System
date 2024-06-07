@@ -67,13 +67,13 @@ const departmentSlice = createSlice({
           state.status = "loading";
         }
       )
-      .addMatcher(
-        departmentApi.endpoints.createDepartment.matchFulfilled,
-        (state, action) => {
-          state.status = "succeeded";
-          state.departments.push(action.payload);
-        }
-      )
+      // .addMatcher(
+      //   departmentApi.endpoints.createDepartment.matchFulfilled,
+      //   (state, action) => {
+      //     state.status = "succeeded";
+      //     state.departments.push(action.payload);
+      //   }
+      // )
       .addMatcher(
         departmentApi.endpoints.createDepartment.matchRejected,
         (state, action) => {
@@ -87,19 +87,19 @@ const departmentSlice = createSlice({
           state.status = "loading";
         }
       )
-      .addMatcher(
-        departmentApi.endpoints.updateDepartmentById.matchFulfilled,
-        (state, action) => {
-          state.status = "succeeded";
-          const { id, ...updatedDepartment } = action.payload;
-          const existingDepartment = state.departments.find(
-            (dep) => dep.id === id
-          );
-          if (existingDepartment) {
-            Object.assign(existingDepartment, updatedDepartment);
-          }
-        }
-      )
+      // .addMatcher(
+      //   departmentApi.endpoints.updateDepartmentById.matchFulfilled,
+      //   (state, action) => {
+      //     state.status = "succeeded";
+      //     const { id, ...updatedDepartment } = action.payload;
+      //     const existingDepartment = state.departments.find(
+      //       (dep) => dep.id === id
+      //     );
+      //     if (existingDepartment) {
+      //       Object.assign(existingDepartment, updatedDepartment);
+      //     }
+      //   }
+      // )
       .addMatcher(
         departmentApi.endpoints.updateDepartmentById.matchRejected,
         (state, action) => {
@@ -113,15 +113,15 @@ const departmentSlice = createSlice({
           state.status = "loading";
         }
       )
-      .addMatcher(
-        departmentApi.endpoints.deleteDepartmentById.matchFulfilled,
-        (state, action) => {
-          state.status = "succeeded";
-          state.departments = state.departments.filter(
-            (dep) => dep.id !== action.payload
-          );
-        }
-      )
+      // .addMatcher(
+      //   departmentApi.endpoints.deleteDepartmentById.matchFulfilled,
+      //   (state, action) => {
+      //     state.status = "succeeded";
+      //     state.departments = state.departments.filter(
+      //       (dep) => dep.id !== action.payload
+      //     );
+      //   }
+      // )
       .addMatcher(
         departmentApi.endpoints.deleteDepartmentById.matchRejected,
         (state, action) => {

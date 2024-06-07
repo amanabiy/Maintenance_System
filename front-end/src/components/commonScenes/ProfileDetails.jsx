@@ -186,6 +186,7 @@ const ChangeProfilePicBtn = styled(IconButton)({
 const ProfileDetails = ({ user }) => {
   const [isEditing, setIsEditing] = useState(false);
   const navigate = useNavigate();
+  console.log(user);
   const id = user.id;
   const [updateMe] = useUpdateMeMutation();
   const [role, setRole] = useState(user.role.roleName || "");

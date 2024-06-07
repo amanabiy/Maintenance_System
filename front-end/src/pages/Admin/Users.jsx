@@ -144,7 +144,7 @@ const Users = () => {
         </Box>
         {!isLoading && (
           <DataTable
-            rows={data.items}
+            rows={data?.items}
             columns={columns}
             title={"All Users"}
             subTitle={"All users in the system"}
