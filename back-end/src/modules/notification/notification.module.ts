@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import { NotificationController } from './notification.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -26,11 +26,13 @@ import { RequestStatusTime } from '../request_status_time/entities/request_statu
 import { RequestStatusTimeService } from '../request_status_time/request_status_time.service';
 import { RequestStatusType } from '../request_status_type/entities/request_status_type.entity';
 import { Permission } from '../permission/entities/permission.entity';
+import { MaintenanceRequestModule } from '../maintenance_request/maintenance_request.module';
 
 @Module({
   imports: [ TypeOrmModule.forFeature([ Notification, User, MaintenanceRequest, Department, Role, Location, 
               MaintenanceRequestType, Media, RequestStatus, RequestStatusTime, RequestStatusTime, RequestStatusType,
-              Permission ])],
+              Permission,]),
+              forwardRef(() => MaintenanceRequestModule)],
   controllers: [NotificationController],
   providers: [ NotificationService, UserService, MaintenanceRequestService, DepartmentService, RoleService, MailService,
               LocationService, MaintenanceRequestTypeService, MediaService, RequestStatusService, RequestStatusTypeService,

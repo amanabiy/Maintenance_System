@@ -33,19 +33,22 @@ import { Permission } from '../permission/entities/permission.entity';
 import { PermissionService } from '../permission/permission.service';
 import { RequestStatusTime } from '../request_status_time/entities/request_status_time.entity';
 import { RequestStatusTimeService } from '../request_status_time/request_status_time.service';
+import { NotificationService } from '../notification/notification.service';
+import { NotificationModule } from '../notification/notification.module';
+import { Notification } from '../notification/entities/notification.entity';
 
 @Module({
   imports: [
             TypeOrmModule.forFeature([RequestStatus, MaintenanceRequest, User, MaintenanceRequestType,
-            Department, Role, Media, RequestStatusType, Location, Permission, RequestStatusTime]),
+            Department, Role, Media, RequestStatusType, Location, Permission, RequestStatusTime, Notification]),
             forwardRef(() => MaintenanceRequestModule), RequestStatusModule, RequestStatusTypeModule,
             UserModule, MediaModule, RoleModule, MaintenanceRequestTypeModule,
-            DepartmentModule, LocationModule
+            DepartmentModule, LocationModule, NotificationModule
         ],
   controllers: [RequestStatusController],
   providers: [RequestStatusService, RequestStatusTypeService, MaintenanceRequestService,
               UserService, MediaService, RoleService, MaintenanceRequestTypeService, DepartmentService,
-              LocationService, MailService, PermissionService, RequestStatusTimeService],
+              LocationService, MailService, PermissionService, RequestStatusTimeService, NotificationService],
   exports: [RequestStatusService],
 })
 export class RequestStatusModule {}
