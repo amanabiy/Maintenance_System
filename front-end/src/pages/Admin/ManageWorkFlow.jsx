@@ -54,7 +54,7 @@ import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 const ManageWorkFlow = () => {
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
-  const [workflowOpen, setWorkflowOpen] = useState(false);
+  const [workflowOpen, setWorkflowOpen] = useState(true);
   const [type, setType] = useState("fields");
   const [transitionState, setTransitionState] = useState(null);
   const firstX = 0;
@@ -81,12 +81,27 @@ const ManageWorkFlow = () => {
   //  views
 
   const [nodes, setNodes] = useState(
-    requestStatusTypes?.items?.map((state, index) => ({
-      id: state.id.toString(),
-      data: { label: state.name, isFirst: state.isInitialStatus },
-      position: { x: firstX + 350 * index, y: firstY + 100 * index },
-      type: "customNode",
-    }))
+    requestStatusTypes?.items?.map((state, index) => {
+      const allowedPermissions = [];
+
+      for (const key in state) {
+        if (state.hasOwnProperty(key) && state[key] === true) {
+          allowedPermissions.push(key);
+        }
+      }
+
+      return {
+        id: state.id.toString(),
+        data: {
+          label: state.name,
+          isFirst: state.isInitialStatus,
+          allowedRoles: state.allowedRoles.map((role) => role.roleName),
+          permissions: allowedPermissions,
+        },
+        position: { x: firstX + 350 * index, y: firstY + 100 * index },
+        type: "customNode",
+      };
+    })
   );
 
   const [edges, setEdges] = useState(
@@ -116,12 +131,27 @@ const ManageWorkFlow = () => {
 
   useEffect(() => {
     setNodes(
-      requestStatusTypes?.items?.map((state, index) => ({
-        id: state.id.toString(),
-        data: { label: state.name, isFirst: state.isInitialStatus },
-        position: { x: firstX + 350 * index, y: firstY + 100 * index },
-        type: "customNode",
-      }))
+      requestStatusTypes?.items?.map((state, index) => {
+        const allowedPermissions = [];
+
+        for (const key in state) {
+          if (state.hasOwnProperty(key) && state[key] === true) {
+            allowedPermissions.push(key);
+          }
+        }
+
+        return {
+          id: state.id.toString(),
+          data: {
+            label: state.name,
+            isFirst: state.isInitialStatus,
+            allowedRoles: state.allowedRoles.map((role) => role.roleName),
+            permissions: allowedPermissions,
+          },
+          position: { x: firstX + 350 * index, y: firstY + 100 * index },
+          type: "customNode",
+        };
+      })
     );
     setEdges(
       requestStatusTypes?.items?.flatMap((state) =>

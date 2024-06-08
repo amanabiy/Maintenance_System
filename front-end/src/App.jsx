@@ -12,6 +12,7 @@ function App() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
+        {/* Rerenders twice in dev but once in prod */}
         <React.StrictMode>
           <RouterProvider router={router} />
         </React.StrictMode>
