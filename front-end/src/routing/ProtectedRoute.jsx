@@ -4,6 +4,8 @@ import { Navigate, Outlet } from "react-router-dom";
 
 const ProtectedRoute = ({ requiredRoles }) => {
   const userRole = localStorage.getItem("role");
+  const cookieParts = document.cookie.split(";");
+  console.log("cookieParts", cookieParts);
 
   console.log("userRole", userRole);
 

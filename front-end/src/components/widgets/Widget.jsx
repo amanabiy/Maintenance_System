@@ -11,7 +11,7 @@ import People from "@mui/icons-material/People";
 
 const Widget = ({ title, todayCount, percentageChange, link, icon }) => {
   return (
-    <div className="widget" style={{ width: "260px" }}>
+    <div className="widget" style={{ minWidth: "260px" }}>
       <div className="left">
         <span className="title">{title}</span>
         <span className="counter">{todayCount}</span>

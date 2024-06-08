@@ -85,63 +85,49 @@ const Dashboard = () => {
   }, [isLoading, error, data, startDate]);
 
   return (
-    <GridParent
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        margin: "10px",
-        gap: "100px",
-      }}
-    >
-      <GridItem
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            gap: "30px",
-            marginLeft: "30px",
-          }}
-        >
-          <Widget
-            title="Maintenance Requests"
-            todayCount={todayCount}
-            percentageChange={percentageChange}
-            link="See all Maintenance Requests"
-            icon="requests"
-          />
-          <Widget
-            title="Total Users"
-            todayCount={totalUsers}
-            percentageChange={101}
-            link="See all users"
-            icon="users"
-          />
-        </div>
-
-        <div>
-          <Updates names={names} subject={subject} />
-        </div>
+    <GridParent style={{ padding: "16px" }}>
+      <GridItem xs={12} md={8}>
+        <GridParent style={{ width: "100%", padding: "4px" }} spacing={1}>
+          <GridItem xs={12} md={6}>
+            <Widget
+              title="Maintenance Requests"
+              todayCount={todayCount}
+              percentageChange={percentageChange}
+              link="See all Maintenance Requests"
+              icon="requests"
+            />
+          </GridItem>
+          <GridItem xs={12} md={6}>
+            <Widget
+              title="Total Users"
+              todayCount={totalUsers}
+              percentageChange={101}
+              link="See all users"
+              icon="users"
+            />
+          </GridItem>
+        </GridParent>
+      </GridItem>
+      <GridItem xs={12} md={4}>
+        <GridParent style={{ padding: "4px", width: "100%" }}>
+          <GridItem xs={11}>
+            <Updates names={names} subject={subject} />
+          </GridItem>
+        </GridParent>
       </GridItem>
 
       <GridItem
-        style={{
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "space-between",
-        }}
+        xs={12}
+        style={{ width: "100%", padding: "4px", marginTop: "16px" }}
       >
-        <div>
-          <PieChartt />
-        </div>
-        <div>
-          <BarChart />
-        </div>
+        <GridParent style={{ width: "100%" }}>
+          <GridItem xs={12} lg={4}>
+            <PieChartt />
+          </GridItem>
+          <GridItem xs={12} lg={8}>
+            <BarChart />
+          </GridItem>
+        </GridParent>
       </GridItem>
     </GridParent>
   );
