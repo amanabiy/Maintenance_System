@@ -199,8 +199,8 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const timeSpent = await this.requestStatusTimeService.calculateSpentTime(startTime, endTime);
     await this.requestStatusTimeService.create(currentStatus.statusType, createdRequestStatus.statusType, maintenanceRequest, currentUser, timeSpent);
 
-    await this.notificationService.createStatusChangeNotification(currentUser.id, maintenanceRequest.id, currentStatus.statusType.name, newRequestStatusType.name, 'link');
-    await this.mailService.sendStatusChangeNotification(currentUser.email, maintenanceRequest.id, currentStatus.statusType.name, newRequestStatusType.name);
+    await this.notificationService.createStatusChangeNotification(maintenanceRequest.requester.id, maintenanceRequest.id, currentStatus.statusType.name, newRequestStatusType.name, 'link');
+    await this.mailService.sendStatusChangeNotification(maintenanceRequest.requester.email, maintenanceRequest.id, currentStatus.statusType.name, newRequestStatusType.name);
 
     return maintenanceRequest;
   }
