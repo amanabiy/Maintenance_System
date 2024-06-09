@@ -40,11 +40,11 @@ export class Payment extends BaseModelEntity {
   @Column({ nullable: true })
   additionalInfo: string;
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => MaintenanceRequest, { nullable: true, eager: true })
+  @ManyToOne(() => MaintenanceRequest, { nullable: true })
   @JoinColumn({ name: 'request_id' })
   request: MaintenanceRequest;
 
@@ -69,7 +69,7 @@ export class Payment extends BaseModelEntity {
   receiptComment: string;
 
   @ApiProperty({ description: 'The user who approved/rejected the receipt', type: () => User, nullable: true })
-  @ManyToOne(() => User, { nullable: true, eager: true })
+  @ManyToOne(() => User, { nullable: true })
   @JoinColumn({ name: 'receipt_approved_by' })
   receiptApprovedBy: User;
 
