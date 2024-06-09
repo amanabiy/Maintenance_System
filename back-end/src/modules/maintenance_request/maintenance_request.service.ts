@@ -240,7 +240,7 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     if (term) {
       filters['subject'] = Like(`%${term}%`);
       filters['description'] = Like(`%${term}%`);
-      filters['requester'] = { name: Like(`%${term}%`) };
+      filters['requester'] = { fullName: Like(`%${term}%`) };
     }
 
     // Fetch the filtered results with pagination
@@ -273,7 +273,7 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     if (term) {
       filters['subject'] = Like(`%${term}%`);
       filters['description'] = Like(`%${term}%`);
-      filters['requester'] = { name: Like(`%${term}%`) };
+      filters['requester'] = { fullName: Like(`%${term}%`) };
     }
     return await this.findWithPagination({ where: filters }, page, limit);
   }
@@ -304,7 +304,7 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     if (term) {
       filters['subject'] = Like(`%${term}%`);
       filters['description'] = Like(`%${term}%`);
-      filters['requester'] = { name: Like(`%${term}%`) };
+      filters['requester'] = { fullName: Like(`%${term}%`) };
     }
 
     // Fetch the filtered results with pagination
@@ -338,7 +338,7 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     if (term) {
       filters['subject'] = Like(`%${term}%`);
       filters['description'] = Like(`%${term}%`);
-      filters['requester'] = { name: Like(`%${term}%`) };
+      filters['requester'] = { fullName: Like(`%${term}%`) };
     }
   
     // Fetch the filtered results with pagination
