@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http; // Import for making API requests
 import 'dart:convert';
 
 import 'package:mobile/models/RequestsModel.dart';
@@ -9,22 +8,21 @@ import 'package:mobile/providers/api_provider.dart';
 import 'package:mobile/screens/authentication/login_page.dart';
 import 'package:mobile/screens/request_page.dart';
 import 'package:mobile/screens/util/custom_app_bar.dart';
-import 'package:mobile/screens/util/custom_scaffold.dart'; // Import for JSON decoding
+import 'package:mobile/screens/util/custom_scaffold.dart';
 
 class RequestsPage extends StatefulWidget {
   const RequestsPage({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _RequestsPageState createState() => _RequestsPageState();
 }
 
 class _RequestsPageState extends State<RequestsPage> {
-  RequestsModel? requests; // Store the entire response data
+  RequestsModel? requests;
   FlutterSecureStorage _storage = FlutterSecureStorage();
   String selectedFilter = 'Assigned to Me';
+  Set<String> selectedStatusTypes = Set();
 
-  // Define the mapping between filter names and endpoints
   final Map<String, String> filterEndpoints = {
     'Assigned to Me': Endpoints.assignedToMeRequests,
     'Handled by My Department': Endpoints.departmentRequests,
@@ -48,15 +46,11 @@ class _RequestsPageState extends State<RequestsPage> {
     'Unknown': Colors.grey.withOpacity(0.2),
   };
 
+  List<String> statusTypes = [];
+
   void logout() async {
-    // clear all login information from the secure storage
-    // and go to login screen
-    await _storage.delete(
-      key: 'accessToken',
-    );
-    await _storage.delete(
-      key: 'refreshToken',
-    );
+    await _storage.delete(key: 'accessToken');
+    await _storage.delete(key: 'refreshToken');
     Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
@@ -64,47 +58,57 @@ class _RequestsPageState extends State<RequestsPage> {
   }
 
   Future<void> fetchRequests() async {
-    // Get the endpoint based on the selected filter
     String endpoint = filterEndpoints[selectedFilter] ?? Endpoints.myRequests;
 
     try {
       final response = await Api().get(endpoint);
       if (response.statusCode == 200) {
-        print("Requests fetched successfully");
         try {
           requests = RequestsModel.fromJson(response.data);
+          extractStatusTypes();
         } catch (e) {
-          print(e);
           throw Exception('Failed to decode requests: $e');
         }
-        print("set fine");
         if (mounted) {
           setState(() {}); // Update UI after fetching data
         }
       } else if (response.statusCode == 401) {
-        // Handle unauthorized requests here
         if (mounted) {
           showFailureSnackBar(context, 'Unauthorized request');
         }
-        print("Unauthorized request");
         logout();
       }
     } catch (e) {
-      // Handle API request errors here
-      print('Error fetching requests: ${e}');
       if (mounted) {
         showFailureSnackBar(context, 'Failed to fetch requests: $e');
-        // throw Exception('Failed to fetch requests: $e');
       }
     }
+  }
+
+  void extractStatusTypes() {
+    Set<String> statusTypeSet = {};
+    if (requests?.items != null) {
+      for (var request in requests!.items) {
+        if (request.requestStatuses != null &&
+            request.requestStatuses!.isNotEmpty) {
+          var lastStatus = request.requestStatuses!.last;
+          if (lastStatus.statusType != null) {
+            statusTypeSet.add(lastStatus.statusType!.name!);
+          }
+        }
+      }
+    }
+    statusTypes = statusTypeSet.toList();
+    selectedStatusTypes = statusTypeSet;
   }
 
   @override
   void initState() {
     super.initState();
-    fetchRequests(); // Call fetch function on initialization
+    fetchRequests();
   }
- @override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(title: 'Requests'),
@@ -112,20 +116,107 @@ class _RequestsPageState extends State<RequestsPage> {
         padding: const EdgeInsets.all(8.0),
         child: Column(
           children: [
-            DropdownButton<String>(
-              value: selectedFilter,
-              items: filterEndpoints.keys.map((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedFilter = newValue!;
-                  fetchRequests();
-                });
-              },
+            Wrap(
+              spacing: 8.0, // Adjust the spacing between elements as needed
+              runSpacing: 4.0, // Adjust the spacing between lines as needed
+              children: [
+                SizedBox(
+                  width: 150, // Adjust the width as needed
+                  child: DropdownButton<String>(
+                    isExpanded:
+                        true, // Ensures the dropdown uses the full width of the SizedBox
+                    value: selectedFilter,
+                    items: filterEndpoints.keys.map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Flexible(
+                          child: Text(
+                            value,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedFilter = newValue!;
+                        fetchRequests();
+                      });
+                    },
+                  ),
+                ),
+                SizedBox(
+                  width: 150, // Adjust the width as needed
+                  child: DropdownButton<String>(
+                    isExpanded:
+                        true, // Ensures the dropdown uses the full width of the SizedBox
+                    hint: Text("Select a status"),
+                    items: statusTypes.map((String status) {
+                      return DropdownMenuItem<String>(
+                        value: status,
+                        child: Flexible(
+                          child: Text(
+                            status,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        if (newValue != null) {
+                          if (selectedStatusTypes.contains(newValue)) {
+                            selectedStatusTypes.remove(newValue);
+                          } else {
+                            selectedStatusTypes.add(newValue);
+                          }
+                        }
+                      });
+                    },
+                    value: null, // Ensures dropdown resets after selection
+                  ),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing:
+                    4.0, // Added run spacing to control vertical space between rows
+                children: selectedStatusTypes.map((status) {
+                  return ChoiceChip(
+                    label: Text(
+                      status,
+                      style: TextStyle(
+                        color: selectedStatusTypes.contains(status)
+                            ? Colors.white
+                            : Colors.black,
+                        fontSize: 10.0, // Smaller text size
+                      ),
+                    ),
+                    selected: selectedStatusTypes.contains(status),
+                    backgroundColor: getStatusCardColor(status),
+                    selectedColor: getStatusCardColor(status).withOpacity(0.5),
+                    shape: StadiumBorder(
+                      side: BorderSide(
+                        color: getStatusCardColor(
+                            status), // Border color same as background color
+                        width: 0.5,
+                      ),
+                    ),
+                    onSelected: (bool selected) {
+                      setState(() {
+                        if (selected) {
+                          selectedStatusTypes.add(status);
+                        } else {
+                          selectedStatusTypes.remove(status);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
             ),
             Expanded(
               child: requests == null
@@ -140,10 +231,19 @@ class _RequestsPageState extends State<RequestsPage> {
                           itemCount: requests!.items.length,
                           itemBuilder: (context, index) {
                             final request = requests!.items[index];
+                            // Filter requests based on selected status types
+                            final length = request.requestStatuses!.length;
+                            bool shouldDisplay = selectedStatusTypes.isEmpty ||
+                                selectedStatusTypes.contains(request
+                                    .requestStatuses.last.statusType!.name!);
+                            // request.requestStatuses![length -].((status) =>
+                            //     selectedStatusTypes
+                            //         .contains(status.statusType!.name));
+                            if (!shouldDisplay) return Container();
+
                             return Card(
                               margin: const EdgeInsets.symmetric(vertical: 8.0),
                               elevation: 4.0,
-                              // color: getStatusCardColor(request?.requestStatuses?.first?.statusType?.name ?? "Unknown"),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
@@ -153,21 +253,23 @@ class _RequestsPageState extends State<RequestsPage> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => RequestDetailPage(
-                                          requestId: request!.id!),
+                                          requestId: request.id!),
                                     ),
                                   );
                                 },
                                 child: Padding(
                                   padding: const EdgeInsets.all(12.0),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              request?.subject ?? "",
+                                              request.subject ?? "",
                                               style: const TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold,
@@ -176,7 +278,8 @@ class _RequestsPageState extends State<RequestsPage> {
                                             ),
                                           ),
                                           Text(
-                                            formatDate(request.createdAt ?? DateTime.now()),
+                                            formatDate(request.createdAt ??
+                                                DateTime.now()),
                                             style: const TextStyle(
                                               fontSize: 12.0,
                                               color: Colors.grey,
@@ -186,26 +289,35 @@ class _RequestsPageState extends State<RequestsPage> {
                                       ),
                                       const SizedBox(height: 8.0),
                                       Text(
-                                        request!.description!.length > 100
-                                            ? '${request!.description?.substring(0, 100)}...'
-                                            : request?.description ?? "",
+                                        request.description!.length > 100
+                                            ? '${request.description?.substring(0, 100)}...'
+                                            : request.description ?? "",
                                         style: const TextStyle(
                                           fontSize: 14.0,
                                           color: Colors.black87,
                                         ),
                                       ),
                                       const SizedBox(height: 8.0),
-                                      getStatusWidget(request?.requestStatuses?.first?.statusType?.name ?? "Unknown"),
+                                      getStatusWidget(request.requestStatuses
+                                              ?.last.statusType?.name ??
+                                          "Unknown"),
                                       const SizedBox(height: 8.0),
                                       Wrap(
                                         children: request
-                                                ?.maintenanceRequestTypes
+                                                .maintenanceRequestTypes
                                                 ?.map((type) => Container(
-                                                      margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                                      padding: const EdgeInsets.all(4.0),
+                                                      margin: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 4.0),
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              4.0),
                                                       decoration: BoxDecoration(
-                                                        color: Colors.blue.withOpacity(0.2),
-                                                        borderRadius: BorderRadius.circular(4.0),
+                                                        color: Colors.blue
+                                                            .withOpacity(0.2),
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(4.0),
                                                       ),
                                                       child: Text(
                                                         type.name ?? "",
