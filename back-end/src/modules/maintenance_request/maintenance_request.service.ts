@@ -206,20 +206,154 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     return result;
   }
 
-  async findAllByRole(roleId: number, page = 1, limit = 10): Promise<findAllResponseDto<MaintenanceRequest>> {
+  async findAllByRoleAndStatus(
+    roleId: number,
+    statusTypeId?: number,
+    term?: string,
+    page = 1,
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    // Fetch the latest status types and their IDs in parallel
     const statusTypes = await this.requestStatusTypeService.getLatestStatusTypeIds([roleId]);
     const statusTypeIds = statusTypes.map((statusType) => statusType.id);
-    console.log(statusTypeIds)
+
     const latestStatusIds = await this.requestStatusService.getLatestStatusByStatusTypeIds(statusTypeIds);
     const requestStatusIds = latestStatusIds.map((status) => status.id);
-    return await this.findWithPagination({
-      where: {
-        requestStatuses: {
-          id: In(requestStatusIds),
-        },
+
+    // Construct the filters
+    const filters: any = {
+      requestStatuses: {
+        id: In(requestStatusIds),
       },
-    }, page, limit);
+    };
+
+    // Include statusTypeId in filters if provided
+    if (statusTypeId) {
+      filters.requestStatuses = {
+        statusType: {
+          id: statusTypeId,
+        }
+      };
+    }
+
+    // Add fuzzy search terms if provided
+    if (term) {
+      filters.$or = [
+        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
+        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
+        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+      ];
+    }
+
+    // Fetch the filtered results with pagination
+    return await this.findWithPagination({ where: filters }, page, limit);
   }
+
+
+
+  async findAllByRequester(
+    requesterId: number,
+    statusType?: number,
+    term?: string,
+    page = 1,
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    const filters: any = {
+      requester: {
+        id: requesterId,
+      },
+    };
+
+    if (statusType) {
+      filters.requestStatuses = {
+        statusType: {
+          id: statusType,
+        },
+      };
+    }
+
+    if (term) {
+      filters.$or = [
+        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
+        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
+        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+      ];
+    }
+
+    return await this.findWithPagination({ where: filters }, page, limit);
+  }
+
+  async findAllByDepartment(
+    departmentId: number,
+    statusTypeId?: number,
+    term?: string,
+    page = 1,
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    const filters: any = {
+      handlingDepartment: {
+        id: departmentId,
+      },
+    };
+
+    // Include statusTypeId in filters if provided
+    if (statusTypeId) {
+      filters['requestStatuses'] = {
+        statusType: {
+          id: statusTypeId,
+        },
+      };
+    }
+
+    // Add fuzzy search terms if provided
+    if (term) {
+      filters.$or = [
+        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
+        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
+        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+      ];
+    }
+
+    // Fetch the filtered results with pagination
+    return await this.findWithPagination({ where: filters }, page, limit);
+  }
+
+
+
+  async findAllByAssignedPerson(
+    assignedPersonId: number, 
+    statusTypeId?: number, 
+    term?: string, 
+    page = 1, 
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    // Construct the filters
+    const filters: any = {
+      assignedPersons: {
+        id: assignedPersonId,
+      },
+    };
+  
+    // Include statusTypeId in filters if provided
+    if (statusTypeId) {
+      filters['requestStatuses']['statusType'] = {
+        id: statusTypeId,
+      };
+    }
+  
+    // Add fuzzy search terms if provided
+    if (term) {
+      filters.$or = [
+        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
+        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
+        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+      ];
+    }
+  
+    // Fetch the filtered results with pagination
+    return await this.findWithPagination({ where: filters }, page, limit);
+  }
+
 
   async delete(id: number): Promise<void> {
     const result = await this.maintenanceRequestRepository.softDelete(id);
