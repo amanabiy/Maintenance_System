@@ -4,6 +4,7 @@ import DashboardIcon from "@mui/icons-material/Dashboard";
 
 // styles
 import "./styles.scss";
+import LogoutButton from "./LogoutButton";
 
 const SidebarContainer = React.forwardRef(
   ({ buttons, sidebarOpen, sidebarType }, ref) => {
@@ -66,10 +67,12 @@ const SidebarContainer = React.forwardRef(
               buttons.user.map((button, index) => (
                 <li key={index}>
                   {button.onClick ? (
-                    <div onClick={button.onClick}>
+                    <div onClick={() => button.onClick()} className="nav-link">
                       <button.icon className="icon" />
                       <span>{button.text}</span>
                     </div>
+                  ) : button.logout ? (
+                    <LogoutButton />
                   ) : (
                     <NavLink to={`/active${button.path}`} className="nav-link">
                       <button.icon className="icon" />

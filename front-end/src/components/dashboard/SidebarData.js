@@ -11,7 +11,7 @@ const AccountCircleIcon = React.lazy(() =>
   import("@mui/icons-material/AccountCircle")
 );
 const SettingsIcon = React.lazy(() => import("@mui/icons-material/Settings"));
-const LogoutIcon = React.lazy(() => import("@mui/icons-material/Logout"));
+// const LogoutIcon = React.lazy(() => import("@mui/icons-material/Logout"));
 
 const PeopleIcon = React.lazy(() => import("@mui/icons-material/People"));
 const ReceiptLongIcon = React.lazy(() =>
@@ -70,9 +70,10 @@ const SidebarData = {
       // },
       {
         text: "Log Out",
-        icon: LogoutIcon,
+        // icon: LogoutIcon,
         // path: generalPaths.LOGIN,
-        onclick: logoutFunction,
+        // onClick: logoutFunction,
+        logout: true,
       },
     ],
   },
@@ -137,9 +138,10 @@ const SidebarData = {
 
       {
         text: "Log Out",
-        icon: LogoutIcon,
+        // icon: LogoutIcon,
         // path: generalPaths.LOGIN,
-        onclick: logoutFunction,
+        // onClick: logoutFunction,
+        logout: true,
       },
     ],
   },

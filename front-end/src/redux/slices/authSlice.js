@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import authApi from "../services/authApi";
 
 const setAuthTokenInCookie = (token) => {
   const expires = new Date();
@@ -58,6 +59,19 @@ export const authSlice = createSlice({
       removeRoleFromSession();
       removeRefreshTokenFromCookie();
     },
+    refreshTokenSuccess: (state, action) => {
+      state.authToken = action.payload.accessToken;
+      setAuthTokenInCookie(action.payload.accessToken);
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addMatcher(
+      authApi.endpoints.refreshToken.matchFulfilled,
+      (state, action) => {
+        state.authToken = action.payload.accessToken;
+        setAuthTokenInCookie(action.payload.accessToken);
+      }
+    );
   },
 });
 

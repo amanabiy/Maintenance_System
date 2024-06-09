@@ -113,169 +113,180 @@ const router = createBrowserRouter(
         path="active"
         element={
           <Suspense fallback={<Loading />}>
-            <DashboardLayout />
+            <ProtectedRoute requiredRoles={null} tokenChk={true} />
           </Suspense>
         }
       >
-        {/* Admin Routes */}
         <Route
-          path="admin-dashboard"
+          path=""
           element={
             <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
+              <DashboardLayout />
             </Suspense>
           }
         >
-          <Route index element={<AdminDashboard />} />
-        </Route>
-        <Route
-          path="all-users"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<Users />} />
-        </Route>
-        <Route
-          path="financial-transactions"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<FinancialTransactions />} />
-        </Route>
-        <Route
-          path="all-requests"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<Requests />} />
+          {/* Admin Routes */}
           <Route
-            path="view/:requestId/more-details"
-            element={<RequestStatusDetails />}
-          />
-          <Route path="view/:requestId" element={<RequestDetails />} />
-          <Route path="edit/:requestId" element={<RequestDetails />} />
-        </Route>
-        <Route
-          path="admin-profile"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<MyProfile />} />
-        </Route>
-        <Route
-          path="manage-workflows"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<ManageWorkFlow />} />
-        </Route>
-
-        <Route
-          path="roles"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<Roles />} />
-        </Route>
-
-        {/* Edit Users */}
-        <Route
-          path="all-users"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<Requests />} />
-          <Route path="edit/:userId" element={<EditUser />} />
-          {/* <Route path="view/:requestId" element={<RequestDetails />} />
-          <Route path="edit/:requestId" element={<RequestDetails />} /> */}
-        </Route>
-
-        {/* Create Users */}
-        <Route
-          path="all-users"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<Requests />} />
-          <Route path="create" element={<CreateUser />} />
-        </Route>
-        <Route
-          path="departments"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["ADMIN"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<Departments />} />
-        </Route>
-
-        {/* Issuer Routes */}
-        <Route
-          path="user-dashboard"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["STUDENT"]} />
-            </Suspense>
-          }
-        >
-          <Route index element={<div>Dashboard Content</div>} />
-        </Route>
-        <Route
-          path="report-issue"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["STUDENT"]} />
-            </Suspense>
-          }
-        >
-          <Route
-            index
+            path="admin-dashboard"
             element={
               <Suspense fallback={<Loading />}>
-                <ReportIssue />
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
               </Suspense>
             }
-          />
-        </Route>
-        <Route
-          path="my-reports"
-          element={
-            <Suspense fallback={<Loading />}>
-              <ProtectedRoute requiredRoles={["STUDENT"]} />
-            </Suspense>
-          }
-        >
+          >
+            <Route index element={<AdminDashboard />} />
+          </Route>
           <Route
-            index
+            path="all-users"
             element={
-              <Suspense fallback={<Loading />}>{/* <DataTable /> */}</Suspense>
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
             }
-          />
+          >
+            <Route index element={<Users />} />
+          </Route>
+          <Route
+            path="financial-transactions"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<FinancialTransactions />} />
+          </Route>
+          <Route
+            path="all-requests"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<Requests />} />
+            <Route
+              path="view/:requestId/more-details"
+              element={<RequestStatusDetails />}
+            />
+            <Route path="view/:requestId" element={<RequestDetails />} />
+            <Route path="edit/:requestId" element={<RequestDetails />} />
+          </Route>
+          <Route
+            path="admin-profile"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<MyProfile />} />
+          </Route>
+          <Route
+            path="manage-workflows"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<ManageWorkFlow />} />
+          </Route>
+
+          <Route
+            path="roles"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<Roles />} />
+          </Route>
+
+          {/* Edit Users */}
+          <Route
+            path="all-users"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<Requests />} />
+            <Route path="edit/:userId" element={<EditUser />} />
+            {/* <Route path="view/:requestId" element={<RequestDetails />} />
+          <Route path="edit/:requestId" element={<RequestDetails />} /> */}
+          </Route>
+
+          {/* Create Users */}
+          <Route
+            path="all-users"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<Requests />} />
+            <Route path="create" element={<CreateUser />} />
+          </Route>
+          <Route
+            path="departments"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["ADMIN"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<Departments />} />
+          </Route>
+
+          {/* Issuer Routes */}
+          <Route
+            path="user-dashboard"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["STUDENT"]} />
+              </Suspense>
+            }
+          >
+            <Route index element={<div>Dashboard Content</div>} />
+          </Route>
+          <Route
+            path="report-issue"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["STUDENT"]} />
+              </Suspense>
+            }
+          >
+            <Route
+              index
+              element={
+                <Suspense fallback={<Loading />}>
+                  <ReportIssue />
+                </Suspense>
+              }
+            />
+          </Route>
+          <Route
+            path="my-reports"
+            element={
+              <Suspense fallback={<Loading />}>
+                <ProtectedRoute requiredRoles={["STUDENT"]} />
+              </Suspense>
+            }
+          >
+            <Route
+              index
+              element={
+                <Suspense fallback={<Loading />}>
+                  {/* <DataTable /> */}
+                </Suspense>
+              }
+            />
+          </Route>
         </Route>
       </Route>
       <Route
