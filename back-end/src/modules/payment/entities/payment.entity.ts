@@ -44,7 +44,7 @@ export class Payment extends BaseModelEntity {
   @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @ManyToOne(() => MaintenanceRequest, { nullable: true })
+  @ManyToOne(() => MaintenanceRequest, { nullable: true, eager: true })
   @JoinColumn({ name: 'request_id' })
   request: MaintenanceRequest;
 
