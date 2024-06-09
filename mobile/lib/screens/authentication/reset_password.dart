@@ -60,6 +60,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
+              CircleAvatar(
+                backgroundImage: AssetImage('assets/image/icon.webp'),
+                radius: 75,
+              ),
+              const SizedBox(height: 50),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
@@ -69,11 +74,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                   contentPadding: const EdgeInsets.all(12.0),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                    borderSide:
+                        const BorderSide(color: Colors.grey, width: 1.0),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10.0),
-                    borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                    borderSide:
+                        const BorderSide(color: Colors.blue, width: 2.0),
                   ),
                 ),
               ),
@@ -85,9 +92,11 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                         _sendResetLink(_emailController.text);
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Color.fromARGB(255, 61, 24, 109), // Button color
+                        primary:
+                            Color.fromARGB(255, 61, 24, 109), // Button color
                         onPrimary: Colors.white, // Text color
-                        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12.0, horizontal: 24.0),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),

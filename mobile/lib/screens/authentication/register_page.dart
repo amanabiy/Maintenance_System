@@ -48,26 +48,28 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     print(jsonDecode(response.statusCode.toString()));
     if (response.statusCode == 200 || response.statusCode == 201) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration successful! Check your email for the verification link.')),
+        const SnackBar(
+            content: Text(
+                'Registration successful! Check your email for the verification link.')),
       );
       // ignore: use_build_context_synchronously
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => const CheckEmailPage(
-          description: 'We have sent a verification link to your email. Please check your inbox and click the link to verify your account.',
-        )),
+        MaterialPageRoute(
+            builder: (context) => const CheckEmailPage(
+                  description:
+                      'We have sent a verification link to your email. Please check your inbox and click the link to verify your account.',
+                )),
       );
-    } else if (response.statusCode == 409 ) {
+    } else if (response.statusCode == 409) {
       showFailureSnackBar(context, 'Email already exists');
-    } else if ( response.statusCode == 400) {
+    } else if (response.statusCode == 400) {
       var errorMessage = responseData['message'][0];
       if (responseData['message'].runtimeType == String) {
         errorMessage = responseData['message'];
       }
       showFailureSnackBar(context, errorMessage);
-
-    }
-    else {
+    } else {
       showFailureSnackBar(context, 'Registration failed');
     }
   }
@@ -85,6 +87,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
+                CircleAvatar(
+                  backgroundImage: AssetImage('assets/image/icon.webp'),
+                  radius: 75,
+                ),
+                const SizedBox(height: 50),
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -94,11 +101,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                 ),
@@ -112,11 +121,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                 ),
@@ -130,11 +141,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                 ),
@@ -148,11 +161,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                   obscureText: true,
@@ -163,9 +178,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     : ElevatedButton(
                         onPressed: _register,
                         style: ElevatedButton.styleFrom(
-                          primary: Color.fromARGB(255, 61, 24, 109), // Button color
+                          primary:
+                              Color.fromARGB(255, 61, 24, 109), // Button color
                           onPrimary: Colors.white, // Text color
-                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 24.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mobile/network/endpoints.dart';
@@ -10,7 +9,6 @@ import 'package:http/http.dart' as http;
 import 'package:mobile/screens/nav_bar.dart';
 import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart';
-// Import for navigation (replace with your implementation)
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -78,7 +76,8 @@ class _LoginPageState extends State<LoginPage> {
       // Handle other exceptions
       print('Error during login: $e');
       if (mounted) {
-        showFailureSnackBar(context, 'An error occurred. Please try again later.');
+        showFailureSnackBar(
+            context, 'An error occurred. Please try again later.');
       }
     }
   }
@@ -98,7 +97,8 @@ class _LoginPageState extends State<LoginPage> {
       MaterialPageRoute(builder: (context) => const CreateAccountPage()),
     );
   }
-@override
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
@@ -107,11 +107,16 @@ class _LoginPageState extends State<LoginPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
-          child: SizedBox(
-            height: 300,
+          child: SingleChildScrollView(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
+                CircleAvatar(
+                  backgroundImage:
+                      AssetImage('assets/image/icon.webp'),
+                  radius: 75,
+                ),
+                const SizedBox(height: 50),
                 TextField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -121,14 +126,17 @@ class _LoginPageState extends State<LoginPage> {
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                 ),
+                const SizedBox(height: 10),
                 TextField(
                   controller: _passwordController,
                   decoration: InputDecoration(
@@ -138,11 +146,13 @@ class _LoginPageState extends State<LoginPage> {
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide:
+                          const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide:
+                          const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                   obscureText: true,
@@ -163,12 +173,15 @@ class _LoginPageState extends State<LoginPage> {
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () {
-                          _login(_emailController.text, _passwordController.text);
+                          _login(
+                              _emailController.text, _passwordController.text);
                         },
                         style: ElevatedButton.styleFrom(
-                          primary: Color.fromARGB(255, 61, 24, 109), // Button color
+                          primary:
+                              Color.fromARGB(255, 61, 24, 109), // Button color
                           onPrimary: Colors.white, // Text color
-                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0, horizontal: 24.0),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10.0),
                           ),
