@@ -238,11 +238,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
 
     // Add fuzzy search terms if provided
     if (term) {
-      filters.$or = [
-        { title: Like(`%${term}%`) },
-        { description: Like(`%${term}%`) },
-        { requester: { name: Like(`%${term}%`) } },
-      ];
+      filters['title'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { requester: { name: Like(`%${term}%`) } };
     }
 
     // Fetch the filtered results with pagination
@@ -273,13 +271,10 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     }
 
     if (term) {
-      filters.$or = [
-        { title: Like(`%${term}%`) },
-        { description: Like(`%${term}%`) },
-        { requester: { name: Like(`%${term}%`) } },
-      ];
+      filters['title'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { requester: { name: Like(`%${term}%`) } };
     }
-
     return await this.findWithPagination({ where: filters }, page, limit);
   }
 
@@ -307,11 +302,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
 
     // Add fuzzy search terms if provided
     if (term) {
-      filters.$or = [
-        { title: Like(`%${term}%`) },
-        { description: Like(`%${term}%`) },
-        { requester: { name: Like(`%${term}%`) } },
-      ];
+      filters['title'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { requester: { name: Like(`%${term}%`) } };
     }
 
     // Fetch the filtered results with pagination
@@ -343,11 +336,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
   
     // Add fuzzy search terms if provided
     if (term) {
-      filters.$or = [
-        { title: Like(`%${term}%`) },
-        { description: Like(`%${term}%`) },
-        { requester: { name: Like(`%${term}%`) } },
-      ];
+      filters['title'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { requester: { name: Like(`%${term}%`) } };
     }
   
     // Fetch the filtered results with pagination
