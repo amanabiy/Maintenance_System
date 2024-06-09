@@ -4,6 +4,7 @@ import 'package:mobile/models/UserModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
 import 'package:mobile/screens/authentication/login_page.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart';
 
 class UserPage extends StatefulWidget {
@@ -24,6 +25,9 @@ class _UserPageState extends State<UserPage> {
   @override
   void initState() {
     super.initState();
+    nameController = TextEditingController();
+    emailController = TextEditingController();
+    phoneController = TextEditingController();
     fetchUserData();
   }
 
@@ -32,23 +36,29 @@ class _UserPageState extends State<UserPage> {
       final response = await api.get(Endpoints.getMyProfile);
       user = User.fromJson(response.data);
       print(response.data);
-      nameController = TextEditingController(text: user.fullName);
-      emailController = TextEditingController(text: user.email);
-      phoneController = TextEditingController(text: user.phoneNumber);
-      setState(() {
-        isLoading = false;
-      });
+      nameController.text = user.fullName!;
+      emailController.text = user.email!;
+      phoneController.text = user.phoneNumber!;
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     }
   }
 
   void toggleEditMode() {
-    setState(() {
-      isEditMode = !isEditMode;
-    });
+    if (mounted) {
+      setState(() {
+        isEditMode = !isEditMode;
+      });
+    }
   }
 
   void saveChanges() async {
@@ -59,9 +69,11 @@ class _UserPageState extends State<UserPage> {
       return;
     }
 
-    setState(() {
-      isLoading = true;
-    });
+    if (mounted) {
+      setState(() {
+        isLoading = true;
+      });
+    }
 
     try {
       final updatedUser = {
@@ -72,39 +84,45 @@ class _UserPageState extends State<UserPage> {
       print(updatedUser);
       await api.patch(Endpoints.updateMyProfile, updatedUser);
 
-      setState(() {
-        user = User(
-          id: user.id,
-          createdAt: user.createdAt,
-          updatedAt: DateTime.now(),
-          email: emailController.text,
-          fullName: nameController.text,
-          phoneNumber: phoneController.text,
-          isVerified: user.isVerified,
-          lastPasswordUpdatedAt: user.lastPasswordUpdatedAt,
-          role: user.role,
-          department: user.department,
-        );
-        isEditMode = false;
-        isLoading = false;
-      });
-      showSuccessSnackBar(context, 'Profile updated successfully!');
+      if (mounted) {
+        setState(() {
+          user = User(
+            id: user.id,
+            createdAt: user.createdAt,
+            updatedAt: DateTime.now(),
+            email: emailController.text,
+            fullName: nameController.text,
+            phoneNumber: phoneController.text,
+            isVerified: user.isVerified,
+            lastPasswordUpdatedAt: user.lastPasswordUpdatedAt,
+            role: user.role,
+            department: user.department,
+          );
+          isEditMode = false;
+          isLoading = false;
+        });
+        showSuccessSnackBar(context, 'Profile updated successfully!');
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
       print(e.toString());
       showFailureSnackBar(context, 'Failed to update profile: $e');
     }
   }
 
   void cancelChanges() {
-    setState(() {
-      nameController.text = user.fullName!;
-      emailController.text = user.email!;
-      phoneController.text = user.phoneNumber ?? "+251XXXXXXXXX";
-      isEditMode = false;
-    });
+    if (mounted) {
+      setState(() {
+        nameController.text = user.fullName!;
+        emailController.text = user.email!;
+        phoneController.text = user.phoneNumber ?? "+251XXXXXXXXX";
+        isEditMode = false;
+      });
+    }
   }
 
   void logout() async {
@@ -116,10 +134,13 @@ class _UserPageState extends State<UserPage> {
     await _storage.delete(
       key: 'refreshToken',
     );
-    Navigator.pushAndRemoveUntil(
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const LoginPage()),
-        (route) => false);
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -133,12 +154,12 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile'),
+      appBar: CustomAppBar(
+        title: 'Profile',
         actions: [
           IconButton(
-            icon: Icon(Icons.logout),
             onPressed: logout,
+            icon: Icon(Icons.logout),
           ),
         ],
       ),
@@ -184,7 +205,11 @@ class _UserPageState extends State<UserPage> {
                             controller: nameController,
                             decoration: InputDecoration(
                               labelText: 'Name',
-                              border: OutlineInputBorder(),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10.0),
+                                borderSide:
+                                    BorderSide(color: Colors.grey, width: 1.0),
+                              ),
                               filled: true,
                               fillColor: Colors.white,
                             ),
@@ -211,7 +236,11 @@ class _UserPageState extends State<UserPage> {
                               controller: emailController,
                               decoration: InputDecoration(
                                 labelText: 'Email',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey, width: 1.0),
+                                ),
                                 filled: true,
                                 fillColor: Colors.white,
                               ),
@@ -243,7 +272,11 @@ class _UserPageState extends State<UserPage> {
                               controller: phoneController,
                               decoration: InputDecoration(
                                 labelText: 'Phone Number',
-                                border: OutlineInputBorder(),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  borderSide: BorderSide(
+                                      color: Colors.grey, width: 1.0),
+                                ),
                                 filled: true,
                                 fillColor: Colors.white,
                               ),
@@ -274,16 +307,24 @@ class _UserPageState extends State<UserPage> {
                         padding: const EdgeInsets.symmetric(horizontal: 16.0),
                         child: isEditMode
                             ? Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Expanded(
                                     child: ElevatedButton(
                                       onPressed: saveChanges,
                                       child: Text('Save'),
                                       style: ElevatedButton.styleFrom(
+                                        primary:
+                                            Color.fromARGB(255, 61, 24, 109),
+                                        onPrimary: Colors.white,
                                         padding:
                                             EdgeInsets.symmetric(vertical: 15),
                                         textStyle: TextStyle(fontSize: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -293,9 +334,15 @@ class _UserPageState extends State<UserPage> {
                                       onPressed: cancelChanges,
                                       child: Text('Cancel'),
                                       style: ElevatedButton.styleFrom(
+                                        primary: Colors.grey,
+                                        onPrimary: Colors.white,
                                         padding:
                                             EdgeInsets.symmetric(vertical: 15),
                                         textStyle: TextStyle(fontSize: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -307,9 +354,14 @@ class _UserPageState extends State<UserPage> {
                                   onPressed: toggleEditMode,
                                   child: Text('Edit Profile'),
                                   style: ElevatedButton.styleFrom(
+                                    primary: Color.fromARGB(255, 61, 24, 109),
+                                    onPrimary: Colors.white,
                                     padding: EdgeInsets.symmetric(
                                         vertical: 15, horizontal: 30),
                                     textStyle: TextStyle(fontSize: 16),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10.0),
+                                    ),
                                   ),
                                 ),
                               ),

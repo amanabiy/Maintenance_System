@@ -10,6 +10,7 @@ import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
 import 'package:mobile/screens/authentication/login_page.dart';
 import 'package:mobile/screens/request_page.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart'; // Import for JSON decoding
 
 // Assuming your RequestsModel class definition is similar to this:
@@ -27,7 +28,6 @@ class _RequestsPageState extends State<RequestsPage> {
   RequestsModel? requests; // Store the entire response data
   FlutterSecureStorage _storage = FlutterSecureStorage();
 
-
   void logout() async {
     // clear all login information from the secure storage
     // and go to login screen
@@ -42,7 +42,7 @@ class _RequestsPageState extends State<RequestsPage> {
         MaterialPageRoute(builder: (context) => const LoginPage()),
         (route) => false);
   }
-  
+
   Future<void> fetchRequests() async {
     try {
       final response = await Api().get(Endpoints.myRequests);
@@ -55,17 +55,23 @@ class _RequestsPageState extends State<RequestsPage> {
           throw Exception('Failed to decode requests: $e');
         }
         print("set fine");
-        setState(() {}); // Update UI after fetching data
+        if (mounted) {
+          setState(() {}); // Update UI after fetching data
+        }
       } else if (response.statusCode == 401) {
         // Handle unauthorized requests here
+        if (mounted) {
+          showFailureSnackBar(context, 'Unauthorized request');
+        }
         print("Unauthorized request");
-        showFailureSnackBar(context, 'Unauthorized request');
         logout();
-      } 
+      }
     } catch (e) {
       // Handle API request errors here
       print('Error fetching requests: ${e}');
-      showFailureSnackBar(context, 'Failed to fetch requests: $e');
+      if (mounted) {
+        showFailureSnackBar(context, 'Failed to fetch requests: $e');
+      }
       throw Exception('Failed to fetch requests: $e');
     }
   }
@@ -79,111 +85,128 @@ class _RequestsPageState extends State<RequestsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Requests'), // Set application title here
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: requests == null
-              ? const Center(
-                  child:
-                      CircularProgressIndicator()) // Show loading indicator if requests is null
-              : (requests?.items == null || requests!.items.isEmpty)
-                  ? const Center(
-                      child: Text(
-                          "No requests until now")) // Show message if items list is null or empty
-                  : ListView.builder(
-                      itemCount: requests!.items.length,
-                      itemBuilder: (context, index) {
-                        final request = requests!.items[index];
-                        return Card(
-                          margin: const EdgeInsets.symmetric(vertical: 8.0),
-                          elevation: 4.0, // Add elevation for a shadow effect
-                          color: Colors.white, // Set card background color
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(10.0), // Rounded corners
-                          ),
-                          child: ListTile(
-                            leading: Icon(
-                              Icons.settings,
-                              size: 50,
-                              color: Colors
-                                  .blue, // Adjust color based on request type
-                            ),
-                            title: Text(
-                              request?.subject ?? "",
-                              style: const TextStyle(
-                                fontSize: 16.0, // Adjust title font size
-                                fontWeight: FontWeight.bold, // Make title bold
+      appBar: CustomAppBar(title: 'Requests'),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: requests == null
+            ? const Center(
+                child: CircularProgressIndicator(),
+              ) // Show loading indicator if requests is null
+            : (requests?.items == null || requests!.items.isEmpty)
+                ? const Center(
+                    child: Text("No requests until now"),
+                  ) // Show message if items list is null or empty
+                : ListView.builder(
+                    itemCount: requests!.items.length,
+                    itemBuilder: (context, index) {
+                      final request = requests!.items[index];
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 8.0),
+                        elevation: 4.0, // Add elevation for a shadow effect
+                        color: Colors.white, // Set card background color
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(10.0), // Rounded corners
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      request?.subject ?? "",
+                                      style: const TextStyle(
+                                        fontSize: 16.0, // Adjust title font size
+                                        fontWeight:
+                                            FontWeight.bold, // Make title bold
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    formatDate(
+                                        request.createdAt ?? DateTime.now()),
+                                    style: const TextStyle(
+                                      fontSize: 12.0,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  request?.description ?? "",
-                                  style: const TextStyle(fontSize: 14.0),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                request?.description ?? "",
+                                style: const TextStyle(
+                                  fontSize: 14.0,
+                                  color: Colors.black87,
                                 ),
-                                const SizedBox(height: 4.0),
-                                Text(
-                                  "Status: ${request?.requestStatuses?.first?.statusType?.name ?? "Unknown"}",
-                                  style: const TextStyle(
-                                      fontSize: 12.0, color: Colors.grey),
+                              ),
+                              const SizedBox(height: 8.0),
+                              Text(
+                                "Status: ${request?.requestStatuses?.first?.statusType?.name ?? "Unknown"}",
+                                style: const TextStyle(
+                                  fontSize: 12.0,
+                                  color: Colors.grey,
                                 ),
-                                const SizedBox(
-                                    height: 4.0), // Add spacing for chips
-                                Wrap(
-                                  children: request?.maintenanceRequestTypes
-                                          ?.map((type) => Container(
-                                                margin:
-                                                    const EdgeInsets.symmetric(
-                                                        horizontal: 4.0),
-                                                padding:
-                                                    const EdgeInsets.all(4.0),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.blue.withOpacity(
-                                                      0.2), // Set a light blue background
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          4.0),
+                              ),
+                              const SizedBox(
+                                  height: 8.0), // Add spacing for chips
+                              Wrap(
+                                children: request?.maintenanceRequestTypes
+                                        ?.map((type) => Container(
+                                              margin:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 4.0),
+                                              padding:
+                                                  const EdgeInsets.all(4.0),
+                                              decoration: BoxDecoration(
+                                                color: Colors.blue.withOpacity(
+                                                    0.2), // Light blue background
+                                                borderRadius:
+                                                    BorderRadius.circular(4.0),
+                                              ),
+                                              child: Text(
+                                                type.name ?? "",
+                                                style: const TextStyle(
+                                                  fontSize:
+                                                      12.0, // Reduce font size
+                                                  color:
+                                                      Colors.blue, // Text color
                                                 ),
-                                                child: Text(
-                                                  type.name ?? "",
-                                                  style: const TextStyle(
-                                                    fontSize:
-                                                        12.0, // Reduce font size
-                                                    color: Colors
-                                                        .blue, // Set text color to blue
-                                                  ),
-                                                ),
-                                              ))
-                                          .toList() ??
-                                      [], // Handle empty list
+                                              ),
+                                            ))
+                                        .toList() ??
+                                    [], // Handle empty list
+                              ),
+                              const SizedBox(height: 8.0),
+                              Align(
+                                alignment: Alignment.centerRight,
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_forward),
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => RequestDetailPage(
+                                            requestId: request!.id!),
+                                      ),
+                                    );
+                                  },
                                 ),
-                                Text(
-                                  "Created At: ${formatDate(request?.createdAt ?? DateTime.now())}",
-                                  style: const TextStyle(
-                                      fontSize: 12.0, color: Colors.grey),
-                                ),
-                                // ... other subtitle elements
-                              ],
-                            ),
-                            trailing: const Icon(Icons.arrow_forward),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RequestDetailPage(
-                                      requestId: request!.id!),
-                                ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
-                        );
-                      },
-                    ),
-        ));
+                        ),
+                      );
+                    },
+                  ),
+      ),
+    );
   }
 
   String formatDate(DateTime date) {

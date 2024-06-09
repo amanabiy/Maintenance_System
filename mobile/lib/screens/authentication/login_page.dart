@@ -8,6 +8,7 @@ import 'package:mobile/screens/authentication/register_page.dart';
 import 'package:mobile/screens/authentication/reset_password.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/screens/nav_bar.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart';
 // Import for navigation (replace with your implementation)
 
@@ -76,7 +77,9 @@ class _LoginPageState extends State<LoginPage> {
     } catch (e) {
       // Handle other exceptions
       print('Error during login: $e');
-      showFailureSnackBar(context, 'An error occurred. Please try again later.');
+      if (mounted) {
+        showFailureSnackBar(context, 'An error occurred. Please try again later.');
+      }
     }
   }
 
@@ -95,12 +98,11 @@ class _LoginPageState extends State<LoginPage> {
       MaterialPageRoute(builder: (context) => const CreateAccountPage()),
     );
   }
-
-  @override
+@override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Login'),
+      appBar: CustomAppBar(
+        title: 'Login',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -119,13 +121,11 @@ class _LoginPageState extends State<LoginPage> {
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide:
-                          const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                 ),
@@ -133,16 +133,16 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    hintText: 'Enter your password',
+                    hintStyle: const TextStyle(color: Colors.grey),
                     contentPadding: const EdgeInsets.all(12.0),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide:
-                          const BorderSide(color: Colors.grey, width: 1.0),
+                      borderSide: const BorderSide(color: Colors.grey, width: 1.0),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10.0),
-                      borderSide:
-                          const BorderSide(color: Colors.blue, width: 2.0),
+                      borderSide: const BorderSide(color: Colors.blue, width: 2.0),
                     ),
                   ),
                   obscureText: true,
@@ -163,9 +163,16 @@ class _LoginPageState extends State<LoginPage> {
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: () {
-                          _login(
-                              _emailController.text, _passwordController.text);
+                          _login(_emailController.text, _passwordController.text);
                         },
+                        style: ElevatedButton.styleFrom(
+                          primary: Color.fromARGB(255, 61, 24, 109), // Button color
+                          onPrimary: Colors.white, // Text color
+                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
                         child: const Text('Login'),
                       ),
                 Row(

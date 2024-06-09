@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/screens/authentication/login_page.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 
 class CheckEmailPage extends StatelessWidget {
   final String description;
@@ -9,9 +10,7 @@ class CheckEmailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Check Your Email'),
-      ),
+      appBar: CustomAppBar(title: 'Check Your Email'),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(

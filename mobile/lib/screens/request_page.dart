@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/models/RequestsModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 
 class RequestDetailPage extends StatefulWidget {
   final int requestId;
@@ -25,27 +26,30 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
 
   Future<void> fetchRequestDetails() async {
     try {
-      final response = await api.get('${Endpoints.request}/${widget.requestId}');
+      final response =
+          await api.get('${Endpoints.request}/${widget.requestId}');
       request = Item.fromJson(response.data);
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load request details: $e')),
-      );
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to load request details: $e')),
+        );
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Request Details'),
-      ),
+      appBar: CustomAppBar(title: 'Request Details'),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : request == null
@@ -58,27 +62,48 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                       children: [
                         _buildDetailSection('General Information', [
                           _buildDetailRow('Subject', request?.subject ?? 'N/A'),
-                          _buildDetailRow('Description', request?.description ?? 'N/A'),
-                          _buildDetailRow('Status', request?.verificationStatus ?? 'N/A'),
+                          _buildDetailRow(
+                              'Description', request?.description ?? 'N/A'),
+                          _buildDetailRow(
+                              'Status', request?.verificationStatus ?? 'N/A'),
                           // _buildDetailRow('Priority', request?.priority?.toString() ?? 'N/A'),
                         ]),
                         _buildDetailSection('Requester Information', [
-                          _buildDetailRow('Requester', request?.requester?.fullName ?? 'N/A'),
-                          _buildDetailRow('Assigned Persons', request?.assignedPersons.map((p) => p.fullName).join(', ') ?? 'N/A'),
+                          _buildDetailRow('Requester',
+                              request?.requester?.fullName ?? 'N/A'),
+                          _buildDetailRow(
+                              'Assigned Persons',
+                              request?.assignedPersons
+                                      .map((p) => p.fullName)
+                                      .join(', ') ??
+                                  'N/A'),
                         ]),
                         _buildDetailSection('Request Details', [
-                          _buildDetailRow('Maintenance Types', request?.maintenanceRequestTypes.map((t) => t.name).join(', ') ?? 'N/A'),
-                          _buildDetailRow('Department', request?.handlingDepartment?.name ?? 'N/A'),
-                          _buildDetailRow('Location', 'Block ${request?.location?.blockNumber}, Floor ${request?.location?.floor}, Room ${request?.location?.roomNumber}'),
+                          _buildDetailRow(
+                              'Maintenance Types',
+                              request?.maintenanceRequestTypes
+                                      .map((t) => t.name)
+                                      .join(', ') ??
+                                  'N/A'),
+                          _buildDetailRow('Department',
+                              request?.handlingDepartment?.name ?? 'N/A'),
+                          _buildDetailRow('Location',
+                              'Block ${request?.location?.blockNumber}, Floor ${request?.location?.floor}, Room ${request?.location?.roomNumber}'),
                           // _buildDetailRow('Equipments', request?.equipments.map((e) => e.name).join(', ') ?? 'N/A'),
                         ]),
-                        _buildDetailSection('Request Statuses', request!.requestStatuses.map((status) => ListTile(
-                          title: Text(status.statusType?.name ?? ''),
-                          subtitle: Text(status.statusType?.description ?? ''),
-                          leading: Icon(Icons.info),
-                        )).toList()),
-                        _buildDetailSection('Media Files', _buildMediaFiles(request!.mediaFiles)),
-
+                        _buildDetailSection(
+                            'Request Statuses',
+                            request!.requestStatuses
+                                .map((status) => ListTile(
+                                      title:
+                                          Text(status.statusType?.name ?? ''),
+                                      subtitle: Text(
+                                          status.statusType?.description ?? ''),
+                                      leading: Icon(Icons.info),
+                                    ))
+                                .toList()),
+                        _buildDetailSection('Media Files',
+                            _buildMediaFiles(request!.mediaFiles)),
                       ],
                     ),
                   ),
@@ -100,7 +125,10 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
           children: [
             Text(
               title,
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blue),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 123, 69, 193)),
             ),
             SizedBox(height: 8),
             ...children,
@@ -152,7 +180,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(media.filename ?? ''),
-                  Text(media.mimetype ?? '', style: TextStyle(color: Colors.grey)),
+                  Text(media.mimetype ?? '',
+                      style: TextStyle(color: Colors.grey)),
                 ],
               ),
             ),

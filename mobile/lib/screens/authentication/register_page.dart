@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/screens/authentication/check_email.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'dart:convert';
 
 import 'package:mobile/screens/util/custom_scaffold.dart';
@@ -74,8 +75,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Create Account'),
+      appBar: CustomAppBar(
+        title: 'Create Account',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -161,6 +162,14 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     ? const CircularProgressIndicator()
                     : ElevatedButton(
                         onPressed: _register,
+                        style: ElevatedButton.styleFrom(
+                          primary: Color.fromARGB(255, 61, 24, 109), // Button color
+                          onPrimary: Colors.white, // Text color
+                          padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
                         child: const Text('Create Account'),
                       ),
               ],

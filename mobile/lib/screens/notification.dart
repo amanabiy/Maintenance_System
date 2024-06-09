@@ -5,6 +5,7 @@ import 'dart:convert';
 
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart';
 
 class NotificationsPage extends StatefulWidget {
@@ -25,9 +26,11 @@ Future<void> fetchNotifications(bool isRead) async {
     if (response.statusCode == 200) {
       final items = response.data['items'] as List;
       print(items);
+      if (mounted) {
       setState(() {
         notifications = items.map((item) => NotificationModel.fromJson(item)).toList();
       });
+      }
     } else {
       print(response.data);
       print('Failed to load notifications: ${response.statusCode}');
@@ -35,8 +38,11 @@ Future<void> fetchNotifications(bool isRead) async {
     }
   } catch (e) {
     print('Error fetching notifications: $e');
+    if (mounted) {
     showFailureSnackBar(context, 'Failed to fetch notifications: $e');
-    throw Exception('Failed to fetch notifications: $e');
+
+    }
+  throw Exception('Failed to fetch notifications: $e');
   }
 }
 
@@ -50,8 +56,7 @@ Future<void> fetchNotifications(bool isRead) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Notifications'),
+      appBar: CustomAppBar(title: 'Requests', 
         actions: [
           Switch(
             value: showUnread,

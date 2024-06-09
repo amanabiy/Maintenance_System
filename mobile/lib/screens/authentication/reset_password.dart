@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/screens/authentication/check_email.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart';
 
 class ResetPasswordPage extends StatefulWidget {
@@ -50,8 +51,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reset Password'),
+      appBar: CustomAppBar(
+        title: 'Reset Password',
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -83,6 +84,14 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                       onPressed: () {
                         _sendResetLink(_emailController.text);
                       },
+                      style: ElevatedButton.styleFrom(
+                        primary: Color.fromARGB(255, 61, 24, 109), // Button color
+                        onPrimary: Colors.white, // Text color
+                        padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 24.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
                       child: const Text('Send Reset Link'),
                     ),
             ],
