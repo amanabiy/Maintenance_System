@@ -19,33 +19,32 @@ class _NotificationsPageState extends State<NotificationsPage> {
   List<NotificationModel> notifications = [];
   bool showUnread = true;
 
-Future<void> fetchNotifications(bool isRead) async {
-  try {
-    final response = await Api().get(Endpoints.getMyNotification);
+  Future<void> fetchNotifications(bool isRead) async {
+    try {
+      final response = await Api().get(Endpoints.getMyNotification);
 
-    if (response.statusCode == 200) {
-      final items = response.data['items'] as List;
-      print(items);
-      if (mounted) {
-      setState(() {
-        notifications = items.map((item) => NotificationModel.fromJson(item)).toList();
-      });
+      if (response.statusCode == 200) {
+        final items = response.data['items'] as List;
+        print(items);
+        if (mounted) {
+          setState(() {
+            notifications =
+                items.map((item) => NotificationModel.fromJson(item)).toList();
+          });
+        }
+      } else {
+        print(response.data);
+        print('Failed to load notifications: ${response.statusCode}');
+        throw Exception('Failed to load notifications');
       }
-    } else {
-      print(response.data);
-      print('Failed to load notifications: ${response.statusCode}');
-      throw Exception('Failed to load notifications');
+    } catch (e) {
+      print('Error fetching notifications: $e');
+      if (mounted) {
+        showFailureSnackBar(context, 'Failed to fetch notifications: $e');
+        // throw Exception('Failed to fetch notifications: $e');
+      }
     }
-  } catch (e) {
-    print('Error fetching notifications: $e');
-    if (mounted) {
-    showFailureSnackBar(context, 'Failed to fetch notifications: $e');
-
-    }
-  throw Exception('Failed to fetch notifications: $e');
   }
-}
-
 
   @override
   void initState() {
@@ -56,7 +55,8 @@ Future<void> fetchNotifications(bool isRead) async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(title: 'Requests', 
+      appBar: CustomAppBar(
+        title: 'Requests',
         actions: [
           Switch(
             value: showUnread,
@@ -108,7 +108,8 @@ Future<void> fetchNotifications(bool isRead) async {
                           const SizedBox(height: 8.0),
                           Text(
                             "Created At: ${notification.createdAt}",
-                            style: const TextStyle(fontSize: 12.0, color: Colors.grey),
+                            style: const TextStyle(
+                                fontSize: 12.0, color: Colors.grey),
                           ),
                         ],
                       ),

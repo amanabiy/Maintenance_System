@@ -16,8 +16,8 @@ class RequestsModel {
 
     factory RequestsModel.fromJson(Map<String, dynamic> json){ 
         return RequestsModel(
-            page: json["page"],
-            limit: json["limit"],
+            page: json["page"] is int ? json["page"] : int.parse(json["page"]),
+            limit: json["limit"] is int ? json["limit"] : int.parse(json["limit"]),
             total: json["total"],
             items: json["items"] == null ? [] : List<Item>.from(json["items"]!.map((x) => Item.fromJson(x))),
         );

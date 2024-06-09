@@ -88,7 +88,7 @@ class Api {
       return res;
     } on DioError catch (e) {
       // Empty body
-      print(e.response?.data);
+      print(e.response);
       var errorMessage = e.response?.data['message'];
       if (e.response?.data['message'].runtimeType != String) {
         errorMessage = e.response?.data['message'][0];
