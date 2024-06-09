@@ -1,7 +1,7 @@
 import { ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MaintenanceRequest } from './entities/maintenance_request.entity';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { GenericDAL } from 'src/DAL/dal';
 import { CreateMaintenanceRequestDto } from './dto/create-maintenance_request.dto';
 import { UpdateMaintenanceRequestDto } from './dto/update-maintenance_request.dto';
@@ -239,9 +239,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     // Add fuzzy search terms if provided
     if (term) {
       filters.$or = [
-        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
-        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
-        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+        { title: Like(`%${term}%`) },
+        { description: Like(`%${term}%`) },
+        { requester: { name: Like(`%${term}%`) } },
       ];
     }
 
@@ -274,9 +274,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
 
     if (term) {
       filters.$or = [
-        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
-        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
-        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+        { title: Like(`%${term}%`) },
+        { description: Like(`%${term}%`) },
+        { requester: { name: Like(`%${term}%`) } },
       ];
     }
 
@@ -308,9 +308,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     // Add fuzzy search terms if provided
     if (term) {
       filters.$or = [
-        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
-        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
-        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+        { title: Like(`%${term}%`) },
+        { description: Like(`%${term}%`) },
+        { requester: { name: Like(`%${term}%`) } },
       ];
     }
 
@@ -344,9 +344,9 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     // Add fuzzy search terms if provided
     if (term) {
       filters.$or = [
-        { title: { $regex: term, $options: 'i' } }, // Fuzzy search on title
-        { description: { $regex: term, $options: 'i' } }, // Fuzzy search on description
-        { 'requester.name': { $regex: term, $options: 'i' } } // Fuzzy search on submitter's name
+        { title: Like(`%${term}%`) },
+        { description: Like(`%${term}%`) },
+        { requester: { name: Like(`%${term}%`) } },
       ];
     }
   
