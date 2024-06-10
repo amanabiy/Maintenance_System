@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GenericDAL } from 'src/DAL/dal';
 import { Like, Repository } from 'typeorm';
@@ -26,5 +26,12 @@ export class MaintenanceRequestTypeService extends GenericDAL<
         { description: Like(`%${term}%`) },
       ],
     });
+  }
+
+  async delete(id: number): Promise<void> {
+    const result = await this.maintenanceRequestTypeRepository.softDelete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`MaintenanceRequest Type with ID ${id} not found`);
+    }
   }
 }
