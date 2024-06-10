@@ -3,7 +3,6 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
-  useRouteError,
 } from "react-router-dom";
 
 import Loading from "../components/loading/Loading.jsx";
@@ -116,7 +115,7 @@ const router = createBrowserRouter(
         path="active"
         element={
           <Suspense fallback={<Loading />}>
-            <ProtectedRoute requiredRoles={null} tokenChk={true} />
+            <ProtectedRoute requiredPermissions={null} tokenChk={true} />
           </Suspense>
         }
       >
@@ -159,7 +158,7 @@ const router = createBrowserRouter(
               element={
                 <Suspense fallback={<Loading />}>
                   <ProtectedRoute
-                    requiredRoles={[
+                    requiredPermissions={[
                       allPermissions[3].name,
                       allPermissions[4].name,
                     ]}
@@ -174,7 +173,9 @@ const router = createBrowserRouter(
               path="create"
               element={
                 <Suspense fallback={<Loading />}>
-                  <ProtectedRoute requiredRoles={[allPermissions[1].name]} />
+                  <ProtectedRoute
+                    requiredPermissions={[allPermissions[1].name]}
+                  />
                 </Suspense>
               }
             >
@@ -199,7 +200,9 @@ const router = createBrowserRouter(
             path="all-requests"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={[allPermissions[12].name]} />
+                <ProtectedRoute
+                  requiredPermissions={[allPermissions[12].name]}
+                />
               </Suspense>
             }
           >
@@ -209,7 +212,7 @@ const router = createBrowserRouter(
               element={
                 <Suspense fallback={<Loading />}>
                   <ProtectedRoute
-                    requiredRoles={[
+                    requiredPermissions={[
                       allPermissions[16].name,
                       allPermissions[17].name,
                     ]}
@@ -223,7 +226,9 @@ const router = createBrowserRouter(
               path="view/:requestId"
               element={
                 <Suspense fallback={<Loading />}>
-                  <ProtectedRoute requiredRoles={[allPermissions[16].name]} />
+                  <ProtectedRoute
+                    requiredPermissions={[allPermissions[16].name]}
+                  />
                 </Suspense>
               }
             >
