@@ -49,7 +49,7 @@ export class NotificationService extends GenericDAL<Notification, CreateNotifica
     }
     
     console.log(whereConditions);
-    return this.findWithPagination({
+    return await this.findWithPagination({
       where: whereConditions,
     });
   }
