@@ -27,6 +27,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
   constructor(
     @InjectRepository(RequestStatus)
     private readonly requestStatusRepository: Repository<RequestStatus>,
+    @Inject(forwardRef(() => RequestStatusTypeService))
     private readonly requestStatusTypeService: RequestStatusTypeService,
     @Inject(forwardRef(() => MaintenanceRequestService))
     private readonly maintenanceRequestService: MaintenanceRequestService,

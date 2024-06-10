@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { RequestStatusType } from './entities/request_status_type.entity';
@@ -9,12 +9,16 @@ import { FindAllResponseRequestStatustypeDto } from './dto/find-all-response-mai
 import { Role } from '../role/entities/role.entity';
 import { RoleService } from '../role/role.service';
 import { MaintenanceRequestType } from '../maintenance_request_type/entities/maintenance_request_type.entity';
+import { RequestStatus } from '../request_status/entities/request_status.entity';
+import { RequestStatusService } from '../request_status/request_status.service';
 
 @Injectable()
 export class RequestStatusTypeService extends GenericDAL<RequestStatusType, CreateRequestStatusTypeDto, UpdateRequestStatusTypeDto> {
   constructor(
     @InjectRepository(RequestStatusType)
     private readonly requestStatusTypeRepository: Repository<RequestStatusType>,
+    @Inject(forwardRef(() => RequestStatusService))
+    private readonly requestStatusRepository: RequestStatusService,
     private readonly roleService: RoleService,
   ) {
     super(requestStatusTypeRepository, 0, 10, ['allowedTransitions', 'allowedRoles']);
@@ -52,15 +56,53 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
     return newStatusType;
   }
 
-  async delete(id: number): Promise<void> {
-    const requestStatusType = await this.findOne(id);
+  async deleteForDev(id: number): Promise<void> {
+    const requestStatusType = await this.findOne(id, {
+      relations: ['allowedTransitions', 'requestStatuses']
+    });
+  
     if (!requestStatusType) {
       throw new Error('Request status type not found');
     }
-
+  
     if (requestStatusType.isInitialStatus) {
       throw new Error('Cannot delete initial status type');
     }
+  
+    // Delete associated maintenance requests
+    if (requestStatusType.requestStatuses && requestStatusType.requestStatuses.length > 0) {
+      for (const requestStatus of requestStatusType.requestStatuses) {
+        await this.requestStatusRepository.delete(requestStatus.id);
+      }
+    }
+  
+    // Remove allowed transitions relations
+    if (requestStatusType.allowedTransitions && requestStatusType.allowedTransitions.length > 0) {
+      await this.requestStatusTypeRepository
+        .createQueryBuilder()
+        .relation(RequestStatusType, 'allowedTransitions')
+        .of(requestStatusType)
+        .remove(requestStatusType.allowedTransitions);
+    }
+  
+    await this.requestStatusTypeRepository.delete(id);
+  }
+  
+
+  async delete(id: number): Promise<void> {
+    const requestStatusType = await this.findOne(id);
+    if (!requestStatusType) {
+      throw new BadRequestException('Request status type not found');
+    }
+
+    if (requestStatusType.isInitialStatus) {
+      throw new BadRequestException('Cannot delete initial status type');
+    }
+
+      // Check if there are any associated maintenance requests
+  if (requestStatusType.requestStatuses && requestStatusType.requestStatuses.length > 0) {
+    throw new BadRequestException('Cannot delete status type as there are associated maintenance requests');
+  }
 
     await this.requestStatusTypeRepository
       .createQueryBuilder()

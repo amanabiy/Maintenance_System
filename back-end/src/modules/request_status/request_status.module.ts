@@ -41,7 +41,7 @@ import { Notification } from '../notification/entities/notification.entity';
   imports: [
             TypeOrmModule.forFeature([RequestStatus, MaintenanceRequest, User, MaintenanceRequestType,
             Department, Role, Media, RequestStatusType, Location, Permission, RequestStatusTime, Notification]),
-            forwardRef(() => MaintenanceRequestModule), RequestStatusModule, RequestStatusTypeModule,
+            forwardRef(() => MaintenanceRequestModule), RequestStatusModule, forwardRef(() => RequestStatusTypeModule),
             UserModule, MediaModule, RoleModule, MaintenanceRequestTypeModule,
             DepartmentModule, LocationModule, NotificationModule
         ],

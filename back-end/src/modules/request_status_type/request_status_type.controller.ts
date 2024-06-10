@@ -53,7 +53,7 @@ export class RequestStatusTypeController {
   @ApiResponse({ status: HttpStatus.OK, description: 'Request status type has been successfully deleted', type: DeleteResponseDto })
   @ApiNotFoundResponse({ description: 'Request status type with the specified ID not found' })
   async remove(@Param('id') id: string): Promise<DeleteResponseDto> {
-    await this.requestStatusTypeService.delete(+id);
+    await this.requestStatusTypeService.deleteForDev(+id);
     return new DeleteResponseDto();
   }
 
