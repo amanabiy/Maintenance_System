@@ -18,6 +18,7 @@ import {
 } from "../../redux/features/user";
 import { useGetAllRolesQuery } from "../../redux/features/role";
 import { useGetAllDepartmentsQuery } from "../../redux/features/department";
+import Loading from "../../components/loading/Loading";
 
 const EditUser = () => {
   const { userId } = useParams();
@@ -54,10 +55,10 @@ const EditUser = () => {
     error: roleErr,
     isLoading: roleLoading,
   } = useGetAllRolesQuery();
-  const { data, error, isLoading } = useGetUserByIdQuery(userId);
+  const { data, error, status, isLoading } = useGetUserByIdQuery(userId);
 
   useEffect(() => {
-    if (!isLoading && data) {
+    if (!isLoading && status === "fulfilled" && data) {
       setUserData({
         fullName: data.fullName || "",
         email: data.email || "",
@@ -91,8 +92,18 @@ const EditUser = () => {
     }
   };
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error fetching user data.</div>;
+  if (isLoading || roleLoading || departmentLoading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
+  if (error || roleErr || departmentError)
+    return (
+      <div>Error fetching user data. {error + roleErr + departmentError}</div>
+    );
+
+  console.log("User data:", userData, roles.items, departments.items);
 
   return (
     <Container component="main" maxWidth="md" sx={{ mt: 4 }}>
@@ -136,7 +147,7 @@ const EditUser = () => {
               onChange={handleChange}
               label="Role"
             >
-              {roles.map((role) => (
+              {roles.items.map((role) => (
                 <MenuItem key={role.id} value={role.id}>
                   {role.roleName}
                 </MenuItem>
