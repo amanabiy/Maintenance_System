@@ -57,35 +57,10 @@ export class RequestStatusTypeService extends GenericDAL<RequestStatusType, Crea
   }
 
   async deleteForDev(id: number): Promise<void> {
-    const requestStatusType = await this.findOne(id, {
-      relations: ['allowedTransitions', 'requestStatuses']
-    });
-  
-    if (!requestStatusType) {
-      throw new Error('Request status type not found');
+    const result = await this.requestStatusTypeRepository.softDelete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Maintenance Request Type with ID ${id} not found`);
     }
-  
-    if (requestStatusType.isInitialStatus) {
-      throw new Error('Cannot delete initial status type');
-    }
-  
-    // Delete associated maintenance requests
-    if (requestStatusType.requestStatuses && requestStatusType.requestStatuses.length > 0) {
-      for (const requestStatus of requestStatusType.requestStatuses) {
-        await this.requestStatusRepository.delete(requestStatus.id);
-      }
-    }
-  
-    // Remove allowed transitions relations
-    if (requestStatusType.allowedTransitions && requestStatusType.allowedTransitions.length > 0) {
-      await this.requestStatusTypeRepository
-        .createQueryBuilder()
-        .relation(RequestStatusType, 'allowedTransitions')
-        .of(requestStatusType)
-        .remove(requestStatusType.allowedTransitions);
-    }
-  
-    await this.requestStatusTypeRepository.delete(id);
   }
   
 
