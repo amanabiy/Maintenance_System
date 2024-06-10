@@ -8,9 +8,14 @@ class Endpoints {
   static String forgotPasswordRequestOtp = "$baseUrl/auth/request-otp";
 
   // Users
+  static String fuzzySearchUsers = "$baseUrl/users/fuzzy-search";
+
+  // Requests
   static String request = "$baseUrl/maintenance-request";
   static String myRequests = "$baseUrl/maintenance-request/my-requests";
   static String createRequest = "$baseUrl/maintenance-request";
+  static String requestById= "$baseUrl/maintenance-request";
+  static String updateRequest = "$baseUrl/maintenance-request";
   static String assignedToMeRequests = "$baseUrl/maintenance-request/assigned-to-me?page=1&limit=10000";
   static String requestsAssignedToMyRole = "$baseUrl/maintenance-request/by-my-role";
   static String departmentRequests = "$baseUrl/maintenance-request/my-department";
@@ -28,4 +33,7 @@ class Endpoints {
 
   // Notifications
   static String getMyNotification = '${Endpoints.baseUrl}/notifications/logged-in-user';
+
+  // Maintenance Request Type
+  static String maintenanceRequestTypeFuzzy = "$baseUrl/maintenance-request-types/fuzzy-search";
 }
