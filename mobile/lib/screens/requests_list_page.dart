@@ -99,7 +99,6 @@ class _RequestsPageState extends State<RequestsPage> {
       }
     }
     statusTypes = statusTypeSet.toList();
-    selectedStatusTypes = statusTypeSet;
   }
 
   @override
@@ -129,11 +128,9 @@ class _RequestsPageState extends State<RequestsPage> {
                     items: filterEndpoints.keys.map((String value) {
                       return DropdownMenuItem<String>(
                         value: value,
-                        child: Flexible(
-                          child: Text(
-                            value,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        child: Text(
+                          value,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       );
                     }).toList(),
@@ -154,11 +151,9 @@ class _RequestsPageState extends State<RequestsPage> {
                     items: statusTypes.map((String status) {
                       return DropdownMenuItem<String>(
                         value: status,
-                        child: Flexible(
-                          child: Text(
-                            status,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                        child: Text(
+                          status,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       );
                     }).toList(),
