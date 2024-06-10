@@ -1,4 +1,4 @@
-import { Entity, Column, ManyToMany } from 'typeorm';
+import { Entity, Column, ManyToMany, DeleteDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
 import { MaintenanceRequest } from 'src/modules/maintenance_request/entities/maintenance_request.entity';
@@ -16,4 +16,7 @@ export class MaintenanceRequestType extends BaseModelEntity {
   @ApiProperty({ description: 'Maintenance requests associated with this type' })
   @ManyToMany(() => MaintenanceRequest)
   maintenanceRequests: MaintenanceRequest[];
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
