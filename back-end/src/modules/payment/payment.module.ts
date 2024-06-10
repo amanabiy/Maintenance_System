@@ -27,13 +27,16 @@ import { PermissionService } from '../permission/permission.service';
 import { RequestStatusTime } from '../request_status_time/entities/request_status_time.entity';
 import { RequestStatusTimeModule } from '../request_status_time/request_status_time.module';
 import { RequestStatusTimeService } from '../request_status_time/request_status_time.service';
+import { NotificationService } from '../notification/notification.service';
+import { Notification } from '../notification/entities/notification.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Payment, User, MaintenanceRequest, Department, Role, Location,
-              MaintenanceRequestType, Media, RequestStatus, RequestStatusType, Permission, RequestStatusTime]), RequestStatusTimeModule],
+              MaintenanceRequestType, Media, RequestStatus, RequestStatusType, Permission, RequestStatusTime,
+            Notification]), RequestStatusTimeModule],
   providers: [PaymentService, UserService, MaintenanceRequestService, DepartmentService, RoleService,
               MailService, LocationService, MaintenanceRequestTypeService, MediaService, RequestStatusService,
-              RequestStatusTypeService, PermissionService, RequestStatusTimeService],
+              RequestStatusTypeService, PermissionService, RequestStatusTimeService, NotificationService],
   controllers: [PaymentController],
   exports: [PaymentService]
 })

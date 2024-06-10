@@ -38,10 +38,10 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 
       # MailHog SMTP
-      MAIL_HOST: mailhog
-      MAIL_PORT: 1025
-      MAIL_USER: ''
-      MAIL_PASS: ''
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USER: ${MAIL_USER}
+      MAIL_PASS: ${MAIL_PASS}
 
     volumes:
       - ./src:/usr/src/app/src

@@ -18,6 +18,9 @@ import { User } from '../user/entities/user.entity';
 import { UpdateRequestStatusDto } from './dto/update-request_status.dto';
 import { LocationService } from '../location/location.service';
 import { RequestStatusTimeService } from '../request_status_time/request_status_time.service';
+import { NotificationService } from '../notification/notification.service';
+import { MailService } from '../mail/mailer.service';
+
 
 @Injectable()
 export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
@@ -34,6 +37,9 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     private readonly departmentService: DepartmentService,
     private readonly locationService: LocationService,
     private readonly requestStatusTimeService: RequestStatusTimeService,
+    @Inject(forwardRef(() => NotificationService))
+    private readonly notificationService: NotificationService,
+    private readonly mailService: MailService,
   ) {
     super(requestStatusRepository, 0, 10, ['request', 'statusUpdatedBy', 'statusType']);
   }
@@ -113,6 +119,10 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     if (newRequestStatusType.allowsForwardToPerson && updateDto.assignedPersonIds) {
       internalVersionChanges += `Assigned persons updated from ${maintenanceRequest.assignedPersons} to ${updateDto.assignedPersonIds}\n`;
       maintenanceRequest.assignedPersons = await this.userService.findByIds(updateDto.assignedPersonIds);
+      // Create notifications for assigned persons
+      for (const person of maintenanceRequest.assignedPersons) {
+        await this.notificationService.createAssignmentNotification(person.id, maintenanceRequest.id);
+      }
     }
 
     // Update handling department if allowed
@@ -188,6 +198,9 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const endTime = createdRequestStatus.createdAt;
     const timeSpent = await this.requestStatusTimeService.calculateSpentTime(startTime, endTime);
     await this.requestStatusTimeService.create(currentStatus.statusType, createdRequestStatus.statusType, maintenanceRequest, currentUser, timeSpent);
+
+    await this.notificationService.createStatusChangeNotification(maintenanceRequest.requester.id, maintenanceRequest.id, currentStatus.statusType.name, newRequestStatusType.name, 'link');
+    await this.mailService.sendStatusChangeNotification(maintenanceRequest.requester.email, maintenanceRequest.id, currentStatus.statusType.name, newRequestStatusType.name);
 
     return maintenanceRequest;
   }
