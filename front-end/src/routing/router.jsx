@@ -49,6 +49,7 @@ const Departments = lazy(() => import("../pages/Admin/Departments"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
+import { allPermissions } from "../data/allPermissions.js";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -125,117 +126,151 @@ const router = createBrowserRouter(
             </Suspense>
           }
         >
-          {/* Admin Routes */}
+          {/* Stats Admin----------------------------------------- */}
           <Route
             path="admin-dashboard"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute
+                  requiredPermissions={[allPermissions[35].name]}
+                />
               </Suspense>
             }
           >
             <Route index element={<AdminDashboard />} />
           </Route>
+          {/* Users List---------------------------------------------- */}
           <Route
             path="all-users"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute
+                  requiredPermissions={[allPermissions[2].name]}
+                />
               </Suspense>
             }
           >
             <Route index element={<Users />} />
+
+            <Route
+              path="edit/:userId"
+              element={
+                <Suspense fallback={<Loading />}>
+                  <ProtectedRoute
+                    requiredRoles={[
+                      allPermissions[3].name,
+                      allPermissions[4].name,
+                    ]}
+                  />
+                </Suspense>
+              }
+            >
+              <Route index element={<EditUser />} />
+            </Route>
+
+            <Route
+              path="create"
+              element={
+                <Suspense fallback={<Loading />}>
+                  <ProtectedRoute requiredRoles={[allPermissions[1].name]} />
+                </Suspense>
+              }
+            >
+              <Route index element={<CreateUser />} />
+            </Route>
           </Route>
+          {/* Financial Transactions----------------------------------------- */}
           <Route
             path="financial-transactions"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute
+                  requiredPermissions={[allPermissions[29].name]}
+                />
               </Suspense>
             }
           >
             <Route index element={<FinancialTransactions />} />
           </Route>
+          {/* All Requests-------------------------------------------------------- */}
           <Route
             path="all-requests"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute requiredRoles={[allPermissions[12].name]} />
               </Suspense>
             }
           >
             <Route index element={<Requests />} />
             <Route
               path="view/:requestId/more-details"
-              element={<RequestStatusDetails />}
-            />
-            <Route path="view/:requestId" element={<RequestDetails />} />
-            <Route path="edit/:requestId" element={<RequestDetails />} />
+              element={
+                <Suspense fallback={<Loading />}>
+                  <ProtectedRoute
+                    requiredRoles={[
+                      allPermissions[16].name,
+                      allPermissions[17].name,
+                    ]}
+                  />
+                </Suspense>
+              }
+            >
+              <Route index element={<RequestStatusDetails />} />
+            </Route>
+            <Route
+              path="view/:requestId"
+              element={
+                <Suspense fallback={<Loading />}>
+                  <ProtectedRoute requiredRoles={[allPermissions[16].name]} />
+                </Suspense>
+              }
+            >
+              <Route index element={<RequestDetails />} />
+            </Route>
           </Route>
+          {/* My Profile-------------------------------------------------------- */}
           <Route
-            path="admin-profile"
+            path="my-profile"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute />
               </Suspense>
             }
           >
             <Route index element={<MyProfile />} />
           </Route>
+          {/* Manage Workflows----------------------------------------------------- */}
           <Route
             path="manage-workflows"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute />
+                {/* Remember to add permissions here */}
               </Suspense>
             }
           >
             <Route index element={<ManageWorkFlow />} />
           </Route>
-
+          {/* Roles------------------------------------------------------------- */}
           <Route
             path="roles"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute
+                  requiredPermissions={[allPermissions[7].name]}
+                />
               </Suspense>
             }
           >
             <Route index element={<Roles />} />
           </Route>
-
-          {/* Edit Users */}
-          <Route
-            path="all-users"
-            element={
-              <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
-              </Suspense>
-            }
-          >
-            <Route index element={<Requests />} />
-            <Route path="edit/:userId" element={<EditUser />} />
-            {/* <Route path="view/:requestId" element={<RequestDetails />} />
-          <Route path="edit/:requestId" element={<RequestDetails />} /> */}
-          </Route>
-
-          {/* Create Users */}
-          <Route
-            path="all-users"
-            element={
-              <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
-              </Suspense>
-            }
-          >
-            <Route index element={<Requests />} />
-            <Route path="create" element={<CreateUser />} />
-          </Route>
+          {/* Departments------------------------------------------------------------ */}
           <Route
             path="departments"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["ADMIN"]} />
+                <ProtectedRoute />
+                {/* Remember to add protected permissions */}
               </Suspense>
             }
           >
@@ -244,20 +279,12 @@ const router = createBrowserRouter(
 
           {/* Issuer Routes */}
           <Route
-            path="user-dashboard"
-            element={
-              <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["STUDENT"]} />
-              </Suspense>
-            }
-          >
-            <Route index element={<div>Dashboard Content</div>} />
-          </Route>
-          <Route
             path="report-issue"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["STUDENT"]} />
+                <ProtectedRoute
+                  requiredPermissions={[allPermissions[11].name]}
+                />
               </Suspense>
             }
           >
@@ -274,7 +301,9 @@ const router = createBrowserRouter(
             path="my-reports"
             element={
               <Suspense fallback={<Loading />}>
-                <ProtectedRoute requiredRoles={["STUDENT"]} />
+                <ProtectedRoute
+                  requiredPermissions={[allPermissions[14].name]}
+                />
               </Suspense>
             }
           >

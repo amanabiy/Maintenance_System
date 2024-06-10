@@ -18,7 +18,10 @@ const style = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   borderRadius: 2,
-  width: 1000,
+  maxWidth: "80%",
+  width: 600,
+  maxHeight: "80%",
+  overflowY: "auto",
   bgcolor: "background.paper",
   boxShadow: 36,
   p: 4,
@@ -46,7 +49,7 @@ const CreateRole = ({
     setRoleName(role);
   }, [role]);
 
-  console.log(role, roleId, roleName);
+  // console.log(role, roleId, roleName);
 
   const handlePermissionChange = (permissionName) => {
     setSelectedPermissions((prev) => {

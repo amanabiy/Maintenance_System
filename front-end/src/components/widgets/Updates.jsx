@@ -9,7 +9,7 @@ const Updates = ({ names, subject }) => {
       </div>
       <div className="internal">
         {names && subject && names.length === subject.length ? (
-          names.map((name, index) => (
+          names.slice(0, 5).map((name, index) => (
             <div className="update" key={index}>
               <div className="left">
                 <Avatar className="avatar" style={{ color: "#4e24e1" }} />

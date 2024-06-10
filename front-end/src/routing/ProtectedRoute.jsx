@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { useRefreshTokenMutation } from "../redux/features/auth";
+import { usePermissions } from "../hooks/PermissionsProvider";
 
-const ProtectedRoute = ({ requiredRoles }) => {
+const ProtectedRoute = ({ requiredPermissions }) => {
   const cookies = document.cookie.split(";");
   const [authToken, setAuthToken] = useState(
     (() => {
@@ -21,6 +22,9 @@ const ProtectedRoute = ({ requiredRoles }) => {
     })()
   );
   const userRole = localStorage.getItem("role");
+  const roleId = localStorage.getItem("roleId");
+  const permissions = usePermissions();
+  // redux
   const [refreshTokenMutation, { data: refreshData, isSuccess, isError }] =
     useRefreshTokenMutation();
 
@@ -43,6 +47,8 @@ const ProtectedRoute = ({ requiredRoles }) => {
     }
     if (isError) {
       localStorage.removeItem("role");
+      localStorage.removeItem("roleId");
+      localStorage.removeItem("permissions");
       document.cookie =
         "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
       document.cookie =
@@ -51,14 +57,16 @@ const ProtectedRoute = ({ requiredRoles }) => {
     }
   }, [isSuccess, refreshData, isError]);
 
-  console.log("authToken", authToken);
-  console.log("refreshToken", refreshToken);
+  // console.log(userRole, permissions);
 
   if (!authToken && !refreshToken) {
     return <Navigate to="/" replace />;
   }
 
-  if (requiredRoles && !requiredRoles.includes(userRole)) {
+  if (
+    requiredPermissions &&
+    !requiredPermissions.every((permission) => permissions.includes(permission))
+  ) {
     return <Navigate to="/not-authorized" replace />;
   }
 
