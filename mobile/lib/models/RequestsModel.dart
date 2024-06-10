@@ -348,6 +348,7 @@ class RequestStatus {
 
 class StatusType {
     StatusType({
+        required this.id,
         required this.createdAt,
         required this.updatedAt,
         required this.name,
@@ -380,7 +381,7 @@ class StatusType {
     final bool? needsFile;
     final bool? needsSignatures;
     final bool? isInternal;
-    final List<AllowedTransition> allowedTransitions;
+    final List<StatusType>? allowedTransitions;
     final bool? allowChangePriority;
     final bool? allowChangeconfirmationStatus;
     final bool? allowChangeverificationStatus;
@@ -391,10 +392,12 @@ class StatusType {
     final bool? allowsChangeTitleAndDescription;
     final bool? allowsChangeMedia;
     final bool? allowsAddMoreMedia;
-    final List<Role> allowedRoles;
+    final List<Role>? allowedRoles;
+    final int? id;
 
     factory StatusType.fromJson(Map<String, dynamic> json){ 
         return StatusType(
+            id: json["id"],
             createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
             updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
             name: json["name"],
@@ -404,7 +407,7 @@ class StatusType {
             needsFile: json["needsFile"],
             needsSignatures: json["needsSignatures"],
             isInternal: json["isInternal"],
-            allowedTransitions: json["allowedTransitions"] == null ? [] : List<AllowedTransition>.from(json["allowedTransitions"]!.map((x) => AllowedTransition.fromJson(x))),
+            allowedTransitions: json["allowedTransitions"] == null ? [] : List<StatusType>.from(json["allowedTransitions"]!.map((x) => StatusType.fromJson(x))),
             allowChangePriority: json["allowChangePriority"],
             allowChangeconfirmationStatus: json["allowChangeconfirmationStatus"],
             allowChangeverificationStatus: json["allowChangeverificationStatus"],

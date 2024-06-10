@@ -36,4 +36,10 @@ class Endpoints {
 
   // Maintenance Request Type
   static String maintenanceRequestTypeFuzzy = "$baseUrl/maintenance-request-types/fuzzy-search";
+
+  // Request Status Type
+  static String RequestStatusTypeById = "$baseUrl/request-status-type";
+
+  
+
 }

@@ -7,7 +7,6 @@ import 'package:mobile/models/RequestsModel.dart';
 import 'package:mobile/models/UserModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
-import 'package:mobile/screens/util/fuzzy_search_input.dart';
 
 enum ConfirmationStatus { NOT_COMPLETED, DONE }
 
@@ -40,6 +39,8 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
   ConfirmationStatus? _selectedConfirmationStatus;
   VerificationStatus? _selectedVerificationStatus;
   int? _selectedPriority;
+  StatusType? _selectedRequestStatusType;
+  List<StatusType>? _possibleRequestStatusTypes = [];
 
   late List<String> selectedDepartments = [];
   final List<String> handlingDepartments = [
@@ -189,13 +190,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
     fetchRequestById(widget.requestId);
   }
 
-  void _handleSelectedItemsChanged(List<String> items) {
-    print(items);
-    setState(() {
-      selectedDepartments = items;
-    });
-  }
-
   Future<List<User>> fetchUsers(String term) async {
     try {
       final response = await Api().get('${Endpoints.fuzzySearchUsers}/$term');
@@ -239,8 +233,29 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
       print("fetched request by id");
       print(response.data);
       if (response.statusCode == 200) {
+        print("requestStatuses");
+        print(response.data['requestStatuses'].last['statusType']);
+        int? id = response.data['requestStatuses'].last['statusType']['id'];
+        final resStatusType =
+            await Api().get('${Endpoints.RequestStatusTypeById}/$id');
+
         setState(() {
           _request = Item.fromJson(response.data);
+          print("request is fetched");
+          // int? id =
+          //     _request!.requestStatuses.last.statusType!.id;
+          // final resStatusType = await Api().get('${Endpoints.RequestStatusTypeById}/$id');
+          if (resStatusType.statusCode == 200) {
+            final body = resStatusType.data;
+            final currentStatus = StatusType.fromJson(body);
+            _possibleRequestStatusTypes =
+                currentStatus.allowedTransitions ?? [];
+            if (_possibleRequestStatusTypes?.length == 1) {
+              _selectedRequestStatusType = _possibleRequestStatusTypes!.first;
+            }
+          }
+          print("possible states");
+          print(_possibleRequestStatusTypes);
           _populateFormFields();
           _isLoading = false;
         });
@@ -359,6 +374,34 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
 
   List<Step> getSteps() {
     return [
+      if (_possibleRequestStatusTypes!.length > 1)
+        Step(
+            title: Text('Choose state of request'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                    'Change status from ${_request?.requestStatuses.last.statusType?.name ?? 'Unknown'} to:'),
+                DropdownButtonFormField<StatusType>(
+                  decoration: InputDecoration(labelText: 'Next Step'),
+                  value: _selectedRequestStatusType,
+                  items:
+                      _possibleRequestStatusTypes?.map((StatusType statusType) {
+                    return DropdownMenuItem<StatusType>(
+                      value: statusType,
+                      child: Text(statusType.name ?? 'Unknown'),
+                    );
+                  }).toList(),
+                  onChanged: (StatusType? newValue) {
+                    setState(() {
+                      _selectedRequestStatusType = newValue;
+                    });
+                  },
+                  validator: (value) =>
+                      value == null ? 'Please select a status type' : null,
+                ),
+              ],
+            )),
       Step(
         title: Text('Update Maintenance'),
         content: Column(
@@ -373,14 +416,14 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
               decoration: InputDecoration(labelText: 'Description'),
               maxLines: 3,
             ),
-TextFormField(
-      controller: _blockNumberController,
-      decoration: InputDecoration(labelText: 'Block Number'),
-      keyboardType: TextInputType.number,
-      inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.digitsOnly
-      ],
-    ),
+            TextFormField(
+              controller: _blockNumberController,
+              decoration: InputDecoration(labelText: 'Block Number'),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly
+              ],
+            ),
             TextFormField(
               controller: _floorController,
               decoration: InputDecoration(labelText: 'Floor'),
