@@ -49,9 +49,11 @@ export class NotificationService extends GenericDAL<Notification, CreateNotifica
     }
     
     console.log(whereConditions);
-    return await this.findWithPagination({
+    const result = await this.findWithPagination({
       where: whereConditions,
     });
+    console.log(result);
+    return result;
   }
 
   async markAsRead(id: number): Promise<Notification> {
