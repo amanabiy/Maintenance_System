@@ -5,7 +5,7 @@ import GridItem from "../../components/layout/GridItem";
 import DataTable from "../../components/tables/DataTable";
 import { useTheme } from "@mui/material/styles";
 import { tokens } from "../../theme";
-import { Box, IconButton, Tooltip } from "@mui/material";
+import { Box, Button, Grid, IconButton, Tooltip } from "@mui/material";
 import { mockUserData } from "../../data/mockUserData";
 // icons
 import EditIcon from "@mui/icons-material/Edit";
@@ -13,6 +13,7 @@ import LockIcon from "@mui/icons-material/Lock";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
 import DeleteConfirmation from "../../components/modals/DeleteConfirmation";
 import {
   useGetAllUsersQuery,
@@ -20,6 +21,8 @@ import {
 } from "../../redux/features/user";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import AboveTableHeader from "../../components/headers/AboveTableHeader";
+import Loading from "../../components/loading/Loading";
 
 const Users = () => {
   const theme = useTheme();
@@ -122,32 +125,48 @@ const Users = () => {
       ),
     },
   ];
+
+  if (isLoading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   return (
     <GridParent>
+      <GridItem xs={12} style={{ padding: "16px" }}>
+        <AboveTableHeader
+          title={"All Users"}
+          subTitle={"All users in the system"}
+        />
+      </GridItem>
+      <GridItem xs={12} sx={{ position: "relative", height: "40px" }}>
+        <Button
+          variant="contained"
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 16,
+            fontSize: "15px",
+            backgroundColor: colors.primary[500],
+            // padding: "5px",
+          }}
+          endIcon={<PersonAddAlt1Icon />}
+          onClick={() => {
+            console.log("clicked");
+            navigate("create");
+          }}
+          size="small"
+        >
+          Create User
+        </Button>
+        {/* </Box> */}
+      </GridItem>
       <GridItem xs={12}>
-        <Box sx={{ position: "relative" }}>
-          <button
-            style={{
-              position: "absolute",
-              top: "100px",
-              right: "50px",
-              fontSize: "15px",
-              // padding: "5px",
-            }}
-            onClick={() => {
-              console.log("clicked");
-              navigate("create");
-            }}
-          >
-            Create User
-          </button>
-        </Box>
         {!isLoading && (
           <DataTable
-            rows={data?.items}
+            rows={data?.items ? data.items : []}
             columns={columns}
-            title={"All Users"}
-            subTitle={"All users in the system"}
             checkboxSelection={true}
           />
         )}

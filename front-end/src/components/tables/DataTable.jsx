@@ -14,7 +14,8 @@ const DataTable = ({ title, subTitle, rows, columns, checkboxSelection }) => {
 
   return (
     <Box m="20px">
-      <AboveTableHeader title={title} subTitle={subTitle} />
+      {title ||
+        (subTitle && <AboveTableHeader title={title} subTitle={subTitle} />)}
       <Box
         m="40px 0 0 0 "
         sx={{
