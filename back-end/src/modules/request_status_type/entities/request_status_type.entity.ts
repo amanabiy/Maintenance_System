@@ -1,4 +1,4 @@
-import { Entity, Column, OneToMany, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, Column, OneToMany, ManyToMany, JoinTable, DeleteDateColumn } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseModelEntity } from 'src/modules/BaseEntity/base-model.entity';
 import { RequestStatus } from 'src/modules/request_status/entities/request_status.entity';
@@ -152,4 +152,7 @@ export class RequestStatusType extends BaseModelEntity {
 
   @OneToMany(() => RequestStatus, requestStatus => requestStatus.statusType)
   requestStatuses: RequestStatus[];
+
+  @DeleteDateColumn()
+  deletedAt: Date;
 }
