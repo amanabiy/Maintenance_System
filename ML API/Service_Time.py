@@ -76,8 +76,7 @@ def convert_hours_to_weeks_days_hours(hours):
     if days > 0:
         time_str.append(f"{days} day{'s' if days > 1 else ''}")
     if remaining_hours > 0:
-        time_str.append(f"{remaining_hours} hour{
-                        's' if remaining_hours > 1 else ''}")
+        time_str.append(f"{remaining_hours} hour{'s' if remaining_hours > 1 else ''}")
     return ', '.join(time_str)
 
 
