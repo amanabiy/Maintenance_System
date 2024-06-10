@@ -47,7 +47,8 @@ export class NotificationService extends GenericDAL<Notification, CreateNotifica
     if (isRead !== undefined) {
       whereConditions.isRead = isRead;
     }
-  
+    
+    console.log(whereConditions);
     return this.findWithPagination({
       where: whereConditions,
     });
