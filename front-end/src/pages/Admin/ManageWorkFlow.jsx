@@ -1,10 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
   Background,
   ReactFlowProvider,
   MarkerType,
+  useNodesState,
+  useEdgesState,
+  applyNodeChanges,
+  applyEdgeChanges,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import {
@@ -80,54 +84,59 @@ const ManageWorkFlow = () => {
 
   //  views
 
-  const [nodes, setNodes] = useState(
-    requestStatusTypes?.items?.map((state, index) => {
-      const allowedPermissions = [];
+  const initialNodes = useMemo(
+    () =>
+      requestStatusTypes?.items?.map((state, index) => {
+        const allowedPermissions = [];
 
-      for (const key in state) {
-        if (state.hasOwnProperty(key) && state[key] === true) {
-          allowedPermissions.push(key);
+        for (const key in state) {
+          if (state.hasOwnProperty(key) && state[key] === true) {
+            allowedPermissions.push(key);
+          }
         }
-      }
-
-      return {
-        id: state.id.toString(),
-        data: {
-          label: state.name,
-          isFirst: state.isInitialStatus,
-          allowedRoles: state.allowedRoles.map((role) => role.roleName),
-          permissions: allowedPermissions,
-        },
-        position: { x: firstX + 350 * index, y: firstY + 100 * index },
-        type: "customNode",
-      };
-    })
-  );
-
-  const [edges, setEdges] = useState(
-    requestStatusTypes?.items?.flatMap((state) =>
-      state.allowedTransitions.map((target) => {
-        const sourceId = state.id;
-        const targetId = target.id;
-        const direction = sourceId < targetId ? "forward" : "backward";
 
         return {
-          id: `${state.id}-${target.id}`,
-          source: sourceId.toString(),
-          target: targetId.toString(),
-          animated: true,
-          markerEnd: {
-            type: MarkerType.ArrowClosed,
+          id: state.id.toString(),
+          data: {
+            label: state.name,
+            isFirst: state.isInitialStatus,
+            allowedRoles: state.allowedRoles.map((role) => role.roleName),
+            permissions: allowedPermissions,
           },
-          type: "default",
-          style: {
-            strokeWidth: 2,
-            stroke: { backward: "#FF0072", forward: "#00FF72" }[direction],
-          },
+          position: { x: firstX + 350 * index, y: firstY + 100 * index },
+          type: "customNode",
         };
-      })
-    )
+      }) || []
   );
+
+  const initialEdges = useMemo(
+    () =>
+      requestStatusTypes?.items?.flatMap((state) =>
+        state.allowedTransitions.map((target) => {
+          const sourceId = state.id;
+          const targetId = target.id;
+          const direction = sourceId < targetId ? "forward" : "backward";
+
+          return {
+            id: `${state.id}-${target.id}`,
+            source: sourceId.toString(),
+            target: targetId.toString(),
+            animated: true,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+            },
+            type: "default",
+            style: {
+              strokeWidth: 2,
+              stroke: { backward: "#FF0072", forward: "#00FF72" }[direction],
+            },
+          };
+        })
+      ) || []
+  );
+
+  const [nodes, setNodes] = useNodesState(initialNodes);
+  const [edges, setEdges] = useEdgesState(initialEdges);
 
   useEffect(() => {
     setNodes(
@@ -262,6 +271,15 @@ const ManageWorkFlow = () => {
       console.error(error);
     }
   };
+
+  const onNodesChange = useCallback(
+    (changes) => setNodes((nds) => applyNodeChanges(changes, nds)),
+    [setNodes]
+  );
+  const onEdgesChange = useCallback(
+    (changes) => setEdges((eds) => applyEdgeChanges(changes, eds)),
+    [setEdges]
+  );
 
   if (getRequestStatusTypesStatus === "PENDING") {
     return <Loading />;
@@ -469,6 +487,8 @@ const ManageWorkFlow = () => {
                 nodes={nodes}
                 edges={edges}
                 nodeTypes={nodeTypes}
+                onNodesChange={onNodesChange}
+                onEdgesChange={onEdgesChange}
                 fitView
               >
                 <MiniMap />

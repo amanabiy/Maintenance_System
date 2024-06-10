@@ -3,6 +3,7 @@ import {
   createBrowserRouter,
   createRoutesFromElements,
   Route,
+  useRouteError,
 } from "react-router-dom";
 
 import Loading from "../components/loading/Loading.jsx";
@@ -50,10 +51,11 @@ const Departments = lazy(() => import("../pages/Admin/Departments"));
 // paths
 import { generalPaths, issuerPaths } from "./paths";
 import { allPermissions } from "../data/allPermissions.js";
+import ErrorBoundary from "./ErrorBoundary.jsx";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
-    <Route>
+    <Route errorElement={<ErrorBoundary />}>
       <Route
         index
         element={

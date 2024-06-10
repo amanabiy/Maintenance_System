@@ -8,7 +8,7 @@ import { PermissionsProvider } from "./hooks/PermissionsProvider";
 
 function App() {
   const [theme, colorMode] = useMode();
-  console.log(theme);
+  // console.log(theme);
   return (
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
