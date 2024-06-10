@@ -17,7 +17,7 @@ import {
   Alert,
 } from "@mui/material";
 import {
-  useGetUserByIdQuery,
+  useLazyGetUserByIdQuery,
   useUpdateUserByIdMutation,
 } from "../../redux/features/user";
 import { useGetAllRolesQuery } from "../../redux/features/role";
@@ -33,7 +33,17 @@ import SaveIcon from "@mui/icons-material/Save";
 const EditUser = () => {
   const [open, setOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
   const { userId } = useParams();
+  const [
+    getUserById,
+    {
+      data: currentUser,
+      error: currentUserError,
+      isLoading: currentUserLoading,
+      status,
+    },
+  ] = useLazyGetUserByIdQuery();
   const [updateUser] = useUpdateUserByIdMutation();
 
   const {
@@ -55,19 +65,24 @@ const EditUser = () => {
     error: roleErr,
     isLoading: roleLoading,
   } = useGetAllRolesQuery();
-  const { data, error, status, isLoading } = useGetUserByIdQuery(userId);
 
   useEffect(() => {
-    if (!isLoading && status === "fulfilled" && data) {
+    if (userId) {
+      getUserById(userId);
+    }
+  }, [userId, getUserById]);
+
+  useEffect(() => {
+    if (currentUser) {
       setUserData({
-        fullName: data.fullName || "",
-        email: data.email || "",
-        phoneNumber: data.phoneNumber || "",
-        roleId: data.role.id || 0,
-        departmentId: data.department?.id || 0,
+        fullName: currentUser.fullName || "",
+        email: currentUser.email || "",
+        phoneNumber: currentUser.phoneNumber || "",
+        roleId: currentUser.role?.id || 0,
+        departmentId: currentUser.department?.id || 0,
       });
     }
-  }, [isLoading, data]);
+  }, [currentUser, currentUserError]);
 
   const handleChange = (e) => {
     setUserData({ ...userData, [e.target.name]: e.target.value });
@@ -87,8 +102,14 @@ const EditUser = () => {
       });
       const res = await updateUser({ id, user: userData }).unwrap();
       console.log("User updated successfully:", res);
+      setOpen(true);
+      setSeverity("success");
+      setSnackbarMessage("User updated successfully");
     } catch (error) {
       console.error("Error updating user:", error);
+      setOpen(true);
+      setSeverity("error");
+      setSnackbarMessage("Error updating user: " + error.message || "");
     }
   };
 
@@ -111,13 +132,13 @@ const EditUser = () => {
     setOpen(false);
   };
 
-  if (isLoading || roleLoading || departmentLoading)
+  if (currentUserLoading || roleLoading || departmentLoading)
     return (
       <div>
         <Loading />
       </div>
     );
-  if (error || roleErr || departmentError)
+  if (currentUserError || roleErr || departmentError)
     return (
       <div>Error fetching user data. {error + roleErr + departmentError}</div>
     );
@@ -125,7 +146,7 @@ const EditUser = () => {
   console.log("User data:", userData, roles.items, departments.items);
 
   return (
-    <GridParent style={{}}>
+    <GridParent>
       <GridItem xs={12} style={{ padding: "16px" }}>
         <AboveTableHeader title="Edit User" />
       </GridItem>
@@ -279,7 +300,7 @@ const EditUser = () => {
         onClose={handleClose}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
-        <Alert onClose={handleClose} severity="success" sx={{ width: "100%" }}>
+        <Alert onClose={handleClose} severity={severity} sx={{ width: "100%" }}>
           {snackbarMessage}
         </Alert>
       </Snackbar>

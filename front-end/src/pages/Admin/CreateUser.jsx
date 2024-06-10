@@ -11,13 +11,30 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import { useCreateUserMutation } from "../../redux/features/auth";
 import { useGetAllRolesQuery } from "../../redux/features/role";
 import { useGetAllDepartmentsQuery } from "../../redux/features/department";
+import Loading from "../../components/loading/Loading";
+import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import PersonAddAlt1Icon from "@mui/icons-material/PersonAddAlt1";
+import GridItem from "../../components/layout/GridItem";
+import AboveTableHeader from "../../components/headers/AboveTableHeader";
 
 const CreateUser = () => {
-  const [createUser] = useCreateUserMutation();
+  const [open, setOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [severity, setSeverity] = useState("success");
+  const [
+    createUser,
+    {
+      data: creatUserRes,
+      isLoading: createUserLoading,
+      isError: createUserError,
+    },
+  ] = useCreateUserMutation();
 
   const { data, error, isLoading } = useGetAllDepartmentsQuery();
   const {
@@ -67,17 +84,39 @@ const CreateUser = () => {
       console.log("User data:", userData);
       const res = await createUser(userData).unwrap();
       console.log("User created successfully:", res);
+      setOpen(true);
+      setSnackbarMessage("User created successfully");
+      setSeverity("success");
     } catch (error) {
       console.error("Error creating user:", error);
+      setOpen(true);
+      setSnackbarMessage("Error creating user");
+      setSeverity("error");
     }
   };
 
+  if (isLoading || roleLoading)
+    return (
+      <div>
+        <Loading />
+      </div>
+    );
   return (
-    <Container component="main" maxWidth="md" sx={{ mt: 4 }}>
-      <Typography variant="h5" gutterBottom>
-        Create User
-      </Typography>
+    <Container
+      component="main"
+      maxWidth="md"
+      sx={{ mt: 4 }}
+      style={{
+        position: "relative",
+        padding: "32px",
+        borderLeft: "dashed 2px lightGrey",
+      }}
+    >
+      <GridItem xs={12} style={{ padding: "16px" }}>
+        <AboveTableHeader title="Create User" />
+      </GridItem>
       <Grid container spacing={2}>
+        <PersonAddAlt1Icon />
         <Grid item xs={12}>
           <TextField
             name="fullName"
@@ -123,7 +162,7 @@ const CreateUser = () => {
               onChange={handleChange}
               label="Role"
             >
-              {roles.map((role) => (
+              {roles.items.map((role) => (
                 <MenuItem key={role.id} value={role.id}>
                   {role.roleName}
                 </MenuItem>
@@ -159,6 +198,20 @@ const CreateUser = () => {
           </Button>
         </Grid>
       </Grid>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
+        }}
+        open={open}
+        autoHideDuration={6000}
+        onClose={() => setOpen(false)}
+        message={snackbarMessage}
+      >
+        <Alert onClose={() => setOpen(false)} severity={severity}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };
