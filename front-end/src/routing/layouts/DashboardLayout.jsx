@@ -25,11 +25,11 @@ const DashboardLayout = () => {
   const sidebarRef = useRef(null);
 
   useEffect(() => {
-    if (userRole && userRole === "STUDENT") {
-      setSidebarButtons(SidebarData.userButtons);
-    } else if (userRole && userRole === "ADMIN") {
-      setSidebarButtons(SidebarData.adminButtons);
-    }
+    // if (userRole && userRole === "STUDENT") {
+    // setSidebarButtons(SidebarData.userButtons);
+    // } else if (userRole && userRole === "ADMIN") {
+    setSidebarButtons(SidebarData.adminButtons);
+    // }
   }, []);
 
   useEffect(() => {
