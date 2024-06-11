@@ -43,6 +43,9 @@ class Endpoints {
   // change status of a request
   static String changeRequestStatus = "$baseUrl/maintenance-requests";
 
+
+  static String departments = "$baseUrl/department";
+
   
 
 }

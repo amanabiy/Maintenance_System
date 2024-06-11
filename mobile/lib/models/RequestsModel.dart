@@ -135,6 +135,7 @@ class Requester {
 
 class Department {
     Department({
+        required this.id,
         required this.createdAt,
         required this.updatedAt,
         required this.name,
@@ -143,9 +144,11 @@ class Department {
     final DateTime? createdAt;
     final DateTime? updatedAt;
     final String? name;
+    final int? id;
 
     factory Department.fromJson(Map<String, dynamic> json){ 
         return Department(
+            id: json["id"],
             createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
             updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
             name: json["name"],

@@ -56,7 +56,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: CustomAppBar(
-        title: 'Requests',
+        title: 'Requests Changes',
         actions: [
           Switch(
             value: showUnread,
@@ -76,7 +76,7 @@ class _NotificationsPageState extends State<NotificationsPage> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: notifications.isEmpty
-            ? const Center(child: Text('No notifications'))
+            ? const Center(child: Text('No changes'))
             : ListView.builder(
                 itemCount: notifications.length,
                 itemBuilder: (context, index) {

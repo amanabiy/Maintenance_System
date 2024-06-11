@@ -252,7 +252,7 @@ class _RequestsPageState extends State<RequestsPage> {
                             final length = request.requestStatuses!.length;
                             bool shouldDisplay = selectedStatusTypes.isEmpty ||
                                 selectedStatusTypes.contains(request
-                                    .requestStatuses.last.statusType!.name!);
+                                    .requestStatuses.first.statusType!.name!);
                             // request.requestStatuses![length -].((status) =>
                             //     selectedStatusTypes
                             //         .contains(status.statusType!.name));

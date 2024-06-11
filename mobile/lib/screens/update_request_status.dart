@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -11,12 +12,36 @@ import 'package:mobile/models/RequestsModel.dart';
 import 'package:mobile/models/UserModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
+import 'package:mobile/screens/util/custom_app_bar.dart';
 import 'package:mobile/screens/util/custom_scaffold.dart';
 import 'package:http_parser/http_parser.dart';
 
 enum ConfirmationStatus { NOT_COMPLETED, DONE }
 
 enum VerificationStatus { PASSED, FAILED }
+
+class Department {
+  int id;
+  DateTime createdAt;
+  DateTime updatedAt;
+  String name;
+
+  Department({
+    required this.id,
+    required this.createdAt,
+    required this.updatedAt,
+    required this.name,
+  });
+
+  factory Department.fromJson(Map<String, dynamic> json) {
+    return Department(
+      id: json['id'],
+      createdAt: DateTime.parse(json['createdAt']),
+      updatedAt: DateTime.parse(json['updatedAt']),
+      name: json['name'],
+    );
+  }
+}
 
 class UpdateRequestPage extends StatefulWidget {
   final int requestId;
@@ -72,9 +97,10 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
 
   List<MaintenanceRequestType> filteredMaintenanceRequestType = [];
   List<MaintenanceRequestType> selectedMaintenanceRequestType = [];
+  late List<Department> departments = [];
 
   List<String> filteredDepartments = [];
-  String? selectedDepartment;
+  Department? selectedDepartment;
 
   List<XFile> _selectedImages = [];
   List<Map<String, dynamic>> _uploadedFiles = [];
@@ -157,7 +183,8 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
 
   void _selectDepartment(String department) {
     setState(() {
-      selectedDepartment = department;
+      selectedDepartment =
+          departments.firstWhere((dept) => dept.name == department);
       filteredDepartments = [];
     });
   }
@@ -193,6 +220,44 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
         });
       }
     });
+
+    final String jsonData = '''
+    [
+      {
+        "id": 1,
+        "createdAt": "2024-06-06T20:13:03.007Z",
+        "updatedAt": "2024-06-11T04:33:27.000Z",
+        "name": "GENERAL H"
+      },
+      {
+        "id": 2,
+        "createdAt": "2024-06-06T20:13:03.007Z",
+        "updatedAt": "2024-06-06T20:13:03.007Z",
+        "name": "MAINTENANCE"
+      },
+      {
+        "id": 3,
+        "createdAt": "2024-06-06T20:13:03.007Z",
+        "updatedAt": "2024-06-06T20:13:03.007Z",
+        "name": "ELECTRICITY"
+      },
+      {
+        "id": 4,
+        "createdAt": "2024-06-06T20:13:03.007Z",
+        "updatedAt": "2024-06-06T20:13:03.007Z",
+        "name": "SANITARY"
+      },
+      {
+        "id": 5,
+        "createdAt": "2024-06-06T20:13:03.007Z",
+        "updatedAt": "2024-06-06T20:13:03.007Z",
+        "name": "VERIFIER"
+      }
+    ]
+    ''';
+
+    List<dynamic> jsonList = json.decode(jsonData);
+    departments = jsonList.map((json) => Department.fromJson(json)).toList();
 
     fetchRequestById(widget.requestId);
   }
@@ -249,9 +314,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
         setState(() {
           _request = Item.fromJson(response.data);
           print("request is fetched");
-          // int? id =
-          //     _request!.requestStatuses.last.statusType!.id;
-          // final resStatusType = await Api().get('${Endpoints.RequestStatusTypeById}/$id');
           if (resStatusType.statusCode == 200) {
             final body = resStatusType.data;
             final currentStatus = StatusType.fromJson(body);
@@ -306,7 +368,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
       _internalNoteController.text = '';
       _externalNoteController.text = '';
       _signatureByNameController.text = '';
-      _departmentController.text = selectedDepartment ?? '';
+      _departmentController.text = selectedDepartment?.name ?? '';
     }
   }
 
@@ -362,14 +424,14 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
           pickedTime.minute,
         );
 
-        if (!isStart ||
-            !isStart &&
-                _selectedStartDate != null &&
-                selectedDateTime.isBefore(_selectedStartDate!)) {
-          // ignore: use_build_context_synchronously
-          showFailureSnackBar(context, "End time must be after start time.");
-          return;
-        }
+        // if (!isStart ||
+        //     !isStart &&
+        //         _selectedStartDate != null &&
+        //         selectedDateTime.isBefore(_selectedStartDate!)) {
+        //   // ignore: use_build_context_synchronously
+        //   showFailureSnackBar(context, "End time must be after start time.");
+        //   return;
+        // }
 
         setState(() {
           if (isStart) {
@@ -498,7 +560,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
         "feedback": _feedbackController.text,
         "assignedPersonIds": selectedUsers.map((user) => user.id).toList(),
         "handlingDepartmentId":
-            handlingDepartments.indexOf(selectedDepartment ?? '')
+            handlingDepartments.indexOf(selectedDepartment?.name ?? '')
       },
       "updateRequestStatus": {
         "scheduleMaintenanceStartDateTime":
@@ -514,7 +576,9 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
     try {
       print("sending data");
       print(data);
-      final response = await Api().patch('${Endpoints.changeRequestStatus}/${_request?.id}/statuses/${_selectedRequestStatusType?.id}', data);
+      final response = await Api().patch(
+          '${Endpoints.changeRequestStatus}/${_request?.id}/statuses/${_selectedRequestStatusType?.id}',
+          data);
       print("received");
       print(response.data);
       print(response.statusCode);
@@ -612,7 +676,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                 ],
               ),
             ),
-
             Visibility(
               visible:
                   _selectedRequestStatusType?.allowsChangeLocation ?? false,
@@ -621,7 +684,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                 decoration: InputDecoration(labelText: 'Room Number'),
               ),
             ),
-
             Visibility(
               visible:
                   _selectedRequestStatusType?.allowChangeconfirmationStatus ??
@@ -632,11 +694,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                 maxLines: 3,
               ),
             ),
-            // TextFormField(
-            //   decoration:
-            //       InputDecoration(labelText: 'Maintenance Request Type IDs'),
-            // ),
-
             Visibility(
               visible:
                   _selectedRequestStatusType?.allowsChangeRequestTypes ?? false,
@@ -691,10 +748,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                 ],
               ),
             ),
-
-            // TextFormField(
-            //   decoration: InputDecoration(labelText: 'Media IDs'),
-            // ),
             Visibility(
               visible: _selectedRequestStatusType?.allowChangePriority ?? false,
               child: DropdownButtonFormField<int>(
@@ -716,9 +769,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                     value == null ? 'Please select a priority' : null,
               ),
             ),
-
             SizedBox(height: 20),
-
             Visibility(
               visible:
                   _selectedRequestStatusType?.allowChangeverificationStatus ??
@@ -749,7 +800,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                     value == null ? 'Please select a status' : null,
               ),
             ),
-
             Visibility(
               visible:
                   _selectedRequestStatusType?.allowChangeconfirmationStatus ??
@@ -776,8 +826,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                     _selectedConfirmationStatus = newValue;
                   });
                 },
-                // validator: (value) =>
-                //     value == null ? 'Please select a status' : null,
               ),
             ),
             SizedBox(height: 30),
@@ -834,7 +882,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                 ],
               ),
             ),
-
             Visibility(
               visible: _selectedRequestStatusType?.allowsForwardToDepartment ??
                   false,
@@ -848,7 +895,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                     runSpacing: 4.0,
                     children: selectedDepartments.map((item) {
                       return Chip(
-                        label: Text(item!),
+                        label: Text(item),
                         onDeleted: () {
                           setState(() {
                             selectedDepartments.remove(item);
@@ -859,7 +906,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                   ),
                   if (selectedDepartment != null)
                     Chip(
-                      label: Text(selectedDepartment!),
+                      label: Text(selectedDepartment!.name),
                       onDeleted: () {
                         setState(() {
                           selectedDepartment = null;
@@ -892,7 +939,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                 ],
               ),
             ),
-
             Visibility(
               visible:
                   _selectedRequestStatusType?.allowChangeconfirmationStatus ??
@@ -943,11 +989,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
         title: Text('Update Request Status'),
         content: Column(
           children: [
-            // TextFormField(
-            //   controller: _internalNoteController,
-            //   decoration: InputDecoration(labelText: 'Internal Note'),
-            //   maxLines: 2,
-            // ),
             TextFormField(
               controller: _externalNoteController,
               decoration: InputDecoration(labelText: 'Comment'),
@@ -960,7 +1001,6 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                 decoration: InputDecoration(labelText: 'Signature By Name'),
               ),
             ),
-
             Visibility(
               visible: _selectedRequestStatusType?.hasSchedule ?? false,
               child: Column(
@@ -1073,9 +1113,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Update Request'),
-      ),
+      appBar: CustomAppBar(title: 'Update Request Status'),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : Stepper(
