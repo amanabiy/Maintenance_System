@@ -46,7 +46,7 @@ export class MaintenanceRequest extends BaseModelEntity {
   description: string;
 
   @ApiProperty({ description: 'The location of the maintenance request' })
-  @ManyToOne(() => Location, { eager: false, nullable: true })
+  @ManyToOne(() => Location, { eager: true, nullable: true })
   location: Location;
 
   @ApiProperty({ enum: MaintenanceVerificationStatusEnum, description: 'The verification status of the maintenance request' })
