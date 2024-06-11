@@ -46,7 +46,7 @@ export class MaintenanceRequest extends BaseModelEntity {
   description: string;
 
   @ApiProperty({ description: 'The location of the maintenance request' })
-  @ManyToOne(() => Location, { eager: true, nullable: true })
+  @ManyToOne(() => Location, { eager: false, nullable: true })
   location: Location;
 
   @ApiProperty({ enum: MaintenanceVerificationStatusEnum, description: 'The verification status of the maintenance request' })
@@ -56,7 +56,7 @@ export class MaintenanceRequest extends BaseModelEntity {
   verificationStatus: MaintenanceVerificationStatusEnum;
 
   @ApiProperty({ description: 'The user who requested the maintenance' })
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'requester_id' })
   verifiedBy: User;  
 
@@ -95,21 +95,21 @@ export class MaintenanceRequest extends BaseModelEntity {
   feedback: string;
 
   @ApiProperty({ description: 'The user who requested the maintenance' })
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User, { eager: false })
   @JoinColumn({ name: 'requester_id' })
   requester: User;  
 
   @ApiProperty({ description: 'The users assigned to handle the maintenance request', 
     type: [User]
   })
-  @ManyToMany(() => User, { eager: true })
+  @ManyToMany(() => User, { eager: false })
   @JoinTable()
   assignedPersons: User[];
 
   @ApiProperty({ description: 'Types of maintenance requests associated with this request',
     type: [MaintenanceRequestType]
   })
-  @ManyToMany(() => MaintenanceRequestType, { eager: true })
+  @ManyToMany(() => MaintenanceRequestType, { eager: false })
   @JoinTable()
   maintenanceRequestTypes: MaintenanceRequestType[];
 
@@ -120,20 +120,20 @@ export class MaintenanceRequest extends BaseModelEntity {
   @ApiProperty({ description: 'The media files associated with this maintenance request',
     type: [Media]
   })
-  @OneToMany(() => Media, media => media.maintenanceRequests, { eager: true })
+  @OneToMany(() => Media, media => media.maintenanceRequests, { eager: false })
   @JoinColumn({ name: 'media_id'})
   mediaFiles: Media[];
 
   @ApiProperty({ description: 'The statuses associated with this maintenance request',
     type: [RequestStatus]
   })
-  @OneToMany(() => RequestStatus, requestStatus => requestStatus.request, { eager: true })
+  @OneToMany(() => RequestStatus, requestStatus => requestStatus.request, { eager: false })
   requestStatuses: RequestStatus[];
 
   @ApiProperty({ description: 'The equipments associated with this maintenance request', 
     type: [MaintenanceEquipment]
   })
-  @OneToMany(() => MaintenanceEquipment, (equipment) => equipment.maintenanceRequest, { eager: true })
+  @OneToMany(() => MaintenanceEquipment, (equipment) => equipment.maintenanceRequest, { eager: false })
   equipments: MaintenanceEquipment[];
 
   @DeleteDateColumn()
