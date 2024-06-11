@@ -37,7 +37,7 @@ export class NotificationController {
     @CurrentUser() currentUser: User,
     @Query('isRead') isRead?: boolean,
   ): Promise<FindAllResponseNotificationDto> {
-    return this.notificationService.getNotificationsForUser(currentUser.id, isRead);
+    return await this.notificationService.getNotificationsForUser(currentUser.id, isRead);
   }
 
   @Get(':id')

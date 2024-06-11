@@ -2,14 +2,24 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const setAuthTokenInCookie = (token) => {
   const expires = new Date();
-  expires.setTime(expires.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days expiry
+  expires.setTime(expires.getTime() + 1 * 60 * 60 * 1000); // 1 hour expiry
   document.cookie = `authToken=${token}; path=/; expires=${expires.toUTCString()}; secure; samesite=strict`;
+};
+const setRefreshTokenInCookie = (token) => {
+  const expires = new Date();
+  expires.setTime(expires.getTime() + 7 * 24 * 60 * 60 * 1000); // 7 days expiry
+  document.cookie = `refreshToken=${token}; path=/; expires=${expires.toUTCString()}; secure; samesite=strict`;
 };
 
 const removeAuthTokenFromCookie = () => {
   document.cookie =
     "authToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    console.log("Log out");
+  console.log("Log out");
+};
+
+const removeRefreshTokenFromCookie = () => {
+  document.cookie =
+    "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
 };
 
 const setRoleInSession = (role) => {
@@ -38,6 +48,7 @@ export const authSlice = createSlice({
       state.email = action.payload.result.user.email;
       state.role = action.payload.result.user.role.roleName;
       setAuthTokenInCookie(action.payload.result.accessToken);
+      setRefreshTokenInCookie(action.payload.result.refreshToken);
       setRoleInSession(action.payload.result.user.role.roleName);
     },
     logout: (state) => {
@@ -45,6 +56,7 @@ export const authSlice = createSlice({
       state.authToken = "";
       removeAuthTokenFromCookie();
       removeRoleFromSession();
+      removeRefreshTokenFromCookie();
     },
   },
 });

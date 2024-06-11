@@ -1,7 +1,7 @@
 import { ForbiddenException, Inject, Injectable, NotFoundException, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MaintenanceRequest } from './entities/maintenance_request.entity';
-import { In, Repository } from 'typeorm';
+import { In, Like, Repository } from 'typeorm';
 import { GenericDAL } from 'src/DAL/dal';
 import { CreateMaintenanceRequestDto } from './dto/create-maintenance_request.dto';
 import { UpdateMaintenanceRequestDto } from './dto/update-maintenance_request.dto';
@@ -206,20 +206,145 @@ export class MaintenanceRequestService extends GenericDAL<MaintenanceRequest, Cr
     return result;
   }
 
-  async findAllByRole(roleId: number, page = 1, limit = 10): Promise<findAllResponseDto<MaintenanceRequest>> {
+  async findAllByRoleAndStatus(
+    roleId: number,
+    statusTypeId?: number,
+    term?: string,
+    page = 1,
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    // Fetch the latest status types and their IDs in parallel
     const statusTypes = await this.requestStatusTypeService.getLatestStatusTypeIds([roleId]);
     const statusTypeIds = statusTypes.map((statusType) => statusType.id);
-    console.log(statusTypeIds)
+
     const latestStatusIds = await this.requestStatusService.getLatestStatusByStatusTypeIds(statusTypeIds);
     const requestStatusIds = latestStatusIds.map((status) => status.id);
-    return await this.findWithPagination({
-      where: {
-        requestStatuses: {
-          id: In(requestStatusIds),
-        },
+
+    // Construct the filters
+    const filters: any = {
+      requestStatuses: {
+        id: In(requestStatusIds),
       },
-    }, page, limit);
+    };
+
+    // Include statusTypeId in filters if provided
+    if (statusTypeId) {
+      filters.requestStatuses = {
+        statusType: {
+          id: statusTypeId,
+        }
+      };
+    }
+
+    // Add fuzzy search terms if provided
+    if (term) {
+      filters['subject'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { fullName: Like(`%${term}%`) };
+    }
+
+    // Fetch the filtered results with pagination
+    return await this.findWithPagination({ where: filters }, page, limit);
   }
+
+
+
+  async findAllByRequester(
+    requesterId: number,
+    statusType?: number,
+    term?: string,
+    page = 1,
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    const filters: any = {
+      requester: {
+        id: requesterId,
+      },
+    };
+
+    if (statusType) {
+      filters.requestStatuses = {
+        statusType: {
+          id: statusType,
+        },
+      };
+    }
+
+    if (term) {
+      filters['subject'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { fullName: Like(`%${term}%`) };
+    }
+    return await this.findWithPagination({ where: filters }, page, limit);
+  }
+
+  async findAllByDepartment(
+    departmentId: number,
+    statusTypeId?: number,
+    term?: string,
+    page = 1,
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    const filters: any = {
+      handlingDepartment: {
+        id: departmentId,
+      },
+    };
+
+    // Include statusTypeId in filters if provided
+    if (statusTypeId) {
+      filters['requestStatuses'] = {
+        statusType: {
+          id: statusTypeId,
+        },
+      };
+    }
+
+    // Add fuzzy search terms if provided
+    if (term) {
+      filters['subject'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { fullName: Like(`%${term}%`) };
+    }
+
+    // Fetch the filtered results with pagination
+    return await this.findWithPagination({ where: filters }, page, limit);
+  }
+
+
+
+  async findAllByAssignedPerson(
+    assignedPersonId: number, 
+    statusTypeId?: number, 
+    term?: string, 
+    page = 1, 
+    limit = 10
+  ): Promise<findAllResponseDto<MaintenanceRequest>> {
+    // Construct the filters
+    const filters: any = {
+      assignedPersons: {
+        id: assignedPersonId,
+      },
+    };
+  
+    // Include statusTypeId in filters if provided
+    if (statusTypeId) {
+      filters['requestStatuses']['statusType'] = {
+        id: statusTypeId,
+      };
+    }
+  
+    // Add fuzzy search terms if provided
+    if (term) {
+      filters['subject'] = Like(`%${term}%`);
+      filters['description'] = Like(`%${term}%`);
+      filters['requester'] = { fullName: Like(`%${term}%`) };
+    }
+  
+    // Fetch the filtered results with pagination
+    return await this.findWithPagination({ where: filters }, page, limit);
+  }
+
 
   async delete(id: number): Promise<void> {
     const result = await this.maintenanceRequestRepository.softDelete(id);

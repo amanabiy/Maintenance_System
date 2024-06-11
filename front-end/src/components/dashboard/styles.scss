@@ -75,8 +75,8 @@
   .bottom {
     display: flex;
     align-items: center;
-    bottom: 5px;
-    position: absolute;
+    // bottom: 0;
+    // position: sticky;
     margin: 10px;
     .colorOption {
       width: 20px;
@@ -101,12 +101,26 @@
   width: 100px;
   position: fixed;
   height: auto;
+  background-color: white;
+
+  .nav-link {
+    transform: scale(1);
+  }
+  .title {
+    transform: scale(1);
+  }
 }
 .animate-sidebar-open {
   animation: sidebar-open 1s forwards;
 }
 .animate-sidebar-close {
   animation: sidebar-close 1s forwards;
+}
+.animate-sidebar-scale {
+  animation: sidebar-scale 1s forwards;
+}
+.animate-sidebar-downScale {
+  animation: sidebar-downScale 1s forwards;
 }
 
 .navbar {
@@ -234,13 +248,33 @@
     width: 0;
   }
   100% {
-    width: 300px;
+    width: 200px;
   }
 }
 
 @keyframes sidebar-close {
   0% {
-    width: 300px;
+    width: 200px;
+  }
+  100% {
+    width: 0;
+  }
+}
+
+@keyframes sidebar-scale {
+  0% {
+    transform: scaleX(0);
+    // transform: rotateY(0deg);
+  }
+  100% {
+    transform: scaleX(1);
+    // transform: rotateY(180deg);
+  }
+}
+
+@keyframes sidebar-downScale {
+  0% {
+    width: 100%;
   }
   100% {
     width: 0;

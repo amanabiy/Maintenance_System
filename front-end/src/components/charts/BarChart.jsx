@@ -63,7 +63,7 @@ const BarChart = () => {
     ],
     datasets: [
       {
-        label: "Number of Users",
+        label: "Requests",
         data: [12, 19, 3, 5, 2, 3, 10],
         backgroundColor: [
           "rgba(78, 36, 225, 0.8)",
@@ -76,12 +76,12 @@ const BarChart = () => {
   };
 
   return (
-    <Container component="main" style={{ width: "600px" }}>
+    <Container component="main" style={{ maxWidth: "600px" }}>
       <Box display="flex" flexDirection="column" alignItems="center">
         <Typography variant="h5" gutterBottom>
           Time spent by stage
         </Typography>
-        <Box sx={{ width: "100%", height: "400px" }}>
+        <Box sx={{ width: "95%", height: "400px", marginTop: "50px" }}>
           <Bar data={data} options={options} />
         </Box>
       </Box>

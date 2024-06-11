@@ -19,7 +19,7 @@ import findAllResponseDto from 'src/dto/find-all-response.dto';
 @ApiBearerAuth('bearerAuth')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class MaintenanceRequestController {
-  constructor(private readonly maintenanceRequestService: MaintenanceRequestService) {}
+  constructor(private readonly maintenanceRequestService: MaintenanceRequestService) { }
 
   @Post()
   @ApiOperation({ summary: 'Create a new maintenance request' })
@@ -41,7 +41,6 @@ export class MaintenanceRequestController {
     result.items.map(item => plainToInstance(MaintenanceRequest, item))
     return result
   }
-
   @Get('assigned-to-me')
   @ApiOperation({ summary: 'Filter maintenance requests assigned to the current user' })
   @ApiResponse({
@@ -49,19 +48,29 @@ export class MaintenanceRequestController {
     description: 'Retrieved maintenance requests assigned to the current user successfully',
     type: FindAllResponseMaintenanceRequestDto,
   })
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, example: 50 })
+  @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'search', required: false })
   async findAssignedToMe(
     @CurrentUser() currentUser: User,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 50,
+    @Query('status') statusTypeId?: number,
+    @Query('search') search?: string,
   ): Promise<FindAllResponseMaintenanceRequestDto> {
-    const result = await this.maintenanceRequestService.findWithPagination({
-      where: { assignedPersons: { id: currentUser.id } }
-    }, page, limit);
-
+    const result = await this.maintenanceRequestService.findAllByAssignedPerson(
+      currentUser.id,
+      statusTypeId,
+      search,
+      page,
+      limit
+    );
+  
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
-
+  
   @Get('my-requests')
   @ApiOperation({ summary: 'Get maintenance requests created by the current user' })
   @ApiResponse({
@@ -69,19 +78,29 @@ export class MaintenanceRequestController {
     description: 'Retrieved maintenance requests created by the current user successfully',
     type: FindAllResponseMaintenanceRequestDto,
   })
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, example: 50 })
+  @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'search', required: false })
   async findMyRequests(
     @CurrentUser() currentUser: User,
     @Query('page') page = 1,
     @Query('limit') limit = 50,
+    @Query('status') statusTypeId?: number,
+    @Query('search') search?: string,
   ): Promise<FindAllResponseMaintenanceRequestDto> {
-    const result = await this.maintenanceRequestService.findWithPagination({
-      where: { requester: { id: currentUser.id }}
-    }, page, limit);
-
+    const result = await this.maintenanceRequestService.findAllByRequester(
+      currentUser.id,
+      statusTypeId,
+      search,
+      page,
+      limit
+    );
+  
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
-
+  
   @Get('my-department')
   @ApiOperation({ summary: 'Get maintenance requests assigned to the current user\'s department' })
   @ApiResponse({
@@ -89,30 +108,58 @@ export class MaintenanceRequestController {
     description: 'Retrieved maintenance requests for the current user\'s department successfully',
     type: FindAllResponseMaintenanceRequestDto,
   })
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, example: 50 })
+  @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'search', required: false })
   async findMyDepartmentRequests(
     @CurrentUser() currentUser: User,
     @Query('page') page = 1,
     @Query('limit') limit = 50,
+    @Query('status') statusTypeId?: number,
+    @Query('search') search?: string,
   ): Promise<FindAllResponseMaintenanceRequestDto> {
     if (!currentUser.department) {
       throw new NotFoundException('Department of the logged in user is not found');
     }
-    const result = await this.maintenanceRequestService.findWithPagination({
-      where: { handlingDepartment: { id: currentUser.department.id } }
-    }, page, limit);
+    const result = await this.maintenanceRequestService.findAllByDepartment(
+      currentUser.department.id,
+      statusTypeId,
+      search,
+      page,
+      limit
+    );
+  
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
-
+  
   @Get('by-my-role')
   @ApiOperation({ summary: 'Filter maintenance requests by logged in user role' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Filtered maintenance requests by role successfully', type: [MaintenanceRequest] })
-  async findByRole(@Query('page') page = 1, @Query('limit') limit = 50, @CurrentUser() currentUser: User): Promise<FindAllResponseMaintenanceRequestDto> {
-    console.log("in controller", currentUser);
-    const result = await this.maintenanceRequestService.findAllByRole(currentUser.role.id, page, limit);
+  @ApiQuery({ name: 'page', required: false, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, example: 50 })
+  @ApiQuery({ name: 'status', required: false })
+  @ApiQuery({ name: 'search', required: false })
+  async findByRole(
+    @CurrentUser() currentUser: User,
+    @Query('page') page = 1,
+    @Query('limit') limit = 50,
+    @Query('status') statusTypeId?: number,
+    @Query('search') search?: string,
+  ): Promise<FindAllResponseMaintenanceRequestDto> {
+    const result = await this.maintenanceRequestService.findAllByRoleAndStatus(
+      currentUser.role.id,
+      statusTypeId,
+      search,
+      page,
+      limit
+    );
+  
     result.items.map(item => plainToInstance(MaintenanceRequest, item));
     return result;
   }
+  
 
   @Get(':id')
   @ApiOperation({ summary: 'Retrieve a maintenance request by ID' })
