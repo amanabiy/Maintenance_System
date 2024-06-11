@@ -519,19 +519,13 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
       print(response.data);
       print(response.statusCode);
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Request updated successfully')),
-        );
+        showSuccessSnackBar(context, 'Request updated successfully');
         Navigator.pop(context);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update request')),
-        );
+        showSuccessSnackBar(context, 'Failed to update request');
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
-      );
+      showFailureSnackBar(context, '$e');
     }
   }
 

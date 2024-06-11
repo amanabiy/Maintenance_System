@@ -58,6 +58,25 @@ class _RequestsPageState extends State<RequestsPage> {
         (route) => false);
   }
 
+  Map<String, String> getFilteredEndpoints(List<String> permissions) {
+    Map<String, String> filteredEndpoints = {};
+
+    if (permissions.contains('CAN_VIEW_MY_DEPARTMENT_MAINTENANCE_REQUESTS')) {
+      filteredEndpoints['Handled by My Department'] =
+          Endpoints.departmentRequests;
+    }
+    if (permissions.contains('')) {
+      filteredEndpoints['By My Role'] = Endpoints.requestsAssignedToMyRole;
+    }
+    if (permissions.contains('CAN_VIEW_ASSIGNED_MAINTENANCE_REQUESTS')) {
+      filteredEndpoints['Needs my Attention'] =
+          Endpoints.assignedToMeRequests;
+    }
+    filteredEndpoints['My Requests'] = Endpoints.myRequests;
+    // filterEndpoints
+    return filteredEndpoints;
+  }
+
   Future<void> fetchRequests() async {
     isLoading = true;
     String endpoint = filterEndpoints[selectedFilter] ?? Endpoints.myRequests;
@@ -217,7 +236,7 @@ class _RequestsPageState extends State<RequestsPage> {
               ),
             ),
             Expanded(
-              child: isLoading 
+              child: isLoading
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
