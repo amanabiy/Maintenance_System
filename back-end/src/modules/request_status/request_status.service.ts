@@ -73,6 +73,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     //   throw new ForbiddenException('User does not have the allowed role to update the status');
     // }
 
+    console.log("allowed transitions", currentStatus.statusType.allowedTransitions);
     // Check if the new request status type is an allowed transition
     const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => {
       return transition.id == newRequestStatusTypeId
