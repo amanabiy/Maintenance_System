@@ -422,6 +422,8 @@ class StatusType {
         );
     }
 
+  get needSchedule => null;
+
 }
 
 class AllowedTransition {

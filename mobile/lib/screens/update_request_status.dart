@@ -1,12 +1,18 @@
+import 'dart:io';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:mobile/models/MaintenanceRequestType.dart';
 import 'package:mobile/models/RequestsModel.dart';
 import 'package:mobile/models/UserModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
+import 'package:mobile/screens/util/custom_scaffold.dart';
+import 'package:http_parser/http_parser.dart';
 
 enum ConfirmationStatus { NOT_COMPLETED, DONE }
 
@@ -42,6 +48,12 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
   StatusType? _selectedRequestStatusType;
   List<StatusType>? _possibleRequestStatusTypes = [];
 
+  final TextEditingController _startDateController = TextEditingController();
+  final TextEditingController _endDateController = TextEditingController();
+
+  DateTime? _selectedStartDate;
+  DateTime? _selectedEndDate;
+
   late List<String> selectedDepartments = [];
   final List<String> handlingDepartments = [
     'Electrical',
@@ -71,6 +83,9 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
 
   List<String> filteredDepartments = [];
   String? selectedDepartment;
+
+  List<XFile> _selectedImages = [];
+  List<Map<String, dynamic>> _uploadedFiles = [];
 
   void _searchUsers(String query) async {
     if (query.isNotEmpty) {
@@ -319,6 +334,155 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
     super.dispose();
   }
 
+  void _removeFile(String name) {
+    setState(() {
+      try {
+        _uploadedFiles.removeWhere((file) => file['name'] == name);
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error deleting file: $e')),
+        );
+      }
+    });
+  }
+
+  Future<void> _selectDateTime(BuildContext context,
+      TextEditingController controller, bool isStart) async {
+    final DateTime? pickedDate = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+
+    if (pickedDate != null) {
+      final TimeOfDay? pickedTime = await showTimePicker(
+        context: context,
+        initialTime: TimeOfDay.now(),
+      );
+
+      if (pickedTime != null) {
+        final DateTime selectedDateTime = DateTime(
+          pickedDate.year,
+          pickedDate.month,
+          pickedDate.day,
+          pickedTime.hour,
+          pickedTime.minute,
+        );
+
+        if (!isStart ||
+            !isStart &&
+                _selectedStartDate != null &&
+                selectedDateTime.isBefore(_selectedStartDate!)) {
+          // ignore: use_build_context_synchronously
+          showFailureSnackBar(context, "End time must be after start time.");
+          return;
+        }
+
+        setState(() {
+          if (isStart) {
+            _selectedStartDate = selectedDateTime;
+          } else {
+            _selectedEndDate = selectedDateTime;
+          }
+          controller.text = selectedDateTime.toString();
+        });
+      }
+    }
+  }
+
+  Future<ImageSource?> _showPickerOptions(BuildContext context) async {
+    return await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                leading: const Icon(Icons.photo_library),
+                title: const Text('Photo Library'),
+                onTap: () {
+                  Navigator.of(context).pop(ImageSource.gallery);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.photo_camera),
+                title: const Text('Camera'),
+                onTap: () {
+                  Navigator.of(context).pop(ImageSource.camera);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _uploadImages() async {
+    print("Uploading all images");
+    for (var image in _selectedImages) {
+      await _uploadFile(image);
+    }
+  }
+
+  Future<void> pickImage() async {
+    final picker = ImagePicker();
+    final source = await _showPickerOptions(context);
+    if (source == null) return;
+
+    final XFile image;
+    if (source == ImageSource.camera) {
+      image = (await picker.pickImage(source: ImageSource.camera))!;
+    } else {
+      image = (await picker.pickImage(source: ImageSource.gallery))!;
+    }
+
+    if (image != null) {
+      setState(() {
+        _selectedImages.add(image);
+      });
+    }
+  }
+
+  Future<void> _uploadFile(XFile file) async {
+    try {
+      final formData = FormData.fromMap({
+        'file': await MultipartFile.fromFile(
+          file.path,
+          filename: file.name,
+          contentType: MediaType('image', file.path.split('.').last),
+        ),
+      });
+
+      final response = await Api().upload(Endpoints.uploadFile, formData);
+      print(response.data);
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final fileUrl = response.data['fileUrl'];
+        if (mounted) {
+          setState(() {
+            _uploadedFiles.add({
+              'id': response.data['id'],
+              'name': file.name,
+              'path': fileUrl
+            });
+          });
+          showSuccessSnackBar(context, 'File uploaded successfully');
+        }
+      } else {
+        if (mounted) {
+          showFailureSnackBar(
+              context, 'Error uploading file: ${response.statusMessage}');
+        }
+      }
+    } catch (e) {
+      print('Error uploading file: $e');
+      if (mounted) {
+        showFailureSnackBar(context, 'Error uploading file: ${e}');
+      }
+    }
+  }
+
   Future<void> updateRequest() async {
     final data = {
       "updateMaintenance": {
@@ -327,34 +491,41 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
         "locationCreate": {
           "blockNumber": int.tryParse(_blockNumberController.text),
           "floor": int.tryParse(_floorController.text),
-          "latitude": 0,
-          "longitude": 0,
           "roomNumber": _roomNumberController.text,
-          "isToilet": false
+          "isToilet": false // Update this based on actual data if necessary
         },
-        "maintenanceRequestTypeIds": [1], // Replace with actual data
-        "mediaIds": [1], // Replace with actual data
-        "priority": -1, // Replace with actual data
-        "verificationStatus": "PASSED", // Replace with actual data
-        "confirmationStatus": "NOT_COMPLETED", // Replace with actual data
-        "rating": 0, // Replace with actual data
+        "maintenanceRequestTypeIds":
+            selectedMaintenanceRequestType.map((type) => type.id).toList(),
+        "mediaIds": _uploadedFiles.map((file) => file['id']).toList(),
+        "priority": _selectedPriority,
+        "verificationStatus":
+            _selectedVerificationStatus.toString().split('.').last,
+        "confirmationStatus":
+            _selectedConfirmationStatus.toString().split('.').last,
+        "rating": 0, // Update this if you have a rating system
         "feedback": _feedbackController.text,
-        "assignedPersonIds": ["string"], // Replace with actual data
-        "handlingDepartmentId": handlingDepartments
-            .indexOf(selectedDepartment ?? '') // Replace with actual data
+        "assignedPersonIds": selectedUsers.map((user) => user.id).toList(),
+        "handlingDepartmentId":
+            handlingDepartments.indexOf(selectedDepartment ?? '')
       },
       "updateRequestStatus": {
-        "scheduleMaintenanceStartDateTime": DateTime.now().toIso8601String(),
-        "scheduleMaintenanceEndDateTime": DateTime.now().toIso8601String(),
+        "scheduleMaintenanceStartDateTime":
+            _selectedStartDate?.toIso8601String(),
+        "scheduleMaintenanceEndDateTime": _selectedEndDate?.toIso8601String(),
         "internalNote": _internalNoteController.text,
         "externalNote": _externalNoteController.text,
-        "mediaFiles": [0], // Replace with actual data
+        "mediaFiles": _uploadedFiles.map((file) => file['id']).toList(),
         "signatureByName": _signatureByNameController.text
       }
     };
 
     try {
-      final response = await Api().post(Endpoints.updateRequest, data);
+      print("sending data");
+      print(data);
+      final response = await Api().patch('${Endpoints.changeRequestStatus}/${_request?.id}/statuses/${_selectedRequestStatusType?.id}', data);
+      print("received");
+      print(response.data);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Request updated successfully')),
@@ -395,6 +566,11 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                   onChanged: (StatusType? newValue) {
                     setState(() {
                       _selectedRequestStatusType = newValue;
+                      print(_selectedRequestStatusType?.name ?? 'Unknown');
+                      print(_selectedRequestStatusType
+                              ?.allowsChangeTitleAndDescription ??
+                          'Unknown');
+                      print(_selectedRequestStatusType.toString());
                     });
                   },
                   validator: (value) =>
@@ -407,278 +583,370 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextFormField(
-              controller: _subjectController,
-              decoration: InputDecoration(labelText: 'Subject'),
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowsChangeTitleAndDescription ??
+                      false,
+              child: TextFormField(
+                controller: _subjectController,
+                decoration: InputDecoration(labelText: 'Subject'),
+              ),
             ),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: InputDecoration(labelText: 'Description'),
-              maxLines: 3,
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowsChangeTitleAndDescription ??
+                      false,
+              child: TextFormField(
+                controller: _descriptionController,
+                decoration: InputDecoration(labelText: 'Description'),
+                maxLines: 3,
+              ),
             ),
-            TextFormField(
-              controller: _blockNumberController,
-              decoration: InputDecoration(labelText: 'Block Number'),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ],
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowsChangeLocation ?? false,
+              child: TextFormField(
+                controller: _blockNumberController,
+                decoration: InputDecoration(labelText: 'Block Number'),
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+              ),
             ),
-            TextFormField(
-              controller: _floorController,
-              decoration: InputDecoration(labelText: 'Floor'),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly
-              ],
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowsChangeLocation ?? false,
+              child: TextFormField(
+                controller: _floorController,
+                decoration: InputDecoration(labelText: 'Floor'),
+                keyboardType: TextInputType.number,
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.digitsOnly
+                ],
+              ),
             ),
-            TextFormField(
-              controller: _roomNumberController,
-              decoration: InputDecoration(labelText: 'Room Number'),
+
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowsChangeLocation ?? false,
+              child: TextFormField(
+                controller: _roomNumberController,
+                decoration: InputDecoration(labelText: 'Room Number'),
+              ),
             ),
-            TextFormField(
-              controller: _feedbackController,
-              decoration: InputDecoration(labelText: 'Feedback'),
-              maxLines: 3,
+
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowChangeconfirmationStatus ??
+                      false,
+              child: TextFormField(
+                controller: _feedbackController,
+                decoration: InputDecoration(labelText: 'Feedback'),
+                maxLines: 3,
+              ),
             ),
             // TextFormField(
             //   decoration:
             //       InputDecoration(labelText: 'Maintenance Request Type IDs'),
             // ),
 
-            SizedBox(height: 30),
-            Text('Selected Types:'),
-            Wrap(
-              children: selectedMaintenanceRequestType.map((type) {
-                return Chip(
-                  label: Text(type.name!),
-                  onDeleted: () {
-                    _removeMaintenanceRequestType(type);
-                  },
-                );
-              }).toList(),
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowsChangeRequestTypes ?? false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 30),
+                  Text('Selected Types:'),
+                  Wrap(
+                    children: selectedMaintenanceRequestType.map((type) {
+                      return Chip(
+                        label: Text(type.name!),
+                        onDeleted: () {
+                          _removeMaintenanceRequestType(type);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  TextFormField(
+                    focusNode: _focusNodeMaintenanceRequestTypeFetch,
+                    decoration: InputDecoration(
+                        labelText: 'Select Maintenance Request Type'),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchMaintenanceRequestTypeQuery = value;
+                        _searchMaintenanceRequestType(value);
+                      });
+                    },
+                  ),
+                  _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : _searchMaintenanceRequestTypeQuery.isNotEmpty
+                          ? SizedBox(
+                              height:
+                                  200, // Bounded height for the ListView.builder
+                              child: ListView.builder(
+                                itemCount:
+                                    filteredMaintenanceRequestType.length,
+                                itemBuilder: (context, index) {
+                                  final type =
+                                      filteredMaintenanceRequestType[index];
+                                  return ListTile(
+                                    title: Text(type.name!),
+                                    onTap: () {
+                                      _selectMaintenanceRequestType(type);
+                                    },
+                                  );
+                                },
+                              ),
+                            )
+                          : Container(),
+                ],
+              ),
             ),
-            TextFormField(
-              focusNode: _focusNodeMaintenanceRequestTypeFetch,
-              decoration:
-                  InputDecoration(labelText: 'Select Maintenance Request Type'),
-              onChanged: (value) {
-                setState(() {
-                  _searchMaintenanceRequestTypeQuery = value;
-                  _searchMaintenanceRequestType(value);
-                });
-              },
-            ),
-            _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _searchMaintenanceRequestTypeQuery.isNotEmpty
-                    ? SizedBox(
-                        height: 200, // Bounded height for the ListView.builder
-                        child: ListView.builder(
-                          itemCount: filteredMaintenanceRequestType.length,
-                          itemBuilder: (context, index) {
-                            final type = filteredMaintenanceRequestType[index];
-                            return ListTile(
-                              title: Text(type.name!),
-                              onTap: () {
-                                _selectMaintenanceRequestType(type);
-                              },
-                            );
-                          },
-                        ),
-                      )
-                    : Container(),
 
             // TextFormField(
             //   decoration: InputDecoration(labelText: 'Media IDs'),
             // ),
-            DropdownButtonFormField<int>(
-              decoration: InputDecoration(labelText: 'Priority'),
-              value: _selectedPriority,
-              items: List.generate(5, (index) => index + 1).map((int priority) {
-                return DropdownMenuItem<int>(
-                  value: priority,
-                  child: Text(priority.toString()),
-                );
-              }).toList(),
-              onChanged: (int? newValue) {
-                setState(() {
-                  _selectedPriority = newValue;
-                });
-              },
-              validator: (value) =>
-                  value == null ? 'Please select a priority' : null,
-            ),
-            SizedBox(height: 20),
-            DropdownButtonFormField<VerificationStatus>(
-              decoration: InputDecoration(labelText: 'Verification Status'),
-              value: _selectedVerificationStatus,
-              items: VerificationStatus.values.map((VerificationStatus status) {
-                return DropdownMenuItem<VerificationStatus>(
-                  value: status,
-                  child: Text(
-                    status.toString().split('.').last,
-                    style: TextStyle(
-                      color: status == VerificationStatus.FAILED
-                          ? const Color.fromARGB(255, 133, 28, 20)
-                          : const Color.fromARGB(255, 33, 113, 36),
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: (VerificationStatus? newValue) {
-                setState(() {
-                  _selectedVerificationStatus = newValue;
-                });
-              },
-              validator: (value) =>
-                  value == null ? 'Please select a status' : null,
-            ),
-            DropdownButtonFormField<ConfirmationStatus>(
-              decoration: InputDecoration(labelText: 'Confirmation Status'),
-              value: _selectedConfirmationStatus,
-              items: ConfirmationStatus.values.map((ConfirmationStatus status) {
-                return DropdownMenuItem<ConfirmationStatus>(
-                  value: status,
-                  child: Text(
-                    status.toString().split('.').last,
-                    style: TextStyle(
-                      color: status == ConfirmationStatus.NOT_COMPLETED
-                          ? const Color.fromARGB(255, 133, 28, 20)
-                          : const Color.fromARGB(255, 33, 113, 36),
-                    ),
-                  ),
-                );
-              }).toList(),
-              onChanged: (ConfirmationStatus? newValue) {
-                setState(() {
-                  _selectedConfirmationStatus = newValue;
-                });
-              },
-              // validator: (value) =>
-              //     value == null ? 'Please select a status' : null,
-            ),
-            SizedBox(height: 30),
-            Text('Assigned Persons:'),
-            Wrap(
-              children: selectedUsers.map((user) {
-                return Chip(
-                  label: Text(user.fullName!),
-                  onDeleted: () {
-                    _removeUser(user);
-                  },
-                );
-              }).toList(),
-            ),
-            TextFormField(
-              focusNode: _focusNodeUserFetch,
-              decoration: InputDecoration(labelText: 'Assigned Person IDs'),
-              onChanged: (value) {
-                setState(() {
-                  _searchUserQuery = value;
-                  _searchUsers(value);
-                });
-              },
-            ),
-            _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _searchUserQuery.isNotEmpty
-                    ? SizedBox(
-                        height: 200, // Bounded height for the ListView.builder
-                        child: ListView.builder(
-                          itemCount: filteredUsers.length,
-                          itemBuilder: (context, index) {
-                            final user = filteredUsers[index];
-                            return ListTile(
-                              title: Text(user.fullName!),
-                              subtitle:
-                                  Text('${user.email} - ${user.phoneNumber}'),
-                              onTap: () {
-                                _selectUser(user);
-                              },
-                            );
-                          },
-                        ),
-                      )
-                    : Container(),
-            SizedBox(height: 30),
-            Text('Selected Departments:'),
-            Wrap(
-              spacing: 8.0,
-              runSpacing: 4.0,
-              children: selectedDepartments.map((item) {
-                return Chip(
-                  label: Text(item!),
-                  onDeleted: () {
-                    setState(() {
-                      selectedDepartments.remove(item);
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-            if (selectedDepartment != null)
-              Chip(
-                label: Text(selectedDepartment!),
-                onDeleted: () {
+            Visibility(
+              visible: _selectedRequestStatusType?.allowChangePriority ?? false,
+              child: DropdownButtonFormField<int>(
+                decoration: InputDecoration(labelText: 'Priority'),
+                value: _selectedPriority,
+                items:
+                    List.generate(5, (index) => index + 1).map((int priority) {
+                  return DropdownMenuItem<int>(
+                    value: priority,
+                    child: Text(priority.toString()),
+                  );
+                }).toList(),
+                onChanged: (int? newValue) {
                   setState(() {
-                    selectedDepartment = null;
+                    _selectedPriority = newValue;
                   });
                 },
+                validator: (value) =>
+                    value == null ? 'Please select a priority' : null,
               ),
-            TextFormField(
-              controller: _departmentController,
-              decoration: InputDecoration(labelText: 'Search Department'),
-              onChanged: (value) {
-                _searchDepartments(value);
-              },
             ),
-            if (filteredDepartments.isNotEmpty)
-              SizedBox(
-                height: 200,
-                child: ListView.builder(
-                  itemCount: filteredDepartments.length,
-                  itemBuilder: (context, index) {
-                    final department = filteredDepartments[index];
-                    return ListTile(
-                      title: Text(department),
-                      onTap: () {
-                        _selectDepartment(department);
-                      },
-                    );
-                  },
-                ),
-              ),
+
             SizedBox(height: 20),
-            ListTile(
-              title: Text(
-                'Rate How it Went',
-                style: TextStyle(
-                  fontSize: 20,
-                ),
-              ),
-              subtitle: Text(
-                'Give us your rating from 1 to 5 stars.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
+
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowChangeverificationStatus ??
+                      false,
+              child: DropdownButtonFormField<VerificationStatus>(
+                decoration: InputDecoration(labelText: 'Verification Status'),
+                value: _selectedVerificationStatus,
+                items:
+                    VerificationStatus.values.map((VerificationStatus status) {
+                  return DropdownMenuItem<VerificationStatus>(
+                    value: status,
+                    child: Text(
+                      status.toString().split('.').last,
+                      style: TextStyle(
+                        color: status == VerificationStatus.FAILED
+                            ? const Color.fromARGB(255, 133, 28, 20)
+                            : const Color.fromARGB(255, 33, 113, 36),
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (VerificationStatus? newValue) {
+                  setState(() {
+                    _selectedVerificationStatus = newValue;
+                  });
+                },
+                validator: (value) =>
+                    value == null ? 'Please select a status' : null,
               ),
             ),
-            RatingBar.builder(
-              initialRating: 1,
-              minRating: 1,
-              direction: Axis.horizontal,
-              allowHalfRating: true,
-              itemCount: 5,
-              itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-              itemBuilder: (context, _) => Icon(
-                Icons.star,
-                color: Colors.amber,
+
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowChangeconfirmationStatus ??
+                      false,
+              child: DropdownButtonFormField<ConfirmationStatus>(
+                decoration: InputDecoration(labelText: 'Confirmation Status'),
+                value: _selectedConfirmationStatus,
+                items:
+                    ConfirmationStatus.values.map((ConfirmationStatus status) {
+                  return DropdownMenuItem<ConfirmationStatus>(
+                    value: status,
+                    child: Text(
+                      status.toString().split('.').last,
+                      style: TextStyle(
+                        color: status == ConfirmationStatus.NOT_COMPLETED
+                            ? const Color.fromARGB(255, 133, 28, 20)
+                            : const Color.fromARGB(255, 33, 113, 36),
+                      ),
+                    ),
+                  );
+                }).toList(),
+                onChanged: (ConfirmationStatus? newValue) {
+                  setState(() {
+                    _selectedConfirmationStatus = newValue;
+                  });
+                },
+                // validator: (value) =>
+                //     value == null ? 'Please select a status' : null,
               ),
-              onRatingUpdate: (rating) {
-                print(rating);
-              },
+            ),
+            SizedBox(height: 30),
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowsForwardToPerson ?? false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Assigned Persons:'),
+                  Wrap(
+                    children: selectedUsers.map((user) {
+                      return Chip(
+                        label: Text(user.fullName!),
+                        onDeleted: () {
+                          _removeUser(user);
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  TextFormField(
+                    focusNode: _focusNodeUserFetch,
+                    decoration:
+                        InputDecoration(labelText: 'Assigned Person IDs'),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchUserQuery = value;
+                        _searchUsers(value);
+                      });
+                    },
+                  ),
+                  _isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : _searchUserQuery.isNotEmpty
+                          ? SizedBox(
+                              height:
+                                  200, // Bounded height for the ListView.builder
+                              child: ListView.builder(
+                                itemCount: filteredUsers.length,
+                                itemBuilder: (context, index) {
+                                  final user = filteredUsers[index];
+                                  return ListTile(
+                                    title: Text(user.fullName!),
+                                    subtitle: Text(
+                                        '${user.email} - ${user.phoneNumber}'),
+                                    onTap: () {
+                                      _selectUser(user);
+                                    },
+                                  );
+                                },
+                              ),
+                            )
+                          : Container(),
+                ],
+              ),
+            ),
+
+            Visibility(
+              visible: _selectedRequestStatusType?.allowsForwardToDepartment ??
+                  false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 30),
+                  Text('Selected Departments:'),
+                  Wrap(
+                    spacing: 8.0,
+                    runSpacing: 4.0,
+                    children: selectedDepartments.map((item) {
+                      return Chip(
+                        label: Text(item!),
+                        onDeleted: () {
+                          setState(() {
+                            selectedDepartments.remove(item);
+                          });
+                        },
+                      );
+                    }).toList(),
+                  ),
+                  if (selectedDepartment != null)
+                    Chip(
+                      label: Text(selectedDepartment!),
+                      onDeleted: () {
+                        setState(() {
+                          selectedDepartment = null;
+                        });
+                      },
+                    ),
+                  TextFormField(
+                    controller: _departmentController,
+                    decoration: InputDecoration(labelText: 'Search Department'),
+                    onChanged: (value) {
+                      _searchDepartments(value);
+                    },
+                  ),
+                  if (filteredDepartments.isNotEmpty)
+                    SizedBox(
+                      height: 200,
+                      child: ListView.builder(
+                        itemCount: filteredDepartments.length,
+                        itemBuilder: (context, index) {
+                          final department = filteredDepartments[index];
+                          return ListTile(
+                            title: Text(department),
+                            onTap: () {
+                              _selectDepartment(department);
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                ],
+              ),
+            ),
+
+            Visibility(
+              visible:
+                  _selectedRequestStatusType?.allowChangeconfirmationStatus ??
+                      false,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 20),
+                  ListTile(
+                    title: Text(
+                      'Rate How it Went',
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ),
+                    subtitle: Text(
+                      'Give us your rating from 1 to 5 stars.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ),
+                  RatingBar.builder(
+                    initialRating: 1,
+                    minRating: 1,
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                    itemBuilder: (context, _) => Icon(
+                      Icons.star,
+                      color: Colors.amber,
+                    ),
+                    onRatingUpdate: (rating) {
+                      print(rating);
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -689,20 +957,125 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
         title: Text('Update Request Status'),
         content: Column(
           children: [
-            TextFormField(
-              controller: _internalNoteController,
-              decoration: InputDecoration(labelText: 'Internal Note'),
-              maxLines: 2,
-            ),
+            // TextFormField(
+            //   controller: _internalNoteController,
+            //   decoration: InputDecoration(labelText: 'Internal Note'),
+            //   maxLines: 2,
+            // ),
             TextFormField(
               controller: _externalNoteController,
-              decoration: InputDecoration(labelText: 'External Note'),
+              decoration: InputDecoration(labelText: 'Comment'),
               maxLines: 2,
             ),
-            TextFormField(
-              controller: _signatureByNameController,
-              decoration: InputDecoration(labelText: 'Signature By Name'),
+            Visibility(
+              visible: _selectedRequestStatusType?.needsSignatures ?? false,
+              child: TextFormField(
+                controller: _signatureByNameController,
+                decoration: InputDecoration(labelText: 'Signature By Name'),
+              ),
             ),
+
+            Visibility(
+              visible: _selectedRequestStatusType?.hasSchedule ?? false,
+              child: Column(
+                children: [
+                  TextFormField(
+                    controller: _startDateController,
+                    decoration: InputDecoration(
+                      labelText: 'Start Date & Time',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.calendar_today),
+                        onPressed: () => _selectDateTime(
+                            context, _startDateController, true),
+                      ),
+                    ),
+                    readOnly: true,
+                  ),
+                  TextFormField(
+                    controller: _endDateController,
+                    decoration: InputDecoration(
+                      labelText: 'End Date & Time',
+                      suffixIcon: IconButton(
+                        icon: Icon(Icons.calendar_today),
+                        onPressed: () =>
+                            _selectDateTime(context, _endDateController, false),
+                      ),
+                    ),
+                    readOnly: true,
+                  ),
+                ],
+              ),
+            ),
+            Visibility(
+              visible: true,
+              child: Column(
+                children: [
+                  const SizedBox(height: 16.0),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _selectedImages.map((image) {
+                        return Stack(
+                          children: [
+                            Image.file(
+                              File(image.path),
+                              width: 100,
+                              height: 100,
+                              fit: BoxFit.cover,
+                            ),
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _selectedImages.remove(image);
+                                    _removeFile(image.path);
+                                  });
+                                },
+                                child: Container(
+                                  color: Colors.red,
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 16.0),
+                  Row(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Upload Image',
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Color.fromARGB(255, 61, 24, 109),
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(
+                              width: 12.0), // Add space between text and icon
+                          IconButton(
+                            icon: Icon(Icons.file_upload,
+                                color: Color.fromARGB(255, 61, 24, 109)),
+                            iconSize: 36.0,
+                            onPressed: pickImage,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            )
           ],
         ),
         isActive: _currentStep == 1,
@@ -727,7 +1100,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
                   setState(() {
                     _currentStep++;
                   });
-                } else if (_currentStep == 1) {
+                } else if (_currentStep == getSteps().length - 1) {
                   updateRequest();
                 }
               },

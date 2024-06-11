@@ -40,6 +40,9 @@ class Endpoints {
   // Request Status Type
   static String RequestStatusTypeById = "$baseUrl/request-status-type";
 
+  // change status of a request
+  static String changeRequestStatus = "$baseUrl/maintenance-requests";
+
   
 
 }
