@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile/models/RequestsModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
+import 'package:mobile/screens/update_request_status.dart';
 import 'package:mobile/screens/util/custom_app_bar.dart';
 
 class RequestDetailPage extends StatefulWidget {
@@ -91,6 +92,21 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                               'Block ${request?.location?.blockNumber}, Floor ${request?.location?.floor}, Room ${request?.location?.roomNumber}'),
                           // _buildDetailRow('Equipments', request?.equipments.map((e) => e.name).join(', ') ?? 'N/A'),
                         ]),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => UpdateRequestPage(
+                                      requestId: widget.requestId),
+                                ),
+                              );
+                            },
+                            child: Text('Update Status'),
+                          ),
+                        ),
                         _buildDetailSection(
                             'Request Statuses',
                             request!.requestStatuses

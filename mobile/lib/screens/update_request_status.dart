@@ -55,15 +55,7 @@ class _UpdateRequestPageState extends State<UpdateRequestPage> {
   DateTime? _selectedEndDate;
 
   late List<String> selectedDepartments = [];
-  final List<String> handlingDepartments = [
-    'Electrical',
-    'Plumbing',
-    'Computers',
-    'Furniture',
-    'Lighting',
-    'Windows',
-    'Doors',
-  ];
+  final List<String> handlingDepartments = [];
   int _currentStep = 0;
   bool _isLoading = true;
   Item? _request;
