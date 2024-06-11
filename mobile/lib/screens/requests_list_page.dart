@@ -20,11 +20,12 @@ class RequestsPage extends StatefulWidget {
 class _RequestsPageState extends State<RequestsPage> {
   RequestsModel? requests;
   FlutterSecureStorage _storage = FlutterSecureStorage();
-  String selectedFilter = 'Assigned to Me';
+  String selectedFilter = 'Needs my Attention';
   Set<String> selectedStatusTypes = Set();
+  bool isLoading = true;
 
   final Map<String, String> filterEndpoints = {
-    'Assigned to Me': Endpoints.assignedToMeRequests,
+    'Needs my Attention': Endpoints.assignedToMeRequests,
     'Handled by My Department': Endpoints.departmentRequests,
     'By My Role': Endpoints.requestsAssignedToMyRole,
     'My Requests': Endpoints.myRequests,
@@ -58,6 +59,7 @@ class _RequestsPageState extends State<RequestsPage> {
   }
 
   Future<void> fetchRequests() async {
+    isLoading = true;
     String endpoint = filterEndpoints[selectedFilter] ?? Endpoints.myRequests;
 
     try {
@@ -72,6 +74,7 @@ class _RequestsPageState extends State<RequestsPage> {
         if (mounted) {
           setState(() {}); // Update UI after fetching data
         }
+        isLoading = false;
       } else if (response.statusCode == 401) {
         if (mounted) {
           showFailureSnackBar(context, 'Unauthorized request');
@@ -214,7 +217,7 @@ class _RequestsPageState extends State<RequestsPage> {
               ),
             ),
             Expanded(
-              child: requests == null
+              child: isLoading 
                   ? const Center(
                       child: CircularProgressIndicator(),
                     )
