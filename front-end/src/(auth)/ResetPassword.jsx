@@ -18,6 +18,7 @@ import {
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useResetPasswordMutation } from "../redux/features/auth";
 import CircularProgress from "@mui/material/CircularProgress";
+import ResetPasswordSvg from "../assets/images/resetpassword.svg";
 
 const ResetPasswordForm = () => {
   const navigate = useNavigate();
@@ -87,23 +88,24 @@ const ResetPasswordForm = () => {
         margin: 0,
         width: "100vw",
         height: "100vh",
-        backgroundColor: "#24344B",
+        // backgroundColor: "#24344B",
         display: "flex",
         flexDirection: "row",
+        marginLeft: "150px",
       }}
     >
       <Box
         style={{
           width: "50%",
           padding: "20px",
-          backgroundColor: "#24344B",
+          // backgroundColor: "#24344B",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
         }}
       >
         <img
-          src="/forgotpassword.svg"
+          src={ResetPasswordSvg}
           alt="login"
           style={{ width: "500px", height: "auto" }}
         />
@@ -112,7 +114,7 @@ const ResetPasswordForm = () => {
         style={{
           width: "50%",
           padding: "20px",
-          backgroundColor: "#FFFFFF",
+          // backgroundColor: "#FFFFFF",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -250,7 +252,7 @@ const ResetPasswordForm = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleSubmit}
-                style={{ backgroundColor: "#24344B" }}
+                style={{ backgroundColor: "#4e24e1" }}
               >
                 {isLoading ? (
                   <>

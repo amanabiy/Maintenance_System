@@ -84,7 +84,7 @@ const VerifyEmail = () => {
           color="primary"
           onClick={handleSubmit}
           style={{
-            backgroundColor: "#00CC9E",
+            backgroundColor: "#4e24e1",
             width: "20%",
             fontSize: "20px",
             borderRadius: "10px",

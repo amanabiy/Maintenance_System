@@ -46,6 +46,10 @@ const Roles = lazy(() => import("../pages/Admin/Roles"));
 const EditUser = lazy(() => import("../pages/Admin/EditUser"));
 const CreateUser = lazy(() => import("../pages/Admin/CreateUser"));
 const Departments = lazy(() => import("../pages/Admin/Departments"));
+const PaymentDetails = lazy(() =>
+  import("../components/commonScenes/PaymentDetails")
+);
+const CreatePayment = lazy(() => import("../pages/Admin/CreatePayment"));
 
 // paths
 import { generalPaths, issuerPaths } from "./paths";
@@ -147,6 +151,8 @@ const router = createBrowserRouter(
           }
         >
           <Route index element={<FinancialTransactions />} />
+          <Route path="view/:paymentId" element={<PaymentDetails />} />
+          <Route path="create" element={<CreatePayment />} />
         </Route>
         <Route
           path="all-requests"

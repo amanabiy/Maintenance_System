@@ -60,16 +60,17 @@ const ForgotPasswordForm = () => {
         margin: 0,
         width: "100vw",
         height: "100vh",
-        backgroundColor: "#24344B",
+        // backgroundColor: "#24344B",
         display: "flex",
         flexDirection: "row",
+        marginLeft: "150px",
       }}
     >
       <Box
         style={{
           width: "50%",
           padding: "20px",
-          backgroundColor: "#24344B",
+          // backgroundColor: "#24344B",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -77,7 +78,7 @@ const ForgotPasswordForm = () => {
       >
         <img
           src={ForgotPasswordSvg}
-          alt="login"
+          alt="forgot password"
           style={{ width: "500px", height: "auto" }}
         />
       </Box>
@@ -85,7 +86,7 @@ const ForgotPasswordForm = () => {
         style={{
           width: "50%",
           padding: "20px",
-          backgroundColor: "#FFFFFF",
+          // backgroundColor: "#FFFFFF",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -158,7 +159,7 @@ const ForgotPasswordForm = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleSubmit}
-                style={{ backgroundColor: "#24344B" }}
+                style={{ backgroundColor: "#4e24e1" }}
               >
                 {isLoading ? (
                   <>
