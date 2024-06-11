@@ -43,7 +43,7 @@ export class UserService extends GenericDAL<
 
   async determineRoleByEmail(email: string): Promise<Role> {
     const staffDomain = 'aastu.edu.et';
-    const userRole = email.endsWith(staffDomain) ? 'STAFF' : 'STUDENT';
+    const userRole = email.endsWith(staffDomain) ? 'ISSUER' : 'STUDENT';
     const role = await this.roleService.findByName(userRole);
     return role;
   }
