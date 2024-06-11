@@ -90,6 +90,8 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       internalVersionChanges += `Priority changed from ${oldPriority} to ${updateDto.priority}\n`;
     }
 
+
+
     // if (newRequestStatusType.needsFile && !maintenanceRequest.mediaFiles.length) {
     //   throw new Error('File is required');
     // }
@@ -119,13 +121,17 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     }
 
     // Update assigned persons if allowed
-    if (newRequestStatusType.allowsForwardToPerson && updateDto.assignedPersonIds) {
+    if ((newRequestStatusType.allowsForwardToPerson && updateDto.assignedPersonIds)) {
       internalVersionChanges += `Assigned persons updated from ${maintenanceRequest.assignedPersons} to ${updateDto.assignedPersonIds}\n`;
       maintenanceRequest.assignedPersons = await this.userService.findByIds(updateDto.assignedPersonIds);
       // Create notifications for assigned persons
       for (const person of maintenanceRequest.assignedPersons) {
         await this.notificationService.createAssignmentNotification(person.id, maintenanceRequest.id);
       }
+    }
+
+    if (newRequestStatusType.name === 'MAINTENANCE COMPLETED') {
+      maintenanceRequest.assignedPersons = [currentUser]; 
     }
 
     // Update handling department if allowed
