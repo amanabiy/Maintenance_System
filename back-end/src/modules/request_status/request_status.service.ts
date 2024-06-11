@@ -65,37 +65,13 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const newRequestStatusType = await this.requestStatusTypeService.findOne(newRequestStatusTypeId);
     let internalVersionChanges = 'Internal changes\n';
 
-    console.log("printing datas");
-    console.log(currentStatus.statusType);
-    console.log(currentStatus.statusType.allowedRoles);
-    console.log(currentUser.role.id);
-
-    // Check if allowedRoles is an array
-    if (Array.isArray(currentStatus.statusType.allowedRoles)) {
-      console.log("allowedRoles is an array");
-
-      // Check if each item in allowedRoles has an id property
-      const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => {
-        console.log("Checking role:", role);
-        // return role && typeof role.id !== 'undefined' && role.id === currentUser.role.id;
-      });
-
-      console.log("hasAllowedRole:", hasAllowedRole);
-    } else {
-      console.log("allowedRoles is not an array");
-    }
-
-    console.log("printing datas");
-    console.log(currentStatus.statusType);
-    console.log(currentStatus.statusType.allowedRoles);
-    console.log(currentUser.role.id);
-    const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
-    if (!hasAllowedRole && !maintenanceRequest.assignedPersons.includes(currentUser)) {
-      console.log(hasAllowedRole);
-      console.log(currentUser.role.id);
-      console.log(currentStatus.statusType.allowedRoles);
-      throw new ForbiddenException('User does not have the allowed role to update the status');
-    }
+    // const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
+    // if (!hasAllowedRole && !maintenanceRequest.assignedPersons.includes(currentUser)) {
+    //   console.log(hasAllowedRole);
+    //   console.log(currentUser.role.id);
+    //   console.log(currentStatus.statusType.allowedRoles);
+    //   throw new ForbiddenException('User does not have the allowed role to update the status');
+    // }
 
     // Check if the new request status type is an allowed transition
     const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => {
