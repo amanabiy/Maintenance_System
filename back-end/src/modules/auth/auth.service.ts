@@ -46,7 +46,6 @@ export class AuthService {
       user,
     };
 
-    await this.mailService.sendUserConfirmation(user.email, user.fullName)
     return response;
   }
 

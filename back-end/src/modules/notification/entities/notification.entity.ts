@@ -13,11 +13,11 @@ export enum NotificationTypeEnum {
 
 @Entity('notifications')
 export class Notification extends BaseModelEntity {
-@ApiProperty({ enum: NotificationTypeEnum, description: 'The type of notification', example: NotificationTypeEnum.REQUEST_UPDATE })
-@IsNotEmpty()
-@IsEnum(NotificationTypeEnum)
-@Column({ type: 'enum', enum: NotificationTypeEnum })
-type: NotificationTypeEnum;
+  @ApiProperty({ enum: NotificationTypeEnum, description: 'The type of notification', example: NotificationTypeEnum.REQUEST_UPDATE })
+  @IsNotEmpty()
+  @IsEnum(NotificationTypeEnum)
+  @Column({ type: 'enum', enum: NotificationTypeEnum })
+  type: NotificationTypeEnum;
 
   @ApiProperty({ description: 'The subject of the notification', example: 'Maintenance Request Update' })
   @IsNotEmpty()
@@ -37,12 +37,12 @@ type: NotificationTypeEnum;
   isRead: boolean;
 
   @ApiProperty({ description: 'The user this notification is for' })
-  @ManyToOne(() => User )
+  @ManyToOne(() => User, { eager: false, nullable: true } )
   @JoinColumn({ name: 'user_id' })
   user: User;
 
   @ApiProperty({ description: 'The maintenance request this notification relates to', nullable: true })
-  @ManyToOne(() => MaintenanceRequest, { nullable: true, eager: true })
+  @ManyToOne(() => MaintenanceRequest, { nullable: true, eager: false })
   @JoinColumn({ name: 'request_id' })
   maintenanceRequest: MaintenanceRequest;
 }

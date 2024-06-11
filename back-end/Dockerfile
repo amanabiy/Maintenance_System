@@ -30,4 +30,4 @@ EXPOSE 8081
 
 
 # Command to run your app
-CMD ["npm", "run", "start:dev"]
+CMD ["npm", "run", "start:dev --max-old-space-size=4096"]

@@ -92,7 +92,7 @@ const LoginForm = () => {
         margin: 0,
         width: "100vw",
         height: "100vh",
-        backgroundColor: "#24344B",
+        // backgroundColor: "#24344B",
         display: "flex",
         flexDirection: "row",
       }}
@@ -103,11 +103,11 @@ const LoginForm = () => {
         style={{
           // width: "50%",
           padding: "20px",
-          backgroundColor: "#24344B",
+          // backgroundColor: "#24344B",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
-          border: "solid red 2px",
+          // border: "solid red 2px",
         }}
       >
         <img
@@ -122,7 +122,7 @@ const LoginForm = () => {
         style={{
           width: "50%",
           padding: "20px",
-          backgroundColor: "#FFFFFF",
+          // backgroundColor: "#FFFFFF",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -243,7 +243,7 @@ const LoginForm = () => {
               >
                 <Button
                   style={{
-                    color: "#24344B",
+                    color: "#4e24e1",
                     outline: "none",
                     boxShadow: "none",
                     textTransform: "none",
@@ -264,7 +264,7 @@ const LoginForm = () => {
                 variant="contained"
                 color="primary"
                 onClick={handleSubmit}
-                style={{ backgroundColor: "#24344B" }}
+                style={{ backgroundColor: "#4e24e1" }}
               >
                 {isLoading ? (
                   <>
@@ -296,7 +296,7 @@ const LoginForm = () => {
                 </Typography>
                 <Button
                   style={{
-                    color: "#24344B",
+                    color: "#4e24e1",
                     outline: "none",
                     boxShadow: "none",
                     textTransform: "none",

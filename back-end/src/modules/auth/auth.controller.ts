@@ -107,10 +107,12 @@ export class AuthController {
     type: MessageResponseDto,
   })
   async requestToken(@Param('email') email: string): Promise<MessageResponseDto> {
+    console.log(email);
     const result = await this.authService.RequestToken(email);
     if (!result) {
       throw new BadRequestException('Could not send token to Email');
     }
+    console.log(result)
     return { message: 'Token sent to Email Successfully' };
   }
 

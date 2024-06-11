@@ -23,6 +23,7 @@ import ImageUpload from "../../components/form/ImageUpload";
 import { useUploadMediaMutation } from "../../redux/features/media";
 import { useFuzzySearchMutation } from "../../redux/features/maintenanceRequestTypes";
 import { useCreateMaintenanceRequestMutation } from "../../redux/features/maintenanceRequest";
+import { useGetAllMaintenanceRequestTypesQuery } from "../../redux/features/maintenanceRequestTypes";
 
 // form schema
 import { reportSchema } from "../../schemas";
@@ -34,6 +35,8 @@ const ReportIssue = () => {
   const [fuzzySearch] = useFuzzySearchMutation();
   const [createMaintenanceRequest] = useCreateMaintenanceRequestMutation();
   const [type, setType] = useState("");
+  const { data, error, status } = useGetAllMaintenanceRequestTypesQuery();
+  console.log(data);
 
   const handleFileChange = (event) => {
     const files = Array.from(event.target.files);
@@ -223,14 +226,19 @@ const ReportIssue = () => {
                 name="type"
                 style={{ height: "40px" }}
               >
-                <MenuItem value="general">General Maintenance</MenuItem>
+                {/* <MenuItem value="general">General Maintenance</MenuItem>
                 <MenuItem value="electric">Electric Maintenance</MenuItem>
-                <MenuItem value="sanitary">Sanitary Maintenance</MenuItem>
+                <MenuItem value="sanitary">Sanitary Maintenance</MenuItem> */}
+                {data?.items.map((item) => (
+                  <MenuItem key={item.id} value={item.name}>
+                    {item.name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </GridItem>
 
-          <GridItem xs={4} md={2} style={{ marginBottom: 20 }}>
+          {/* <GridItem xs={4} md={2} style={{ marginBottom: 20 }}>
             <FormControl variant="outlined" fullWidth>
               <InputLabel>Block Number</InputLabel>
               <Select
@@ -252,6 +260,26 @@ const ReportIssue = () => {
                 <MenuItem value="57">57</MenuItem>
               </Select>
             </FormControl>
+          </GridItem> */}
+          <GridItem xs={4} md={2} style={{ marginBottom: 20 }}>
+            <TextField
+              label="Block Number"
+              type="number"
+              value={values.locationCreate.blockNumber}
+              onChange={(e) =>
+                setFieldValue(
+                  "locationCreate.blockNumber",
+                  parseInt(e.target.value, 10)
+                )
+              }
+              onBlur={handleBlur}
+              id="locationCreate.blockNumber"
+              name="locationCreate.blockNumber"
+              inputProps={{ min: 1, max: 100 }}
+              style={{ height: "40px", width: "150px" }}
+              variant="outlined"
+              fullWidth
+            />
           </GridItem>
 
           <GridItem xs={12} style={{ marginBottom: 20 }}>

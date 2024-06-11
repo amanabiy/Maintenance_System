@@ -8,7 +8,7 @@ const roleApi = baseApi.injectEndpoints({
         method: "POST",
         body,
       }),
-      providesTags: ["Role"],
+      invalidatesTags: ["Role"],
     }),
     // getAllRoles: builder.mutation({
     //   query: () => ({
@@ -21,12 +21,14 @@ const roleApi = baseApi.injectEndpoints({
         url: "role",
         method: "GET",
       }),
+      providesTags: ["Role"],
     }),
     getRoleById: builder.mutation({
       query: (id) => ({
         url: `role/${id}`,
         method: "GET",
       }),
+      invalidatesTags: ["Role"],
     }),
     UpdateRole: builder.mutation({
       query: ({ id, roleName }) => ({
@@ -34,27 +36,31 @@ const roleApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { roleName },
       }),
+      invalidatesTags: ["Role"],
     }),
     deleteRole: builder.mutation({
       query: (id) => ({
         url: `role/${id}`,
         method: "DELETE",
       }),
-      providesTags: ["Role"],
+      invalidatesTags: ["Role"],
     }),
     addPermissionToRole: builder.mutation({
       query: ({ roleId, permissionId }) => ({
         url: `role/${roleId}/permission/${permissionId}`,
         method: "POST",
       }),
+      invalidatesTags: ["Role"],
     }),
     removePermissionFromRole: builder.mutation({
       query: ({ roleId, permissionId }) => ({
         url: `role/${roleId}/permission/${permissionId}`,
         method: "DELETE",
       }),
+      invalidatesTags: ["Role"],
     }),
   }),
+  tagTypes: ['Role'],
 });
 
 export default roleApi;

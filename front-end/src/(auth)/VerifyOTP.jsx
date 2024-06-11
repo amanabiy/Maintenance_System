@@ -89,16 +89,17 @@ const VerifyOTP = () => {
         margin: 0,
         width: "100vw",
         height: "100vh",
-        backgroundColor: "#24344B",
+        // backgroundColor: "#24344B",
         display: "flex",
         flexDirection: "row",
+        marginLeft: "150px",
       }}
     >
       <Box
         style={{
           width: "50%",
           padding: "20px",
-          backgroundColor: "#24344B",
+          // backgroundColor: "#24344B",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -114,7 +115,7 @@ const VerifyOTP = () => {
         style={{
           width: "50%",
           padding: "20px",
-          backgroundColor: "#FFFFFF",
+          // backgroundColor: "#FFFFFF",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
@@ -189,7 +190,7 @@ const VerifyOTP = () => {
           </div>
           <Button
             style={{
-              color: "#24344B",
+              color: "#4e24e1",
               outline: "none",
               boxShadow: "none",
               textTransform: "none",
@@ -204,7 +205,7 @@ const VerifyOTP = () => {
             variant="contained"
             onClick={handleVerifyOTP}
             style={{
-              backgroundColor: "#24344B",
+              backgroundColor: "#4e24e1",
               width: "65%",
               borderRadius: "10px",
             }}
