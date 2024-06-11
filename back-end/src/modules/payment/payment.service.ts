@@ -23,7 +23,7 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     private readonly mediaService: MediaService,
   ) {
     super(paymentRepository, 1, 1000, [
-      'user',
+      'requester',
       // 'request',
       // 'equipment'
     ]);
@@ -36,7 +36,7 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
       ...rest
     } = paymentData;
 
-    const user = await this.userService.findOne(userId);
+    const requester = await this.userService.findOne(userId);
     let request = null;
     if (requestId) {
       request = await this.maintenanceRequestService.findOne(requestId);
@@ -45,7 +45,7 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     
     const payment = await super.create({
       ...rest,
-      user,
+      requester,
       request
     })
 
@@ -56,7 +56,7 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     const payment = await this.findOne(paymentId);
     const receipt = await this.mediaService.findOne(receiptId);
 
-    if (payment.user.id !== currentUser.id) {
+    if (payment.requester.id !== currentUser.id) {
       throw new ForbiddenException('The user who is requested to pay is the only one who can attach receipt');
     }
 
@@ -78,7 +78,7 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
 
   async filterPaymentsByStatus(user: User, status: PaymentStatus): Promise<FindAllResponsePaymentDto> {
     const where = {
-      user: { id: user.id },
+      requester: { id: user.id },
     }
 
     if (status) {
