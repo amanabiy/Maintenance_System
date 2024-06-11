@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mobile/models/RequestsModel.dart';
+import 'package:mobile/models/UserModel.dart';
 import 'package:mobile/network/endpoints.dart';
 import 'package:mobile/providers/api_provider.dart';
 import 'package:mobile/screens/update_request_status.dart';
 import 'package:mobile/screens/util/custom_app_bar.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class RequestDetailPage extends StatefulWidget {
   final int requestId;
@@ -18,23 +20,42 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   Item? request;
   bool isLoading = true;
   final Api api = Api();
+  User? currentUser;
+  final FlutterSecureStorage _storage = FlutterSecureStorage();
 
   @override
   void initState() {
     super.initState();
+    fetchCurrentUser();
     fetchRequestDetails();
+  }
+
+  Future<void> fetchCurrentUser() async {
+    String? userId = await _storage.read(key: 'userId');
+    if (userId != null) {
+      try {
+        final response = await api.get('${Endpoints.getMyProfile}');
+        setState(() {
+          currentUser = User.fromJson(response.data);
+        });
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to load current user: $e')),
+          );
+        }
+      }
+    }
   }
 
   Future<void> fetchRequestDetails() async {
     try {
       final response =
           await api.get('${Endpoints.request}/${widget.requestId}');
-      request = Item.fromJson(response.data);
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
+      setState(() {
+        request = Item.fromJson(response.data);
+        isLoading = false;
+      });
     } catch (e) {
       if (mounted) {
         setState(() {
@@ -92,21 +113,22 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                               'Block ${request?.location?.blockNumber}, Floor ${request?.location?.floor}, Room ${request?.location?.roomNumber}'),
                           // _buildDetailRow('Equipments', request?.equipments.map((e) => e.name).join(', ') ?? 'N/A'),
                         ]),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => UpdateRequestPage(
-                                      requestId: widget.requestId),
-                                ),
-                              );
-                            },
-                            child: Text('Update Status'),
+                        if (shouldShowUpdateButton())
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UpdateRequestPage(
+                                        requestId: widget.requestId),
+                                  ),
+                                );
+                              },
+                              child: Text('Update Status'),
+                            ),
                           ),
-                        ),
                         _buildDetailSection(
                             'Request Statuses',
                             request!.requestStatuses
@@ -125,6 +147,14 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                   ),
                 ),
     );
+  }
+
+  bool shouldShowUpdateButton() {
+    if (currentUser == null || request == null) return false;
+    bool isRequester = request!.requester?.id == currentUser!.id;
+    bool isStatusComplete = request!.requestStatuses
+        .any((status) => status.statusType?.name == 'MAINTENANCE COMPLETED');
+    return !isRequester && isStatusComplete;
   }
 
   Widget _buildDetailSection(String title, List<Widget> children) {
@@ -182,7 +212,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Row(
           children: [
-            media.mimetype!.startsWith('imagsdfe/')
+            media.mimetype!.startsWith('images/')
                 ? Image.network(
                     '${Endpoints.mediaServe}/${media.id}' ?? '',
                     width: 50,

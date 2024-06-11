@@ -99,6 +99,7 @@ class Item {
 
 class Requester {
     Requester({
+        required this.id,
         required this.createdAt,
         required this.updatedAt,
         required this.role,
@@ -117,9 +118,11 @@ class Requester {
     final Department? department;
     final bool? isVerified;
     final DateTime? lastPasswordUpdatedAt;
+    final int? id;
 
     factory Requester.fromJson(Map<String, dynamic> json){ 
         return Requester(
+            id: json["id"],
             createdAt: DateTime.tryParse(json["createdAt"] ?? ""),
             updatedAt: DateTime.tryParse(json["updatedAt"] ?? ""),
             role: json["role"] == null ? null : Role.fromJson(json["role"]),
