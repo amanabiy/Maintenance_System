@@ -61,6 +61,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const maintenanceRequest: MaintenanceRequest = await this.maintenanceRequestService.findOne(id);
     // console.log("here", id,  maintenanceRequest)
     const currentStatus = await super.findOne(-1, { where: { request: { id: maintenanceRequest.id } }, order: { createdAt: 'DESC' }, relations: ['statusType', 'statusType.allowedTransitions', 'statusType.allowedRoles'] });
+    const currentStatusType = await this.requestStatusTypeService.findOne(currentStatus.statusType.id);
 
     const newRequestStatusType = await this.requestStatusTypeService.findOne(newRequestStatusTypeId);
     let internalVersionChanges = 'Internal changes\n';
@@ -73,9 +74,10 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     //   throw new ForbiddenException('User does not have the allowed role to update the status');
     // }
 
-    console.log("allowed transitions", currentStatus.statusType.allowedTransitions);
+    console.log("current status", currentStatus);
+    console.log("allowed transitions", currentStatusType.allowedTransitions);
     // Check if the new request status type is an allowed transition
-    const isAllowedTransition = currentStatus.statusType.allowedTransitions.some(transition => {
+    const isAllowedTransition = currentStatusType.allowedTransitions.some(transition => {
       return transition.id == newRequestStatusTypeId
     });
     if (!isAllowedTransition) {
