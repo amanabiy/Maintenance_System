@@ -66,13 +66,13 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const newRequestStatusType = await this.requestStatusTypeService.findOne(newRequestStatusTypeId);
     let internalVersionChanges = 'Internal changes\n';
 
-    // const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
-    // if (!hasAllowedRole && !maintenanceRequest.assignedPersons.includes(currentUser)) {
-    //   console.log(hasAllowedRole);
-    //   console.log(currentUser.role.id);
-    //   console.log(currentStatus.statusType.allowedRoles);
-    //   throw new ForbiddenException('User does not have the allowed role to update the status');
-    // }
+    const hasAllowedRole = currentStatusType.allowedRoles.some(role => role.id === currentUser.role.id);
+    if (!hasAllowedRole && !maintenanceRequest.assignedPersons.includes(currentUser)) {
+      console.log(hasAllowedRole);
+      console.log(currentUser.role.id);
+      console.log(currentStatus.statusType.allowedRoles);
+      throw new ForbiddenException('User does not have the allowed role to update the status');
+    }
 
     console.log("current status", currentStatus);
     console.log("allowed transitions", currentStatusType.allowedTransitions);
