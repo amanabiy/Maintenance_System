@@ -1,13 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, UseGuards } from '@nestjs/common';
 import { PermissionService } from './permission.service';
-import { ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiBody, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { FindAllResponsePermissionDto } from './dto/find-all-response-permission.dto';
 import { CreatePermissionDto } from './dto/create-permission.dto';
 import { Permission } from './entities/permission.entity';
 import { DeleteResponseDto } from 'src/dto/delete-response.dto';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles-guard';
+import { PermissionsGuard } from './guard/permissions.guard';
 
 @Controller('permission')
 @ApiTags('Permission')
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
+@ApiBearerAuth('bearerAuth')
 export class PermissionController {
   constructor(private readonly permissionService: PermissionService) {}
   @Get()

@@ -8,10 +8,11 @@ import { RolesGuard } from '../auth/guards/roles-guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../user/entities/user.entity';
 import { FindAllResponseNotificationDto } from './dto/find-all-response-notification';
+import { PermissionsGuard } from '../permission/guard/permissions.guard';
 
 @ApiTags('Notifications')
 @Controller('notifications')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard, PermissionsGuard)
 @ApiBearerAuth('bearerAuth')
 export class NotificationController {
   constructor(private readonly notificationService: NotificationService) {}

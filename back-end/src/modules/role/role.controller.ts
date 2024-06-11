@@ -3,13 +3,14 @@ import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity';
-import { ApiTags, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiOperation, ApiParam, ApiBearerAuth } from '@nestjs/swagger';
 import { DeleteResponseDto } from 'src/dto/delete-response.dto';
 import FindAllResponseDto from 'src/dto/find-all-response.dto';
 import { FindAllResponseRoleDto } from './dto/find-all-response-role.dto';
 
 @ApiTags('Role')
 @Controller('role')
+@ApiBearerAuth('bearerAuth')
 export class RoleController {
   constructor(private readonly roleService: RoleService) {}
 
