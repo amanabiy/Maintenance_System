@@ -115,6 +115,7 @@ const ReportIssue = () => {
   });
 
   const handleSubmitAll = async (values) => {
+    console.log(values, "values");
     try {
       const res = await createMaintenanceRequest(values);
       if (res.data.verificationStatus == "PENDING") {

@@ -32,8 +32,8 @@ export const PermissionsProvider = ({ children }) => {
     fetchPermissions();
     //   console.log("fetchPermissions");
 
-    // Set an interval to check for updates every 5 seconds
-    const intervalId = setInterval(fetchPermissions, 5000);
+    // Set an interval to check for updates every 1 hour.
+    const intervalId = setInterval(fetchPermissions, 1 * 60 * 60 * 1000);
 
     // Cleanup interval on component unmount
     return () => clearInterval(intervalId);

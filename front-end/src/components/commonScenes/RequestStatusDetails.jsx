@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useGetMaintenanceRequestByIdQuery } from "../../redux/features/maintenanceRequest";
+import {
+  useGetMaintenanceRequestByIdQuery,
+  useLazyGetMaintenanceRequestByIdQuery,
+} from "../../redux/features/maintenanceRequest";
 import { useGetRequestStatusTypeByIdQuery } from "../../redux/features/requestStatusType";
 import { useParams } from "react-router-dom";
-
 import {
   Stepper,
   Step,
@@ -14,16 +16,12 @@ import {
   Hidden,
   SvgIcon,
 } from "@mui/material";
-
-// styles and themes
 import { tokens } from "../../theme";
 import { useTheme } from "@mui/material/styles";
 import "./styles.scss";
-
 import Loading from "../loading/Loading";
 import GridParent from "../layout/GridParent";
 import GridItem from "../layout/GridItem";
-
 import EditNoteOutlinedIcon from "@mui/icons-material/EditNoteOutlined";
 import CommentIcon from "@mui/icons-material/Comment";
 import NotesIcon from "@mui/icons-material/Notes";
@@ -32,9 +30,7 @@ import HowToRegIcon from "@mui/icons-material/HowToReg";
 import DoubleArrowIcon from "@mui/icons-material/DoubleArrow";
 import SignatureIcon from "../../assets/icons/signature.svg";
 import MediationIcon from "@mui/icons-material/Mediation";
-
 import GetAppIcon from "@mui/icons-material/GetApp";
-import { transformation } from "leaflet";
 import TransitionModal from "../modals/TransitionModal";
 
 const RequestStatusDetails = () => {
@@ -43,23 +39,33 @@ const RequestStatusDetails = () => {
   const [currentRequestStatus, setCurrentRequestStatus] = useState({});
   const [currentTransitionState, setCurrentTransitionState] = useState({});
   const [transitionModalOpen, setTransitionModalOpen] = useState(false);
+  const [requestStatuses, setRequestStatuses] = useState([]);
   const { requestId } = useParams();
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
-  const {
-    data: request,
-    error,
-    status,
-  } = useGetMaintenanceRequestByIdQuery(requestId);
-  const requestStatuses = request?.requestStatuses || [];
+  const [fetchRequestById, { data: request, error, status }] =
+    useLazyGetMaintenanceRequestByIdQuery();
 
   const {
     data: currentRequestStatusType,
     status: requestStatus,
     error: requestError,
+    isLoading: requestIsLoading,
   } = useGetRequestStatusTypeByIdQuery(currentRequestStatusId, {
     skip: !currentRequestStatusId,
   });
+
+  useEffect(() => {
+    if (requestId) {
+      fetchRequestById(requestId);
+    }
+  }, [requestId, fetchRequestById]);
+
+  useEffect(() => {
+    if (request && request.requestStatuses) {
+      setRequestStatuses(request.requestStatuses);
+    }
+  }, [request]);
 
   useEffect(() => {
     if (requestStatuses.length > 0) {
@@ -72,14 +78,13 @@ const RequestStatusDetails = () => {
     setActiveStep(index);
     setRequestCurrentStatusId(requestStatuses[index]?.statusType?.id);
     setCurrentRequestStatus(requestStatuses[index]);
-    console.log("Step clicked", index);
   };
+
   const handleTransitionModalClose = () => {
     setTransitionModalOpen(false);
   };
 
   if (error || requestError || status === "failed") {
-    console.log("Error", error, requestError);
     return (
       <Alert severity="error">
         Can't seem to load the data at the moment. Try refreshing the page.
@@ -87,17 +92,15 @@ const RequestStatusDetails = () => {
     );
   }
 
-  if (!requestStatuses || status === "PENDING") {
+  if (
+    !request ||
+    !requestStatuses.length ||
+    status === "pending" ||
+    requestIsLoading
+  ) {
     return <Loading />;
   }
 
-  console.log("Requests", request);
-  console.log("current Request Status TYpe", currentRequestStatusType);
-  console.log("Request Statuses", requestStatuses);
-  console.log("Current Request Status", currentRequestStatus);
-  // console.log("Current Request Status", currentRequestStatusType);
-  // console.log("current Reaest status and error", requestStatus, requestError);
-  // console.log("current transition state", currentTransitionState);
   return (
     <GridParent className="request-status-details">
       <GridItem
@@ -164,7 +167,7 @@ const RequestStatusDetails = () => {
         className="details-section"
         style={{ position: "relative" }}
       >
-        {requestStatus === "PENDING" || !currentRequestStatus ? (
+        {requestStatus === "pending" || !currentRequestStatus ? (
           <Loading />
         ) : (
           currentRequestStatusType && (
@@ -192,7 +195,6 @@ const RequestStatusDetails = () => {
                   display: "flex",
                   flexDirection: "row",
                   gap: "10px",
-                  // height: "100%",
                 }}
               >
                 <Box
@@ -312,36 +314,30 @@ const RequestStatusDetails = () => {
                       {currentRequestStatusType.allowedTransitions.length >
                       0 ? (
                         currentRequestStatusType.allowedTransitions.map(
-                          (transitionState) => {
-                            return (
-                              <Box
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
+                          (transitionState) => (
+                            <Box
+                              key={transitionState.id}
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                              }}
+                              className="transition-line"
+                            >
+                              <DoubleArrowIcon style={{ width: "10px" }} />
+                              <Button
+                                variant="text"
+                                onClick={() => {
+                                  setCurrentTransitionState(transitionState);
+                                  setTransitionModalOpen(true);
                                 }}
-                                className="transition-line"
+                                size="small"
+                                style={{ fontSize: "8px" }}
+                                className="transition-button"
                               >
-                                <DoubleArrowIcon style={{ width: "10px" }} />
-                                <Button
-                                  key={transitionState.id}
-                                  variant="text"
-                                  onClick={() => {
-                                    console.log(
-                                      "Transitioning State to",
-                                      transitionState.id
-                                    );
-                                    setCurrentTransitionState(transitionState);
-                                    setTransitionModalOpen(true);
-                                  }}
-                                  size="small"
-                                  style={{ fontSize: "8px" }}
-                                  className="transition-button"
-                                >
-                                  {transitionState.name}
-                                </Button>
-                              </Box>
-                            );
-                          }
+                                {transitionState.name}
+                              </Button>
+                            </Box>
+                          )
                         )
                       ) : (
                         <div>This is a Final State.</div>
@@ -356,7 +352,11 @@ const RequestStatusDetails = () => {
                     display: "flex",
                   }}
                 >
-                  <img src={SignatureIcon} style={{ width: "25px" }}></img>
+                  <img
+                    src={SignatureIcon}
+                    style={{ width: "25px" }}
+                    alt="Signature Icon"
+                  ></img>
                   <Typography variant="h6">Signed By</Typography>
                 </Box>
                 <Typography
