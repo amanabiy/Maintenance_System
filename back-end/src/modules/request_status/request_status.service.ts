@@ -65,7 +65,10 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     const newRequestStatusType = await this.requestStatusTypeService.findOne(newRequestStatusTypeId);
     let internalVersionChanges = 'Internal changes\n';
 
-
+    console.log("printing datas");
+    console.log(currentStatus.statusType);
+    console.log(currentStatus.statusType.allowedRoles);
+    console.log(currentUser.role.id);
     const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
     if (!hasAllowedRole && !maintenanceRequest.assignedPersons.includes(currentUser)) {
       console.log(hasAllowedRole);
