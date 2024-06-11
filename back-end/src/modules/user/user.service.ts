@@ -66,7 +66,7 @@ export class UserService extends GenericDAL<
     // find department and role
     const role = await this.determineRoleByEmail(email);
     let department = null;
-    const adminRole = await this.roleService.findByName('ADMIN')
+    const adminRole = await this.roleService.findByName('SUPER ADMIN')
     if (role.id === adminRole.id && departmentId) {
         department = await this.departmentService.findOne(departmentId);
     }
