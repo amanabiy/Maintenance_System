@@ -69,6 +69,26 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
     console.log(currentStatus.statusType);
     console.log(currentStatus.statusType.allowedRoles);
     console.log(currentUser.role.id);
+
+    // Check if allowedRoles is an array
+    if (Array.isArray(currentStatus.statusType.allowedRoles)) {
+      console.log("allowedRoles is an array");
+
+      // Check if each item in allowedRoles has an id property
+      const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => {
+        console.log("Checking role:", role);
+        // return role && typeof role.id !== 'undefined' && role.id === currentUser.role.id;
+      });
+
+      console.log("hasAllowedRole:", hasAllowedRole);
+    } else {
+      console.log("allowedRoles is not an array");
+    }
+
+    console.log("printing datas");
+    console.log(currentStatus.statusType);
+    console.log(currentStatus.statusType.allowedRoles);
+    console.log(currentUser.role.id);
     const hasAllowedRole = currentStatus.statusType.allowedRoles.some(role => role.id === currentUser.role.id);
     if (!hasAllowedRole && !maintenanceRequest.assignedPersons.includes(currentUser)) {
       console.log(hasAllowedRole);
@@ -216,14 +236,14 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       .groupBy('requestStatus.request')
       .where('requestStatus.statusType.id IN (SELECT id FROM request_status_type WHERE id = :statusTypeId)')
       .getQuery();
-    
+
     const latestStatuses = await this.requestStatusRepository
       .createQueryBuilder('rs')
       .where(`rs.id IN (${latestStatusSubquery})`)
       .leftJoinAndSelect('rs.statusType', 'statusType')
       .setParameter('statusTypeId', statusTypeId)
       .getMany();
-    
+
     return latestStatuses;
   }
 
@@ -237,7 +257,7 @@ export class RequestStatusService extends GenericDAL<RequestStatus, any, any> {
       .where('requestStatus.statusType.id IN (:...statusTypeIds)', { statusTypeIds })
       .getQuery();
 
-      // Main query to get the request statuses
+    // Main query to get the request statuses
     const latestStatuses = await this.requestStatusRepository
       .createQueryBuilder('rs')
       .where(`rs.id IN (${latestStatusSubquery})`)
