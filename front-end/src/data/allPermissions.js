@@ -1,151 +1,52 @@
 export const allPermissions = {
-  1: {
-    name: "CAN_CREATE_USER",
-    description: "Allows roles with this permission to create users",
-  },
-  2: {
-    name: "CAN_VIEW_USERS",
-    description: "Allows roles with this permission to view a list of users",
-  },
-  3: {
-    name: "CAN_VIEW_USER",
-    description: "Allows roles with this permission to view a single user",
-  },
-  4: {
-    name: "CAN_UPDATE_USER",
-    description: "Allows roles with this permission to update user details",
-  },
-  5: {
-    name: "CAN_DELETE_USER",
-    description: "Allows roles with this permission to delete a user",
-  },
-  6: {
-    name: "CAN_CREATE_ROLE",
-    description: "Allows roles with this permission to create roles",
-  },
-  7: {
-    name: "CAN_VIEW_ROLES",
-    description: "Allows roles with this permission to view a list of roles",
-  },
-  8: {
-    name: "CAN_VIEW_ROLE",
-    description: "Allows roles with this permission to view a single role",
-  },
-  9: {
-    name: "CAN_UPDATE_ROLE",
-    description: "Allows roles with this permission to update role details",
-  },
-  10: {
-    name: "CAN_DELETE_ROLE",
-    description: "Allows roles with this permission to delete a role",
-  },
-  11: {
-    name: "CAN_CREATE_MAINTENANCE_REQUEST",
-    description: "Permission to create a new maintenance request",
-  },
-  12: {
-    name: "CAN_VIEW_ALL_MAINTENANCE_REQUESTS",
-    description: "Permission to view all maintenance requests",
-  },
-  13: {
-    name: "CAN_VIEW_ASSIGNED_TO_ME_MAINTENANCE_REQUESTS",
-    description:
-      "Permission to view maintenance requests assigned to the current user",
-  },
-  14: {
-    name: "CAN_VIEW_MY_MAINTENANCE_REQUESTS",
-    description:
-      "Permission to view maintenance requests created by the current user",
-  },
-  15: {
-    name: "CAN_VIEW_MY_DEPARTMENT_MAINTENANCE_REQUESTS",
-    description:
-      "Permission to view maintenance requests assigned to the current user department",
-  },
-  16: {
-    name: "CAN_VIEW_MAINTENANCE_REQUEST_BY_ID",
-    description: "Permission to view a maintenance request by its ID",
-  },
-  17: {
-    name: "CAN_UPDATE_MAINTENANCE_REQUEST",
-    description: "Permission to update a maintenance request by its ID",
-  },
-  18: {
-    name: "CAN_DELETE_MAINTENANCE_REQUEST",
-    description: "Permission to delete a maintenance request by its ID",
-  },
-  19: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS",
-    description: "Permission to search maintenance requests",
-  },
-  20: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_ASSIGNED_PERSON_IDS",
-    description:
-      "Permission to search maintenance requests by assigned person IDs",
-  },
-  21: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUEST_TYPE_IDS",
-    description:
-      "Permission to search maintenance requests by request type IDs",
-  },
-  22: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_HANDLING_DEPARTMENT_ID",
-    description:
-      "Permission to search maintenance requests by handling department ID",
-  },
-  23: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUESTER_ID",
-    description: "Permission to search maintenance requests by requester ID",
-  },
-  24: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_CONFIRMATION_STATUS",
-    description:
-      "Permission to search maintenance requests by confirmation status",
-  },
-  25: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFICATION_STATUS",
-    description:
-      "Permission to search maintenance requests by verification status",
-  },
-  26: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFIED_BY_ID",
-    description: "Permission to search maintenance requests by verified by ID",
-  },
-  27: {
-    name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_PRIORITY",
-    description: "Permission to search maintenance requests by priority",
-  },
-  28: {
-    name: "CAN_CREATE_PAYMENT",
-    description: "Permission to create a new payment",
-  },
-  29: {
-    name: "CAN_VIEW_ALL_PAYMENTS",
-    description: "Permission to view all payments",
-  },
-  30: {
-    name: "CAN_FILTER_PAYMENTS",
-    description:
-      "Permission to filter payments based on user, maintenance request, and status",
-  },
-  31: {
-    name: "CAN_VIEW_PAYMENT",
-    description: "Permission to view a single payment by ID",
-  },
-  32: {
-    name: "CAN_DELETE_PAYMENT",
-    description: "Permission to delete a payment by ID",
-  },
-  33: {
-    name: "CAN_ADD_RECEIPT_TO_PAYMENT",
-    description: "Permission to add a receipt to a payment",
-  },
-  34: {
-    name: "CAN_CHANGE_PAYMENT_STATUS",
-    description: "Permission to change the status of a payment",
-  },
-  35: {
-    name: "CAN_VIEW_STATS",
-    description: "Allows viewing stats",
-  },
+  1: { name: "CAN_CREATE_USER" },
+  2: { name: "CAN_VIEW_USERS" },
+  3: { name: "CAN_VIEW_USER" },
+  4: { name: "CAN_UPDATE_USER" },
+  5: { name: "CAN_DELETE_USER" },
+  6: { name: "CAN_CREATE_ROLE" },
+  7: { name: "CAN_VIEW_ROLES" },
+  8: { name: "CAN_VIEW_ROLE" },
+  9: { name: "CAN_UPDATE_ROLE" },
+  10: { name: "CAN_DELETE_ROLE" },
+  11: { name: "CAN_CREATE_MAINTENANCE_REQUEST" },
+  12: { name: "CAN_VIEW_ALL_MAINTENANCE_REQUESTS" },
+  13: { name: "CAN_VIEW_ASSIGNED_TO_ME_MAINTENANCE_REQUESTS" },
+  14: { name: "CAN_VIEW_MY_MAINTENANCE_REQUESTS" },
+  15: { name: "CAN_VIEW_MY_DEPARTMENT_MAINTENANCE_REQUESTS" },
+  16: { name: "CAN_VIEW_MAINTENANCE_REQUEST_BY_ID" },
+  17: { name: "CAN_UPDATE_MAINTENANCE_REQUEST" },
+  18: { name: "CAN_DELETE_MAINTENANCE_REQUEST" },
+  19: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS" },
+  20: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_ASSIGNED_PERSON_IDS" },
+  21: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUEST_TYPE_IDS" },
+  22: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_HANDLING_DEPARTMENT_ID" },
+  23: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_REQUESTER_ID" },
+  24: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_CONFIRMATION_STATUS" },
+  25: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFICATION_STATUS" },
+  26: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_VERIFIED_BY_ID" },
+  27: { name: "CAN_SEARCH_MAINTENANCE_REQUESTS_BY_PRIORITY" },
+  28: { name: "CAN_CREATE_PAYMENT" },
+  29: { name: "CAN_VIEW_ALL_PAYMENTS" },
+  30: { name: "CAN_FILTER_PAYMENTS" },
+  31: { name: "CAN_VIEW_PAYMENT" },
+  32: { name: "CAN_DELETE_PAYMENT" },
+  33: { name: "CAN_ADD_RECEIPT_TO_PAYMENT" },
+  34: { name: "CAN_CHANGE_PAYMENT_STATUS" },
+  35: { name: "CAN_VIEW_STATS" },
+  36: { name: "CAN_CREATE_NOTIFICATION" },
+  37: { name: "CAN_VIEW_ALL_NOTIFICATIONS" },
+  38: { name: "CAN_VIEW_USER_NOTIFICATIONS" },
+  39: { name: "CAN_VIEW_NOTIFICATION_BY_ID" },
+  40: { name: "CAN_MARK_NOTIFICATION_AS_READ" },
+  41: { name: "CAN_DELETE_NOTIFICATION" },
+  54: { name: "CAN_UPDATE_MAINTENANCE_REQUEST_STATUS" },
+  55: { name: "CAN_VIEW_ALL_STATUSES_FOR_REQUEST" },
+  56: { name: "CAN_VIEW_SINGLE_STATUS_FOR_REQUEST" },
+  57: { name: "CAN_VIEW_EQUIPMENTS_USED_BY_CATEGORY" },
+  58: { name: "CAN_VIEW_EQUIPMENTS_USED_BY_MODEL" },
+  59: { name: "CAN_VIEW_MAINTENANCE_COUNT" },
+  60: { name: "CAN_VIEW_USER_STATS_BY_ROLE" },
+  61: { name: "CAN_VIEW_USER_STATS_BY_DEPARTMENT" },
+  62: { name: "CAN_VIEW_TIME_SPENT_BY_STAGE" },
 };
