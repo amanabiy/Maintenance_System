@@ -23,7 +23,7 @@ export class PaymentService extends GenericDAL<Payment, CreatePaymentDto, Update
     private readonly mediaService: MediaService,
   ) {
     super(paymentRepository, 1, 1000, [
-      // 'user',
+      'user',
       // 'request',
       // 'equipment'
     ]);
