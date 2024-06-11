@@ -42,7 +42,7 @@ export class Notification extends BaseModelEntity {
   user: User;
 
   @ApiProperty({ description: 'The maintenance request this notification relates to', nullable: true })
-  @ManyToOne(() => MaintenanceRequest, { nullable: true, eager: false })
+  @ManyToOne(() => MaintenanceRequest, { nullable: true, eager: true })
   @JoinColumn({ name: 'request_id' })
   maintenanceRequest: MaintenanceRequest;
 }

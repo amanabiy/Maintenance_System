@@ -20,7 +20,7 @@ export class NotificationService extends GenericDAL<Notification, CreateNotifica
     @Inject(forwardRef(() => MaintenanceRequestService))
     private readonly maintenanceRequestService: MaintenanceRequestService,
   ) {
-    super(notificationRepository, 1, 100, ['user', 'maintenanceRequest']);
+    super(notificationRepository, 1, 100);
   }
 
   async create(createNotificationDto: CreateNotificationDto): Promise<Notification> {
