@@ -15,6 +15,8 @@ import maintenanceRequestTypeSlice from "./slices/maintenanceRequestTypesSlice";
 import maintenanceRequestTypeApi from "./services/maintenanceRequestTypesApi";
 import mediaSlice from "./slices/mediaSlice";
 import mediaApi from "./services/mediaApi";
+import notificationApi from "./services/notificationApi";
+import notificationSlice from "./slices/notificationSlice";
 
 export const store = configureStore({
   reducer: {
@@ -34,6 +36,8 @@ export const store = configureStore({
     [departmentApi.reducerPath]: departmentApi.reducer,
     media: mediaSlice,
     [mediaApi.reducerPath]: mediaApi.reducer,
+    notification: notificationSlice,
+    [notificationApi.reducerPath]: notificationApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(

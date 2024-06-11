@@ -7,6 +7,7 @@ export const {
   useGetMeQuery,
   useUpdateMeMutation,
   useGetUserByIdQuery,
+  useLazyGetUserByIdQuery,
   useUpdateUserByIdMutation,
   useDeleteUserByIdMutation,
 } = userApi;

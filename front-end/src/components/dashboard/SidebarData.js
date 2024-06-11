@@ -11,7 +11,7 @@ const AccountCircleIcon = React.lazy(() =>
   import("@mui/icons-material/AccountCircle")
 );
 const SettingsIcon = React.lazy(() => import("@mui/icons-material/Settings"));
-const LogoutIcon = React.lazy(() => import("@mui/icons-material/Logout"));
+// const LogoutIcon = React.lazy(() => import("@mui/icons-material/Logout"));
 
 const PeopleIcon = React.lazy(() => import("@mui/icons-material/People"));
 const ReceiptLongIcon = React.lazy(() =>
@@ -26,74 +26,37 @@ const ManageAccountsIcon = React.lazy(() =>
   import("@mui/icons-material/ManageAccounts")
 );
 const DomainIcon = React.lazy(() => import("@mui/icons-material/Domain"));
-import logoutFunction from "../../functions/logoutFunction";
 import { adminPaths, generalPaths, issuerPaths } from "../../routing/paths";
+import { allPermissions } from "../../data/allPermissions";
 
 const SidebarData = {
-  userButtons: {
-    // main: [
-    //   {
-    //     text: "Dashboard",
-    //     icon: DashboardIcon,
-    //     path: issuerPaths.USER_DASHBOARD,
-    //   },
-    // ],
-    list: [
-      {
-        text: "My Reports",
-        icon: SummarizeIcon,
-        path: issuerPaths.MY_REPORTS,
-      },
-    ],
-    usefull: [
-      {
-        text: "Report Issue",
-        icon: ReportIcon,
-        path: issuerPaths.REPORT_ISSUE,
-      },
-      // {
-      //   text: "Notifications",
-      //   icon: NotificationsIcon,
-      //   path: issuerPaths.NOTIFICATIONS,
-      // },
-    ],
-    user: [
-      {
-        text: "My Profile",
-        icon: AccountCircleIcon,
-        path: issuerPaths.MY_PROFILE,
-      },
-      // {
-      //   text: "Settings",
-      //   icon: SettingsIcon,
-      //   path: issuerPaths.SETTINGS,
-      // },
-      {
-        text: "Log Out",
-        icon: LogoutIcon,
-        // path: generalPaths.LOGIN,
-        onclick: logoutFunction,
-      },
-    ],
-  },
   adminButtons: {
     main: [
       {
         text: "Dashboard",
         icon: DashboardIcon,
         path: adminPaths.ADMIN_DASHBOARD,
+        requiredPermissions: [allPermissions[35].name],
       },
     ],
     list: [
       {
+        text: "My Reports",
+        icon: SummarizeIcon,
+        path: issuerPaths.MY_REPORTS,
+        requiredPermissions: [allPermissions[14].name],
+      },
+      {
         text: "Users",
         icon: PeopleIcon,
         path: adminPaths.USERS,
+        requiredPermissions: [allPermissions[2].name],
       },
       {
         text: "Financial Transactions",
         icon: ReceiptLongIcon,
         path: adminPaths.FINANCIAL_TRANSACTIONS,
+        requiredPermissions: [allPermissions[29].name],
       },
       {
         text: "Store Transactions",
@@ -104,9 +67,16 @@ const SidebarData = {
         text: "Requests",
         icon: SummarizeIcon,
         path: adminPaths.REQUESTS,
+        requiredPermissions: [allPermissions[12].name],
       },
     ],
     usefull: [
+      {
+        text: "Report Issue",
+        icon: ReportIcon,
+        path: issuerPaths.REPORT_ISSUE,
+        requiredPermissions: [allPermissions[11].name],
+      },
       {
         text: "Manage Workflows",
         icon: AccountTreeIcon,
@@ -121,6 +91,7 @@ const SidebarData = {
         text: "Manage Roles",
         icon: ManageAccountsIcon,
         path: adminPaths.ROLES,
+        requiredPermissions: [allPermissions[7].name],
       },
       {
         text: "Manage Departments",
@@ -132,14 +103,15 @@ const SidebarData = {
       {
         text: "My Profile",
         icon: AccountCircleIcon,
-        path: adminPaths.MY_PROFILE,
+        path: issuerPaths.MY_PROFILE,
       },
 
       {
         text: "Log Out",
-        icon: LogoutIcon,
+        // icon: LogoutIcon,
         // path: generalPaths.LOGIN,
-        onclick: logoutFunction,
+        // onClick: logoutFunction,
+        logout: true,
       },
     ],
   },

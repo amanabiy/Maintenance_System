@@ -197,7 +197,7 @@ const TransitionModalFields = (
 
   //   MEDIA INPUT----------------------------------------------------------
 
-  if (transitionState.allowsChangeMedia) {
+  if (false && transitionState.allowsChangeMedia) {
     const medias =
       currentRequest.mediaFiles.length > 0
         ? generateMediaLinks(currentRequest.mediaFiles)
@@ -581,7 +581,7 @@ const TransitionModalFields = (
   );
 
   // INTERNAL NOTE INPUT----------------------------------------------------------
-  if (transitionState.isInternal) {
+  if (false && transitionState.isInternal) {
     fields.push(
       <TextField
         key="internalNote"

@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
-import { Modal, Box, Typography, Button } from "@mui/material";
+import { Modal, Box, Typography, Button, Alert } from "@mui/material";
 import { Formik, Form } from "formik";
 import * as yup from "yup";
 import dayjs from "dayjs";
 import TransitionModalFields from "../form/TransitionModalFields";
 import { useUploadMediaMutation } from "../../redux/features/media";
 import { useUpdateStatusByIdMutation } from "../../redux/features/requestStatus";
-import { useGetMaintenanceRequestByIdQuery } from "../../redux/features/maintenanceRequest";
-import { useParams } from "react-router-dom";
 
 const TransitionModal = ({
   open,
@@ -18,48 +15,19 @@ const TransitionModal = ({
   currentRequest,
 }) => {
   // const { requestId } = useParams();
-  // const {
-  //   data: currentRequest,
-  //   error,
-  //   status,
-  // } = useGetMaintenanceRequestByIdQuery(requestId);
+
   console.log(currentRequest, "currentRequest in TransitionModal");
   // const [filesState, setFilesState] = useState([]);
   // const [base64FilesState, setBase64FilesStates] = useState([]);
-  const [uploadMedia] = useUploadMediaMutation();
-  const [updateStatus] = useUpdateStatusByIdMutation();
+  const [
+    uploadMedia,
+    { data: mediaData, error: mediaError, isLoading: mediaIsLoading },
+  ] = useUploadMediaMutation();
+  const [
+    updateStatus,
+    { data: updateData, error: updateError, isLoading: updateIsLoading },
+  ] = useUpdateStatusByIdMutation();
 
-  // useEffect(() => {
-  //   if (open) {
-  //     setFilesState([]);
-  //     setBase64FilesStates([]);
-  //   }
-  // }),
-  //   [];
-
-  // const transitionState = {
-  //   allowChangePriority: true,
-  //   allowChangeconfirmationStatus: true,
-  //   allowChangeverificationStatus: true,
-  //   allowedRoles: [],
-  //   allowsAddMoreMedia: true,
-  //   allowsChangeLocation: true,
-  //   allowsChangeMedia: true,
-  //   allowsChangeRequestTypes: true,
-  //   allowsChangeTitleAndDescription: true,
-  //   allowsForwardToDepartment: true,
-  //   allowsForwardToPerson: true,
-  //   createdAt: "2024-05-23T10:33:41.470Z",
-  //   description: null,
-  //   hasSchedule: true,
-  //   id: 2,
-  //   isInitialStatus: true,
-  //   isInternal: true,
-  //   name: "VERIFIED",
-  //   needsFile: true,
-  //   needsSignatures: true,
-  //   updatedAt: "2024-05-23T10:33:41.470Z",
-  // };
   const initialValues = {
     priority:
       currentRequest && currentRequest.priority && currentRequest.priority > 0
@@ -68,6 +36,7 @@ const TransitionModal = ({
     confirmationStatus: currentRequest.confirmationStatus || "",
     verificationStatus: currentRequest.verificationStatus || "",
     mediaFiles: currentRequest.mediaFiles || [],
+    mediaFiles: [],
     blockNumber: currentRequest.location?.blockNumber || "",
     floorNumber: currentRequest.location?.floor || "",
     roomNumber: currentRequest.location?.roomNumber || "",
@@ -111,104 +80,112 @@ const TransitionModal = ({
     isInternal: transitionState.isInternal || false,
   };
   const transitionStateSchema = yup.object().shape({
-    // priority: yup.number().when("allowChangePriority", {
+    priority: yup.number().when("allowChangePriority", {
+      is: true,
+      then: () =>
+        yup
+          .number()
+          .required("Priority is required")
+          .min(1, "Priority must be at least 1")
+          .max(5, "Priority must be at most 5"),
+      otherwise: () => yup.number().notRequired(),
+    }),
+    confirmationStatus: yup.string().when("allowChangeconfirmationStatus", {
+      is: true,
+      then: () => yup.string().required("Confirmation Status is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
+    verificationStatus: yup.string().when("allowChangeverificationStatus", {
+      is: true,
+      then: () => yup.string().required("Verification Status is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
+    blockNumber: yup.number().when("allowsChangeLocation", {
+      is: true,
+      then: () =>
+        yup
+          .number()
+          .required("Block Number is required")
+          .min(1, "Block Number must be at least 1")
+          .max(100, "Block Number must be at most 100"),
+      otherwise: () => yup.number().notRequired(),
+    }),
+    floorNumber: yup.number().when("allowsChangeLocation", {
+      is: true,
+      then: () =>
+        yup
+          .number()
+          .required("Floor Number is required")
+          .min(1, "Floor Number must be at least 1")
+          .max(15, "Floor Number must be at most 15"),
+      otherwise: () => yup.number().notRequired(),
+    }),
+    roomNumber: yup.string().when("allowsChangeLocation", {
+      is: true,
+      then: () =>
+        yup
+          .number()
+          .required("Room Number is required")
+          .min(1, "Room Number must be at least 1"),
+      otherwise: () => yup.number().notRequired(),
+    }),
+    subject: yup.string().when("allowsChangeTitleAndDescription", {
+      is: true,
+      then: () => yup.string().required("Subject is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
+    description: yup.string().when("allowsChangeTitleAndDescription", {
+      is: true,
+      then: () => yup.string().required("Description is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
+    handlingDepartment: yup.string().when("allowsForwardToDepartment", {
+      is: true,
+      then: () => yup.string().required("Handling Department is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
+    assignedPersons: yup.array().when("allowsForwardToPerson", {
+      is: true,
+      then: () =>
+        yup
+          .array()
+          .of(
+            yup.object().shape({
+              id: yup.number().required("Assigned Person is required"),
+            })
+          )
+          .required("Assigned Person is required"),
+      otherwise: () => yup.array().notRequired(),
+    }),
+    maintenanceRequestTypes: yup.array().when("allowsChangeRequestTypes", {
+      is: true,
+      then: () =>
+        yup
+          .array()
+          .of(
+            yup.object().shape({
+              id: yup.number().required("Request Type is required"),
+            })
+          )
+          .required("Request Type is required"),
+      otherwise: () => yup.array().notRequired(),
+    }),
+    // scheduleMaintenanceStartDateTime: yup.date().when("hasSchedule", {
     //   is: true,
-    //   then: () =>
-    //     yup
-    //       .number()
-    //       .required("Priority is required")
-    //       .min(1, "Priority must be at least 1")
-    //       .max(5, "Priority must be at most 5"),
-    //   otherwise: () => yup.number().notRequired(),
+    //   then: () => yup.date().required("Start Date is required"),
+    //   otherwise: () => yup.date().notRequired(),
     // }),
-    // confirmationStatus: yup.string().when("allowChangeconfirmationStatus", {
+    // scheduleMaintenanceEndDateTime: yup.date().when("hasSchedule", {
     //   is: true,
-    //   then: () => yup.string().required("Confirmation Status is required"),
-    //   otherwise: () => yup.string().notRequired(),
+    //   then: () => yup.date().required("End Date is required"),
+    //   otherwise: () => yup.date().notRequired(),
     // }),
-    // verificationStatus: yup.string().when("allowChangeverificationStatus", {
-    //   is: true,
-    //   then: () => yup.string().required("Verification Status is required"),
-    //   otherwise: () => yup.string().notRequired(),
-    // }),
-    // blockNumber: yup.number().when("allowsChangeLocation", {
-    //   is: true,
-    //   then: () =>
-    //     yup
-    //       .number()
-    //       .required("Block Number is required")
-    //       .min(1, "Block Number must be at least 1")
-    //       .max(100, "Block Number must be at most 100"),
-    //   otherwise: () => yup.number().notRequired(),
-    // }),
-    // floorNumber: yup.number().when("allowsChangeLocation", {
-    //   is: true,
-    //   then: () =>
-    //     yup
-    //       .number()
-    //       .required("Floor Number is required")
-    //       .min(1, "Floor Number must be at least 1")
-    //       .max(15, "Floor Number must be at most 15"),
-    //   otherwise: () => yup.number().notRequired(),
-    // }),
-    // roomNumber: yup.string().when("allowsChangeLocation", {
-    //   is: true,
-    //   then: () =>
-    //     yup
-    //       .number()
-    //       .required("Room Number is required")
-    //       .min(1, "Room Number must be at least 1"),
-    //   otherwise: () => yup.number().notRequired(),
-    // }),
-    // subject: yup.string().when("allowsChangeTitleAndDescription", {
-    //   is: true,
-    //   then: () => yup.string().required("Subject is required"),
-    //   otherwise: () => yup.string().notRequired(),
-    // }),
-    // description: yup.string().when("allowsChangeTitleAndDescription", {
-    //   is: true,
-    //   then: () => yup.string().required("Description is required"),
-    //   otherwise: () => yup.string().notRequired(),
-    // }),
-    // handlingDepartment: yup.string().when("allowsForwardToDepartment", {
-    //   is: true,
-    //   then: () => yup.string().required("Handling Department is required"),
-    //   otherwise: () => yup.string().notRequired(),
-    // }),
-    // // scheduleMaintenanceStartDateTime: yup.date().when("hasSchedule", {
-    // //   is: true,
-    // //   then: () => yup.date().required("Start Date is required"),
-    // //   otherwise: () => yup.date().notRequired(),
-    // // }),
-    // // scheduleMaintenanceEndDateTime: yup.date().when("hasSchedule", {
-    // //   is: true,
-    // //   then: () => yup.date().required("End Date is required"),
-    // //   otherwise: () => yup.date().notRequired(),
-    // // }),
-    // signature: yup.string().when("needsSignatures", {
-    //   is: true,
-    //   then: () => yup.string().required("Signature is required"),
-    //   otherwise: () => yup.string().notRequired(),
-    // }),
+    signature: yup.string().when("needsSignatures", {
+      is: true,
+      then: () => yup.string().required("Signature is required"),
+      otherwise: () => yup.string().notRequired(),
+    }),
   });
-
-  const handleFileChange = async (filesList) => {
-    // const files = Array.from(filesList);
-    // const readerPromises = files.map((file) => {
-    //   return new Promise((resolve, reject) => {
-    //     const reader = new FileReader();
-    //     reader.readAsDataURL(file);
-    //     reader.onload = () => resolve(reader.result);
-    //     reader.onerror = reject;
-    //   });
-    // });
-    // Promise.all(readerPromises)
-    //   .then((newBase64Files) => {
-    //     setFilesState([...filesState, ...files]);
-    //     setBase64FilesStates([...base64FilesState, ...newBase64Files]);
-    //   })
-    //   .catch((error) => console.error("Error reading files:", error));
-  };
 
   const handleRemoveFile = (index) => {
     const updatedFiles = filesState.filter((_, i) => i !== index);
@@ -319,9 +296,16 @@ const TransitionModal = ({
       });
       // // console.log(len);
       console.log(response, "response in handleSubmit");
+      // setSnackbarMessage("Request Updated Successfully");
+      // setSnackbarSeverity("success");
+      // setSnackbarOpen(true);
+      // onClose();
       //   console.log(formData, "formData in handleSubmit");
     } catch (error) {
       console.log(error);
+      // setSnackbarMessage("Request Update Failed");
+      // setSnackbarSeverity("error");
+      // setSnackbarOpen(true);
     }
 
     // console.log("clicked", values);
@@ -346,6 +330,11 @@ const TransitionModal = ({
           mt: 5,
         }}
       >
+        {mediaIsLoading && updateIsLoading && (
+          <Alert severity="info">Processing...</Alert>
+        )}
+        {mediaError && <Alert severity="error">{mediaError.message}</Alert>}
+        {updateError && <Alert severity="error">{updateError.message}</Alert>}
         <Typography variant="h6">
           Transition To {transitionState.name} State
         </Typography>
